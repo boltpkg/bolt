@@ -1,0 +1,38 @@
+{
+  "name": "pyarn",
+  "version": "0.0.0",
+  "main": "index.js",
+  "author": "James Kyle <me@thejameskyle.com>",
+  "license": "MIT",
+  "bin": {
+    "pyarn": "./bin.js"
+  },
+  "files": [
+    "lib",
+    "bin.js"
+  ],
+  "scripts": {
+    "test": "jest",
+    "build": "babel src -d lib",
+    "prepublish": "yarn build"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-flow": "^6.23.0",
+    "flow-bin": "^0.51.0",
+    "jest": "^20.0.4"
+  },
+  "dependencies": {
+    "chalk": "^2.0.1",
+    "cmd-shim": "^2.0.2",
+    "cross-spawn": "^5.1.0",
+    "find-up": "^2.1.0",
+    "globby": "^6.1.0",
+    "meow": "^3.7.0",
+    "mkdirp": "^0.5.1",
+    "pkg-up": "^2.0.0",
+    "read-pkg": "^2.0.0",
+    "typeable-promisify": "^2.0.0"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "foo-workspace-package",
+  "version": "1.0.0",
+  "dependencies": {
+    "react": "^15.6.1",
+    "bar-workspace-package": "^1.0.0"
+  }
+}
