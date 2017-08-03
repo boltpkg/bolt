@@ -1,6 +1,8 @@
 // @flow
 import meow from 'meow';
 import chalk from 'chalk';
+import * as logger from './logger';
+import cleanStack from 'clean-stack';
 import pyarn from './';
 
 const cli = meow(`
@@ -27,19 +29,19 @@ async function main() {
 
   const start = Date.now();
 
-  console.log(chalk.bold(`pyarn ${command} v${cli.pkg.version}`));
+  logger.title(`pyarn ${command} v${cli.pkg.version}`);
 
   try {
     await pyarn(command, args, opts);
   } catch (err) {
-    console.error(chalk.red('error') + ' ' + err.message);
+    logger.error(cleanStack(err.stack));
     process.exit(1);
   }
 
   const timing = (Date.now() - start) / 1000;
   const rounded = Math.round(timing * 100) / 100;
 
-  console.log(`Done in ${rounded}s.`);
+  logger.log(`Done in ${rounded}s.`);
 }
 
 main();

@@ -1,5 +1,11 @@
 // @flow
 import crossSpawn from 'cross-spawn';
+import * as logger from '../logger';
+import type Package from '../package';
+import pLimit from 'p-limit';
+import os from 'os';
+
+const limit = pLimit(os.cpus().length);
 
 export class ChildProcessError extends Error {
   code: number;
@@ -17,25 +23,36 @@ export class ChildProcessError extends Error {
   }
 }
 
-export default function spawn(cmd: string, args: Array<string>, opts: child_process$spawnOpts = {}) {
-  return new Promise((resolve, reject) => {
+type SpawnOptions = {
+  cwd?: string,
+  pkg?: Package,
+  env?: Object,
+};
+
+export default function spawn(cmd: string, args: Array<string>, opts: SpawnOptions = {}) {
+  return limit(() => new Promise((resolve, reject) => {
     let stdoutBuf = Buffer.from('');
     let stderrBuf = Buffer.from('');
 
-    if (!opts.stdio) {
-      opts.stdio = 'inherit';
-    }
+    let cmdStr = cmd + ' ' + args.join(' ');
 
-    let child = crossSpawn(cmd, args, opts);
+    let child = crossSpawn(cmd, args, {
+      cwd: opts.cwd,
+      env: Object.assign({
+        PATH: process.env.PATH,
+      }, opts.env),
+    });
 
     if (child.stdout) {
       child.stdout.on('data', data => {
+        logger.stdout(cmdStr, data, opts.pkg);
         stdoutBuf = Buffer.concat([stdoutBuf, data]);
       });
     }
 
     if (child.stderr) {
       child.stderr.on('data', data => {
+        logger.stderr(cmdStr, data, opts.pkg);
         stderrBuf = Buffer.concat([stderrBuf, data]);
       });
     }
@@ -52,5 +69,5 @@ export default function spawn(cmd: string, args: Array<string>, opts: child_proc
         reject(new ChildProcessError(code, stdout, stderr));
       }
     });
-  });
+  }));
 }

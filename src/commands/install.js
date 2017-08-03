@@ -5,17 +5,9 @@ import spawn from '../utils/spawn';
 import symlink from '../utils/symlink';
 import mkdirp from '../utils/mkdirp';
 import {join} from 'path';
-import chalk from 'chalk';
-
-async function runScript(workspaces, script) {
-  for (let workspace of workspaces) {
-    if (workspace.pkg.config.scripts && workspace.pkg.config.scripts[script]) {
-      await spawn('yarn', ['run', script], {
-        cwd: workspace.pkg.dir,
-      });
-    }
-  }
-}
+import * as logger from '../logger';
+import runWorkspaceTasks from '../utils/runWorkspaceTasks';
+import runWorkspaceScript from '../utils/runWorkspaceScript';
 
 export default async function install(args: Args, opts: Opts) {
   let cwd = process.cwd();
@@ -23,21 +15,20 @@ export default async function install(args: Args, opts: Opts) {
   let workspaces = await project.getWorkspaces();
   let dependencyGraph = await project.getDependencyGraph(workspaces);
 
-  // TODO: Properly sort packages using a topological sort, resolving cycles
-  // with groups specified in `package.json#pworkspaces`
+  await runWorkspaceTasks(workspaces, async workspace => {
+    await runWorkspaceScript(workspace, 'preinstall');
+  });
 
-  await runScript(workspaces, 'preinstall');
+  logger.log('[1/3] Installing project dependencies...');
 
-  console.log('[1/3] Installing project dependencies...');
-  console.log('----------------------------------------');
+  await spawn('yarn', ['install', '--non-interactive', '-s']);
 
-  await spawn('yarn', ['install']);
-
-  console.log('----------------------------------------');
-  console.log('[2/3] Linking workspace dependencies...');
+  logger.log('[2/3] Linking workspace dependencies...');
 
   let projectNodeModules = join(project.pkg.dir, 'node_modules');
   let projectDependencies = project.pkg.getAllDependencies();
+
+  let symlinks = [];
 
   for (let workspace of workspaces) {
     let nodeModules = join(workspace.pkg.dir, 'node_modules');
@@ -55,11 +46,11 @@ export default async function install(args: Args, opts: Opts) {
       let src = join(projectNodeModules, name);
       let dest = join(nodeModules, name);
 
-      await symlink(src, dest, 'junction');
+      symlinks.push(symlink(src, dest, 'junction'));
     }
   }
 
-  console.log('[3/3] Linking workspace cross-dependencies...');
+  logger.log('[3/3] Linking workspace cross-dependencies...');
 
   for (let [name, node] of dependencyGraph) {
     let nodeModules = join(node.pkg.dir, 'node_modules');
@@ -70,12 +61,16 @@ export default async function install(args: Args, opts: Opts) {
       let src = depWorkspace.pkg.dir;
       let dest = join(nodeModules, dependency);
 
-      await symlink(src, dest, 'junction');
+      symlinks.push(symlink(src, dest, 'junction'));
     }
   }
 
-  await runScript(workspaces, 'postinstall');
-  await runScript(workspaces, 'prepublish');
+  await Promise.all(symlinks);
 
-  console.log(chalk.green('success') + ' Installed and linked workspaces.');
+  await runWorkspaceTasks(workspaces, async workspace => {
+    await runWorkspaceScript(workspace, 'postinstall');
+    await runWorkspaceScript(workspace, 'prepublish');
+  });
+
+  logger.success('Installed and linked workspaces.');
 }
