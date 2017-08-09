@@ -1,6 +1,6 @@
 // @flow
 import crossSpawn from 'cross-spawn';
-import * as logger from '../logger';
+import * as logger from './logger';
 import type Package from '../package';
 import pLimit from 'p-limit';
 import os from 'os';

@@ -1,6 +1,5 @@
 // @flow
 import Package from './Package';
-import type {Config} from './types';
 
 export default class Workspace {
   pkg: Package;

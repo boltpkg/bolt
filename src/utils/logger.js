@@ -1,6 +1,6 @@
 // @flow
 import chalk from 'chalk';
-import type Package from './Package';
+import type Package from '../Package';
 
 export function prefix(prefix: string, message: string | Buffer) {
   return message.toString().trimRight().split('\n').map(line => {

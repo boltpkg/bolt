@@ -1,29 +1,26 @@
 // @flow
-import {join, dirname} from 'path';
+import * as path from 'path';
 import globby from 'globby';
+import semver from 'semver';
 
 import Package from './Package';
 import Workspace from './Workspace';
 import type {Config} from './types';
-import findConfig from './utils/findConfig';
-import readConfig from './utils/readConfig';
+import {getProjectConfig} from './utils/config';
+import * as fs from './utils/fs';
+import * as logger from './utils/logger';
+import * as messages from './utils/messages';
 
-async function getRootWorkspaceConfig(cwd: string) {
-  let searching = cwd;
+type Task = (workspace: Workspace) => Promise<mixed>;
 
-  while (searching) {
-    let filePath = await findConfig(searching);
+type Graph =
+  & Map<string, { pkg: Package, dependencies: Array<string> }>
+  & { valid: boolean };
 
-    if (filePath) {
-      let config = await readConfig(filePath);
-      if (config && config.pworkspaces) {
-        return filePath;
-      }
-      searching = dirname(dirname(filePath));
-    } else {
-      return null;
-    }
-  }
+function initGraph(): Graph {
+  let graph: any = new Map();
+  graph.valid = true;
+  return graph;
 }
 
 export default class Project {
@@ -34,7 +31,7 @@ export default class Project {
   }
 
   static async init(cwd: string) {
-    let filePath = await getRootWorkspaceConfig(cwd);
+    let filePath = await getProjectConfig(cwd);
     if (!filePath) throw new Error(`Unable to find workspace root of project in ${cwd}`);
     let pkg = await Package.init(filePath);
     return new Project(pkg);
@@ -45,12 +42,15 @@ export default class Project {
     let workspaces = [];
 
     for (let pkg of queue) {
-      let cwd = dirname(pkg.filePath);
+      let cwd = path.dirname(pkg.filePath);
       let patterns = this.pkg.getWorkspacesConfig();
       let matchedPaths: Array<string> = await globby(patterns, { cwd });
 
       for (let matchedPath of matchedPaths) {
-        let filePath = join(cwd, matchedPath, 'package.json');
+        let stats = await fs.stat(matchedPath);
+        if (!stats.isDirectory()) continue;
+
+        let filePath = path.join(cwd, matchedPath, 'package.json');
         let wPkg = await Package.init(filePath);
         let workspace = await Workspace.init(wPkg);
 
@@ -63,9 +63,10 @@ export default class Project {
   }
 
   async getDependencyGraph(workspaces: Array<Workspace>) {
-    let graph = new Map();
+    let graph = initGraph();
     let packages = [this.pkg];
     let packagesByName = { [this.pkg.config.name]: this.pkg };
+    let valid = true;
 
     for (let workspace of workspaces) {
       packages.push(workspace.pkg);
@@ -85,7 +86,12 @@ export default class Project {
         let expected = match.config.version
 
         if (actual !== expected) {
-          throw new Error(`Package ${name} must depend on the current version of ${depName}. ${expected} vs ${actual}`);
+          if (semver.satisfies(expected, depVersion)) {
+            pkg.updateDependencyVersionRange(depName, '^' + expected);
+          }
+          valid = false;
+          logger.error(messages.packageMustDependOnCurrentVersion(name, depName, expected, actual));
+          continue;
         }
 
         dependencies.push(depName);
@@ -94,6 +100,20 @@ export default class Project {
       graph.set(name, { pkg, dependencies });
     }
 
+    graph.valid = valid;
+
     return graph;
+  }
+
+  // TODO: Properly sort packages using a topological sort, resolving cycles
+  // with groups specified in `package.json#pworkspaces`
+  static async runWorkspaceTasks(workspaces: Array<Workspace>, task: Task) {
+    let promises = [];
+
+    for (let workspace of workspaces) {
+      promises.push(task(workspace));
+    }
+
+    await Promise.all(promises);
   }
 }

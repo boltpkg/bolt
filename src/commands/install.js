@@ -2,12 +2,10 @@
 import type {Args, Opts} from '../types';
 import Project from '../Project';
 import spawn from '../utils/spawn';
-import symlink from '../utils/symlink';
-import mkdirp from '../utils/mkdirp';
-import {join} from 'path';
-import * as logger from '../logger';
-import runWorkspaceTasks from '../utils/runWorkspaceTasks';
-import runWorkspaceScript from '../utils/runWorkspaceScript';
+import * as fs from '../utils/fs';
+import * as path from 'path';
+import * as logger from '../utils/logger';
+import * as messages from '../utils/messages';
 
 export default async function install(args: Args, opts: Opts) {
   let cwd = process.cwd();
@@ -15,61 +13,87 @@ export default async function install(args: Args, opts: Opts) {
   let workspaces = await project.getWorkspaces();
   let dependencyGraph = await project.getDependencyGraph(workspaces);
 
-  await runWorkspaceTasks(workspaces, async workspace => {
-    await runWorkspaceScript(workspace, 'preinstall');
-  });
-
-  logger.log('[1/3] Installing project dependencies...');
-
-  await spawn('yarn', ['install', '--non-interactive', '-s']);
-
-  logger.log('[2/3] Linking workspace dependencies...');
-
-  let projectNodeModules = join(project.pkg.dir, 'node_modules');
+  let projectNodeModules = path.join(project.pkg.dir, 'node_modules');
   let projectDependencies = project.pkg.getAllDependencies();
 
-  let symlinks = [];
+  let nodeModulesToCreate = [];
+  let symlinksToCreate = [];
+  let valid = true;
 
   for (let workspace of workspaces) {
-    let nodeModules = join(workspace.pkg.dir, 'node_modules');
+    let nodeModules = path.join(workspace.pkg.dir, 'node_modules');
     let dependencies = workspace.pkg.getAllDependencies();
 
-    await mkdirp(nodeModules);
+    nodeModulesToCreate.push(nodeModules);
 
     for (let [name, version] of dependencies) {
       let matched = projectDependencies.get(name);
 
-      if (dependencyGraph.has(name)) continue;
-      if (!matched) throw new Error(`Dependency ${name} in ${workspace.pkg.config.name} must be added to project dependencies.`);
-      if (version !== matched) throw new Error(`Dependency ${name} in ${workspace.pkg.config.name} must match version in project dependencies. ${matched} vs ${version}`);
+      if (dependencyGraph.has(name)) {
+        continue;
+      }
 
-      let src = join(projectNodeModules, name);
-      let dest = join(nodeModules, name);
+      if (!matched) {
+        valid = false;
+        logger.error(messages.depMustBeAddedToProject(workspace.pkg.config.name, name));
+        continue;
+      }
 
-      symlinks.push(symlink(src, dest, 'junction'));
+      if (version !== matched) {
+        valid = false;
+        logger.error(messages.depMustMatchProject(workspace.pkg.config.name, name, matched, version));
+        continue;
+      }
+
+      let src = path.join(projectNodeModules, name);
+      let dest = path.join(nodeModules, name);
+
+      symlinksToCreate.push({ src, dest, type: 'junction' });
     }
   }
 
-  logger.log('[3/3] Linking workspace cross-dependencies...');
-
   for (let [name, node] of dependencyGraph) {
-    let nodeModules = join(node.pkg.dir, 'node_modules');
+    let nodeModules = path.join(node.pkg.dir, 'node_modules');
 
     for (let dependency of node.dependencies) {
       let depWorkspace = dependencyGraph.get(dependency);
-      if (!depWorkspace) throw new Error(`Missing workspace: ${dependency}`);
-      let src = depWorkspace.pkg.dir;
-      let dest = join(nodeModules, dependency);
 
-      symlinks.push(symlink(src, dest, 'junction'));
+      if (!depWorkspace) {
+        throw new Error(`Missing workspace: "${dependency}"`);
+      }
+
+      let src = depWorkspace.pkg.dir;
+      let dest = path.join(nodeModules, dependency);
+
+      symlinksToCreate.push({ src, dest, type: 'junction' });
     }
   }
 
-  await Promise.all(symlinks);
+  if (!dependencyGraph.valid || !valid) {
+    throw new Error('Cannot symlink invalid set of dependencies.');
+  }
 
-  await runWorkspaceTasks(workspaces, async workspace => {
-    await runWorkspaceScript(workspace, 'postinstall');
-    await runWorkspaceScript(workspace, 'prepublish');
+  await Project.runWorkspaceTasks(workspaces, async workspace => {
+    await workspace.pkg.runScript('preinstall');
+  });
+
+  logger.log('[1/2] Installing project dependencies...');
+
+  await spawn('yarn', ['install', '--non-interactive', '-s']);
+
+  logger.log('[2/2] Linking workspace dependencies...');
+
+  await Promise.all(nodeModulesToCreate.map(dirName => {
+    return fs.mkdirp(dirName);
+  }));
+
+  await Promise.all(symlinksToCreate.map(({ src, dest, type }) => {
+    return fs.symlink(src, dest, type);
+  }));
+
+  await Project.runWorkspaceTasks(workspaces, async workspace => {
+    await workspace.pkg.runScript('postinstall');
+    await workspace.pkg.runScript('prepublish');
   });
 
   logger.success('Installed and linked workspaces.');

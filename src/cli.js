@@ -1,7 +1,7 @@
 // @flow
 import meow from 'meow';
 import chalk from 'chalk';
-import * as logger from './logger';
+import * as logger from './utils/logger';
 import cleanStack from 'clean-stack';
 import pyarn from './';
 

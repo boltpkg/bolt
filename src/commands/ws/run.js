@@ -1,7 +1,5 @@
 // @flow
 import type {Args, Opts} from '../../types';
-import runWorkspaceTasks from '../../utils/runWorkspaceTasks';
-import runWorkspaceScript from '../../utils/runWorkspaceScript';
 import Project from '../../Project';
 
 export default async function run(args: Args, opts: Opts) {
@@ -11,7 +9,7 @@ export default async function run(args: Args, opts: Opts) {
 
   let [cmd, ...restArgs] = args;
 
-  await runWorkspaceTasks(workspaces, async workspace => {
-    await runWorkspaceScript(workspace, cmd, restArgs);
+  await Project.runWorkspaceTasks(workspaces, async workspace => {
+    await workspace.pkg.runScript(cmd, restArgs);
   });
 }
