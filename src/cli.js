@@ -2,6 +2,7 @@
 import meow from 'meow';
 import chalk from 'chalk';
 import * as logger from './utils/logger';
+import * as processes from './utils/processes';
 import cleanStack from 'clean-stack';
 import pyarn from './';
 
@@ -30,6 +31,8 @@ async function main() {
   const start = Date.now();
 
   logger.title(`pyarn ${command} v${cli.pkg.version}`);
+
+  processes.handleSignals();
 
   try {
     await pyarn(command, args, opts);

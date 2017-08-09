@@ -1,7 +1,7 @@
 // @flow
 import type {Args, Opts} from '../types';
 import Project from '../Project';
-import spawn from '../utils/spawn';
+import * as processes from '../utils/processes';
 import * as fs from '../utils/fs';
 import * as path from 'path';
 import * as logger from '../utils/logger';
@@ -79,7 +79,7 @@ export default async function install(args: Args, opts: Opts) {
 
   logger.log('[1/2] Installing project dependencies...');
 
-  await spawn('yarn', ['install', '--non-interactive', '-s']);
+  await processes.spawn('yarn', ['install', '--non-interactive', '-s']);
 
   logger.log('[2/2] Linking workspace dependencies...');
 

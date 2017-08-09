@@ -6,6 +6,16 @@ import pLimit from 'p-limit';
 import os from 'os';
 
 const limit = pLimit(os.cpus().length);
+const processes = new Set();
+
+export function handleSignals() {
+  process.on('SIGTERM', () => {
+    for (let child of processes) {
+      child.kill('SIGTERM');
+    }
+    process.exit(1);
+  });
+}
 
 export class ChildProcessError extends Error {
   code: number;
@@ -29,7 +39,7 @@ type SpawnOptions = {
   env?: Object,
 };
 
-export default function spawn(cmd: string, args: Array<string>, opts: SpawnOptions = {}) {
+export function spawn(cmd: string, args: Array<string>, opts: SpawnOptions = {}) {
   return limit(() => new Promise((resolve, reject) => {
     let stdoutBuf = Buffer.from('');
     let stderrBuf = Buffer.from('');
@@ -42,6 +52,8 @@ export default function spawn(cmd: string, args: Array<string>, opts: SpawnOptio
         PATH: process.env.PATH,
       }, opts.env),
     });
+
+    processes.add(child);
 
     if (child.stdout) {
       child.stdout.on('data', data => {
@@ -62,6 +74,8 @@ export default function spawn(cmd: string, args: Array<string>, opts: SpawnOptio
     child.on('close', code => {
       let stdout = stdoutBuf.toString();
       let stderr = stderrBuf.toString();
+
+      processes.delete(child);
 
       if (code === 0) {
         resolve({code, stdout, stderr});

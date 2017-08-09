@@ -3,7 +3,7 @@ import * as path from 'path';
 import {readConfigFile} from './utils/config';
 import type {Config} from './types';
 import {DEPENDENCY_TYPES} from './constants';
-import spawn from './utils/spawn';
+import * as processes from './utils/processes';
 
 export default class Package {
   filePath: string;
@@ -53,7 +53,7 @@ export default class Package {
     }
 
     if (this.config.scripts && this.config.scripts[script]) {
-      await spawn('yarn', spawnArgs, {
+      await processes.spawn('yarn', spawnArgs, {
         cwd: this.dir,
         pkg: this,
       });
