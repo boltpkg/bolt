@@ -1,7 +1,6 @@
 // @flow
 import * as path from 'path';
 import globby from 'globby';
-import semver from 'semver';
 
 import Package from './Package';
 import Workspace from './Workspace';
@@ -12,16 +11,6 @@ import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 
 type Task = (workspace: Workspace) => Promise<mixed>;
-
-type Graph =
-  & Map<string, { pkg: Package, dependencies: Array<string> }>
-  & { valid: boolean };
-
-function initGraph(): Graph {
-  let graph: any = new Map();
-  graph.valid = true;
-  return graph;
-}
 
 export default class Project {
   pkg: Package;
@@ -62,8 +51,8 @@ export default class Project {
     return workspaces;
   }
 
-  async getDependencyGraph(workspaces: Array<Workspace>) {
-    let graph = initGraph();
+  async getDependencyGraph(workspaces: Array<Workspace>, shouldFix: boolean = false) {
+    let graph = new Map();
     let packages = [this.pkg];
     let packagesByName = { [this.pkg.config.name]: this.pkg };
     let valid = true;
@@ -82,16 +71,21 @@ export default class Project {
         let match = packagesByName[depName];
         if (!match) continue;
 
-        let actual = depVersion.replace(/^\^/, '');;
-        let expected = match.config.version
+        let actual = depVersion.replace(/^\^/, '');
+        let expected = match.config.version;
 
         if (actual !== expected) {
-          if (semver.satisfies(expected, depVersion)) {
-            pkg.updateDependencyVersionRange(depName, '^' + expected);
+          let updated = false;
+
+          if (shouldFix) {
+            updated = await pkg.maybeUpdateDependencyVersionRange(depName, depVersion, expected);
           }
-          valid = false;
-          logger.error(messages.packageMustDependOnCurrentVersion(name, depName, expected, actual));
-          continue;
+
+          if (!updated) {
+            valid = false;
+            logger.error(messages.packageMustDependOnCurrentVersion(name, depName, expected, depVersion));
+            continue;
+          }
         }
 
         dependencies.push(depName);
@@ -100,9 +94,7 @@ export default class Project {
       graph.set(name, { pkg, dependencies });
     }
 
-    graph.valid = valid;
-
-    return graph;
+    return { graph, valid };
   }
 
   // TODO: Properly sort packages using a topological sort, resolving cycles

@@ -4,7 +4,7 @@ import type Package from '../Package';
 
 export function prefix(prefix: string, message: string | Buffer) {
   return message.toString().trimRight().split('\n').map(line => {
-    return prefix + ' ' + chalk.dim(line);
+    return prefix + ' ' + line;
   }).join('\n');
 }
 

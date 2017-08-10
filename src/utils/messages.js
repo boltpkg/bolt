@@ -24,3 +24,11 @@ export function depMustBeAddedToProject(pkgName: string, depName: string) {
 export function depMustMatchProject(pkgName: string, depName: string, expected: string, actual: string) {
   return `Package ${pkg(pkgName)} dependency ${pkg(depName)} must match version in project dependencies. ${goodVer(expected)} vs ${badVer(actual)}`;
 }
+
+export function unableToUpdateDepVersion(pkgName: string, depName: string, version: string) {
+  return `Unable to update package ${pkg(pkgName)} dependency ${pkg(depName)} to version ${goodVer(version)}`;
+}
+
+export function updatedPackageDependency(pkgName: string, depName: string, versionRange: string) {
+  return `Updated package ${pkg(pkgName)} dependency ${pkg(depName)} to version ${goodVer(versionRange)}`;
+}

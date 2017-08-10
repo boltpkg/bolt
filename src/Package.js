@@ -1,9 +1,12 @@
 // @flow
 import * as path from 'path';
-import {readConfigFile} from './utils/config';
+import {readConfigFile, writeConfigFile} from './utils/config';
 import type {Config} from './types';
 import {DEPENDENCY_TYPES} from './constants';
 import * as processes from './utils/processes';
+import * as semver from 'semver';
+import * as logger from './utils/logger';
+import * as messages from './utils/messages';
 
 export default class Package {
   filePath: string;
@@ -60,16 +63,36 @@ export default class Package {
     }
   }
 
-  updateDependencyVersionRange(depName: string, versionRange: string) {
+  async updateDependencyVersionRange(depName: string, versionRange: string) {
     for (let type of DEPENDENCY_TYPES) {
-      let deps = this.config[type];
-      if (!deps) continue;
+      if (!this.config[type]) {
+        continue;
+      }
 
-      let currentVersionRange = deps[depName];
-      if (!currentVersionRange) continue;
+      let config = Object.assign({}, this.config);
+      let deps = Object.assign({}, this.config[type]);
 
-      console.log
+      deps[depName] = versionRange;
+      config[type] = deps;
+
+      await writeConfigFile(this.filePath, config);
+      this.config = config;
+      logger.info(messages.updatedPackageDependency(this.config.name, depName, versionRange));
+      return;
     }
+
+    throw new Error(messages.unableToUpdateDepVersion(this.config.name, depName, versionRange));
   }
 
+  async maybeUpdateDependencyVersionRange(depName: string, current: string, version: string) {
+    let versionRange = '^' + version;
+    let updated = false;
+
+    if (semver.satisfies(version, current)) {
+      await this.updateDependencyVersionRange(depName, versionRange);
+      updated = true;
+    }
+
+    return updated;
+  }
 }

@@ -17,7 +17,7 @@ export async function readConfigFile(filePath: string): Promise<Config> {
 }
 
 export async function writeConfigFile(filePath: string, config: Config) {
-  let prevContents = await fs.readFile(filePath);
+  let prevContents = (await fs.readFile(filePath)).toString();
   let indent = detectIndent(prevContents).indent || '  ';
   let contents = JSON.stringify(config, null, indent);
   await fs.writeFile(filePath, contents);

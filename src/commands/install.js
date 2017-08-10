@@ -8,10 +8,16 @@ import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
 
 export default async function install(args: Args, opts: Opts) {
+  let shouldFix = !!opts.fix || false;
+
   let cwd = process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
-  let dependencyGraph = await project.getDependencyGraph(workspaces);
+
+  let {
+    graph: dependencyGraph,
+    valid: dependencyGraphValid,
+  } = await project.getDependencyGraph(workspaces, shouldFix);
 
   let projectNodeModules = path.join(project.pkg.dir, 'node_modules');
   let projectDependencies = project.pkg.getAllDependencies();
@@ -34,9 +40,14 @@ export default async function install(args: Args, opts: Opts) {
       }
 
       if (!matched) {
-        valid = false;
-        logger.error(messages.depMustBeAddedToProject(workspace.pkg.config.name, name));
-        continue;
+        if (shouldFix) {
+          await project.pkg.updateDependencyVersionRange(name, version);
+          matched = version;
+        } else {
+          valid = false;
+          logger.error(messages.depMustBeAddedToProject(workspace.pkg.config.name, name));
+          continue;
+        }
       }
 
       if (version !== matched) {
@@ -69,7 +80,7 @@ export default async function install(args: Args, opts: Opts) {
     }
   }
 
-  if (!dependencyGraph.valid || !valid) {
+  if (!dependencyGraphValid || !valid) {
     throw new Error('Cannot symlink invalid set of dependencies.');
   }
 
@@ -87,8 +98,8 @@ export default async function install(args: Args, opts: Opts) {
     return fs.mkdirp(dirName);
   }));
 
-  await Promise.all(symlinksToCreate.map(({ src, dest, type }) => {
-    return fs.symlink(src, dest, type);
+  await Promise.all(symlinksToCreate.map(async ({ src, dest, type }) => {
+    await fs.symlink(src, dest, type);
   }));
 
   await Project.runWorkspaceTasks(workspaces, async workspace => {

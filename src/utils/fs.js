@@ -4,6 +4,7 @@ import path from 'path';
 import _cmdShim from 'cmd-shim';
 import promisify from 'typeable-promisify';
 import makeDir from 'make-dir';
+import _rimraf from 'rimraf';
 
 export function readFile(filePath: string): Promise<string> {
   return promisify(cb => fs.readFile(filePath, cb));
@@ -15,6 +16,10 @@ export function writeFile(filePath: string, fileContents: string): Promise<strin
 
 export function mkdirp(filePath: string): Promise<void> {
   return makeDir(filePath);
+}
+
+export function rimraf(filePath: string): Promise<void> {
+  return promisify(cb => _rimraf(filePath, cb));
 }
 
 export function stat(filePath: string) {
@@ -29,7 +34,7 @@ function unlink(filePath: string) {
   return promisify(cb => fs.unlink(filePath, cb));
 }
 
-function symlink(src: string, dest: string, type: string) {
+function _symlink(src: string, dest: string, type: string) {
   return promisify(cb => fs.symlink(src, dest, type, cb));
 }
 
@@ -40,9 +45,11 @@ function cmdShim(src: string, dest: string) {
 async function createSymbolicLink(src, dest, type) {
   try {
     await lstat(dest);
-    await unlink(dest);
-  } catch (err) {}
-  await symlink(src, dest, type);
+    await rimraf(dest);
+  } catch (err) {
+    if (err.code === 'EPERM') throw err;
+  }
+  await _symlink(src, dest, type);
 }
 
 async function createPosixSymlink(origin, dest, type) {
@@ -70,7 +77,7 @@ export async function symlink(src: string, dest: string, type: 'exec' | 'junctio
 
   if (process.platform === 'win32') {
     return await createWindowsSymlink(src, dest, type);
-  } else {
+  }  else {
     return await createPosixSymlink(src, dest, type);
   }
 }
