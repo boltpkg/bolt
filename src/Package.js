@@ -7,6 +7,7 @@ import * as processes from './utils/processes';
 import * as semver from 'semver';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
+import sortObject from 'sort-object';
 
 export default class Package {
   filePath: string;
@@ -63,36 +64,41 @@ export default class Package {
     }
   }
 
-  async updateDependencyVersionRange(depName: string, versionRange: string) {
-    for (let type of DEPENDENCY_TYPES) {
-      if (!this.config[type]) {
-        continue;
+  async updateDependencyVersionRange(depName: string, depType: string, versionRange: string) {
+    let prevVersionRange = this.config[depType] && this.config[depType][depName];
+    if (prevVersionRange === versionRange) return;
+
+    let newConfig = {
+      ...this.config,
+      [depType]: sortObject({
+        ...this.config[depType],
+        [depName]: versionRange,
+      }),
+    };
+
+    await writeConfigFile(this.filePath, newConfig);
+    this.config = newConfig;
+    logger.info(messages.updatedPackageDependency(this.config.name, depName, versionRange, prevVersionRange));
+  }
+
+  getDependencyType(depName: string) {
+    for (let depType of DEPENDENCY_TYPES) {
+      if (this.config[depType] && this.config[depType][depName]) {
+        return depType;
       }
-
-      let config = Object.assign({}, this.config);
-      let deps = Object.assign({}, this.config[type]);
-
-      deps[depName] = versionRange;
-      config[type] = deps;
-
-      await writeConfigFile(this.filePath, config);
-      this.config = config;
-      logger.info(messages.updatedPackageDependency(this.config.name, depName, versionRange));
-      return;
     }
-
-    throw new Error(messages.unableToUpdateDepVersion(this.config.name, depName, versionRange));
+    return null;
   }
 
-  async maybeUpdateDependencyVersionRange(depName: string, current: string, version: string) {
-    let versionRange = '^' + version;
-    let updated = false;
+  // async maybeUpdateDependencyVersionRange(depName: string, current: string, version: string) {
+  //   let versionRange = '^' + version;
+  //   let updated = false;
 
-    if (semver.satisfies(version, current)) {
-      await this.updateDependencyVersionRange(depName, versionRange);
-      updated = true;
-    }
+  //   if (semver.satisfies(version, current)) {
+  //     await this.updateDependencyVersionRange(depName, versionRange);
+  //     updated = true;
+  //   }
 
-    return updated;
-  }
+  //   return updated;
+  // }
 }

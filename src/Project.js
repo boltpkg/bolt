@@ -75,17 +75,9 @@ export default class Project {
         let expected = match.config.version;
 
         if (actual !== expected) {
-          let updated = false;
-
-          if (shouldFix) {
-            updated = await pkg.maybeUpdateDependencyVersionRange(depName, depVersion, expected);
-          }
-
-          if (!updated) {
-            valid = false;
-            logger.error(messages.packageMustDependOnCurrentVersion(name, depName, expected, depVersion));
-            continue;
-          }
+          valid = false;
+          logger.error(messages.packageMustDependOnCurrentVersion(name, depName, expected, depVersion));
+          continue;
         }
 
         dependencies.push(depName);

@@ -29,6 +29,12 @@ export function unableToUpdateDepVersion(pkgName: string, depName: string, versi
   return `Unable to update package ${pkg(pkgName)} dependency ${pkg(depName)} to version ${goodVer(version)}`;
 }
 
-export function updatedPackageDependency(pkgName: string, depName: string, versionRange: string) {
-  return `Updated package ${pkg(pkgName)} dependency ${pkg(depName)} to version ${goodVer(versionRange)}`;
+export function updatedPackageDependency(pkgName: string, depName: string, versionRange: string, prevVersionRange?: string) {
+  let str = `Updated package ${pkg(pkgName)} dependency ${pkg(depName)} to version ${goodVer(versionRange)}`;
+  if (prevVersionRange) str += ` from ${badVer(prevVersionRange)}`;
+  return str;
+}
+
+export function unableToNormalizeVersionRanges(depName: string, versionDetails: string) {
+  return `Unable to normalize ${pkg(depName)} for version ranges: ${versionDetails}`;
 }

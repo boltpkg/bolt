@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "flow-bin": "^0.51.0",
@@ -39,6 +40,7 @@
     "read-pkg": "^2.0.0",
     "rimraf": "^2.6.1",
     "semver": "^5.4.1",
+    "sort-object": "^3.0.2",
     "typeable-promisify": "^2.0.0"
   },
   "jest": {

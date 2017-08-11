@@ -7,21 +7,24 @@ import cleanStack from 'clean-stack';
 import pyarn from './';
 
 const cli = meow(`
-  Usage
+  usage
     $ pyarn [command] <...args> <...opts>
 
-  Commands
-    init         Init a pyarn project
-    install      Install a pyarn project
-    add          Add a dependency to a pyarn project
-    upgrade      Upgrade a dependency in a pyarn project
-    remove       Remove a dependency from a pyarn project
-    exec         Execute a command in a pyarn project
-    run          Run a script in a pyarn project
-    publish      Publish all the packages in a pyarn project
-    workspaces   Run a pyarn command inside all workspaces
-    workspace    Run a pyarn command inside a specific workspace
-    help         Get help with pyarn commands
+  commands
+    init         init a pyarn project
+    install      install a pyarn project
+    add          sdd a dependency to a pyarn project
+    upgrade      ipgrade a dependency in a pyarn project
+    remove       remove a dependency from a pyarn project
+    exec         execute a command in a pyarn project
+    run          run a script in a pyarn project
+    publish      publish all the packages in a pyarn project
+    workspaces   run a pyarn command inside all workspaces
+    workspace    run a pyarn command inside a specific workspace
+    help         get help with pyarn commands
+
+  pyarn-specific commands
+    normalize    normalize dependency version ranges across packages (useful when adopting pyarn)
 `);
 
 async function main() {

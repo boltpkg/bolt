@@ -37,6 +37,7 @@ type SpawnOptions = {
   cwd?: string,
   pkg?: Package,
   env?: Object,
+  silent?: boolean,
 };
 
 export function spawn(cmd: string, args: Array<string>, opts: SpawnOptions = {}) {
@@ -57,14 +58,19 @@ export function spawn(cmd: string, args: Array<string>, opts: SpawnOptions = {})
 
     if (child.stdout) {
       child.stdout.on('data', data => {
-        logger.stdout(cmdStr, data, opts.pkg);
+        if (!opts.silent) {
+          logger.stdout(cmdStr, data, opts.pkg);
+        }
+
         stdoutBuf = Buffer.concat([stdoutBuf, data]);
       });
     }
 
     if (child.stderr) {
       child.stderr.on('data', data => {
-        logger.stderr(cmdStr, data, opts.pkg);
+        if (!opts.silent) {
+          logger.stderr(cmdStr, data, opts.pkg);
+        }
         stderrBuf = Buffer.concat([stderrBuf, data]);
       });
     }
