@@ -8,8 +8,6 @@ import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
 
 export default async function install(args: Args, opts: Opts) {
-  let shouldFix = !!opts.fix || false;
-
   let cwd = process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
@@ -17,7 +15,7 @@ export default async function install(args: Args, opts: Opts) {
   let {
     graph: dependencyGraph,
     valid: dependencyGraphValid,
-  } = await project.getDependencyGraph(workspaces, shouldFix);
+  } = await project.getDependencyGraph(workspaces);
 
   let projectNodeModules = path.join(project.pkg.dir, 'node_modules');
   let projectDependencies = project.pkg.getAllDependencies();
@@ -40,14 +38,9 @@ export default async function install(args: Args, opts: Opts) {
       }
 
       if (!matched) {
-        if (shouldFix) {
-          await project.pkg.updateDependencyVersionRange(name, version);
-          matched = version;
-        } else {
-          valid = false;
-          logger.error(messages.depMustBeAddedToProject(workspace.pkg.config.name, name));
-          continue;
-        }
+        valid = false;
+        logger.error(messages.depMustBeAddedToProject(workspace.pkg.config.name, name));
+        continue;
       }
 
       if (version !== matched) {

@@ -51,7 +51,7 @@ export default class Project {
     return workspaces;
   }
 
-  async getDependencyGraph(workspaces: Array<Workspace>, shouldFix: boolean = false) {
+  async getDependencyGraph(workspaces: Array<Workspace>) {
     let graph = new Map();
     let packages = [this.pkg];
     let packagesByName = { [this.pkg.config.name]: this.pkg };

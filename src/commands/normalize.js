@@ -9,7 +9,6 @@ import * as messages from '../utils/messages';
 import * as semver from 'semver';
 import * as npm from '../utils/npm';
 import chalk from 'chalk';
-import table from 'text-table';
 
 function getWorkspaceMap(workspaces) {
   let workspaceMap = new Map();
