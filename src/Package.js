@@ -12,6 +12,8 @@ import sortObject from 'sort-object';
 export default class Package {
   filePath: string;
   dir: string;
+  nodeModules: string;
+  nodeModulesBin: string;
   contents: string;
   config: Config;
   indent: string;
@@ -19,6 +21,8 @@ export default class Package {
   constructor(filePath: string, config: Config) {
     this.filePath = filePath;
     this.dir = path.dirname(filePath);
+    this.nodeModules = path.join(this.dir, 'node_modules');
+    this.nodeModulesBin = path.join(this.nodeModules, '.bin');
     this.config = config;
   }
 

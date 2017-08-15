@@ -6,6 +6,7 @@ import * as fs from '../utils/fs';
 import * as path from 'path';
 import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
+import pathIsInside from 'path-is-inside';
 
 export default async function install(args: Args, opts: Opts) {
   let cwd = process.cwd();
@@ -17,21 +18,26 @@ export default async function install(args: Args, opts: Opts) {
     valid: dependencyGraphValid,
   } = await project.getDependencyGraph(workspaces);
 
-  let projectNodeModules = path.join(project.pkg.dir, 'node_modules');
   let projectDependencies = project.pkg.getAllDependencies();
 
-  let nodeModulesToCreate = [];
+  let directoriesToCreate = [];
   let symlinksToCreate = [];
   let valid = true;
 
+  let workspacesToDependencies = {};
+
   for (let workspace of workspaces) {
-    let nodeModules = path.join(workspace.pkg.dir, 'node_modules');
     let dependencies = workspace.pkg.getAllDependencies();
 
-    nodeModulesToCreate.push(nodeModules);
+    workspacesToDependencies[workspace.pkg.config.name] = dependencies;
+
+    directoriesToCreate.push(workspace.pkg.nodeModules);
+    directoriesToCreate.push(workspace.pkg.nodeModulesBin);
 
     for (let [name, version] of dependencies) {
       let matched = projectDependencies.get(name);
+
+      console.log(name);
 
       if (dependencyGraph.has(name)) {
         continue;
@@ -49,8 +55,8 @@ export default async function install(args: Args, opts: Opts) {
         continue;
       }
 
-      let src = path.join(projectNodeModules, name);
-      let dest = path.join(nodeModules, name);
+      let src = path.join(project.pkg.nodeModules, name);
+      let dest = path.join(workspace.pkg.nodeModules, name);
 
       symlinksToCreate.push({ src, dest, type: 'junction' });
     }
@@ -87,7 +93,43 @@ export default async function install(args: Args, opts: Opts) {
 
   logger.log('[2/2] Linking workspace dependencies...');
 
-  await Promise.all(nodeModulesToCreate.map(dirName => {
+  for (let binFile of await fs.readdir(project.pkg.nodeModulesBin)) {
+    let binPath = path.join(project.pkg.nodeModulesBin, binFile);
+    let binName = path.basename(binPath);
+
+    let linkFile = await fs.readlink(binPath);
+    let linkPath = path.join(project.pkg.nodeModulesBin, linkFile);
+
+    if (!pathIsInside(linkPath, project.pkg.nodeModules)) {
+      throw new Error(`${binName} is linked to a location outside of project node_modules: ${linkPath}`);
+    }
+
+    let relativeLinkPath = path.relative(project.pkg.nodeModules, linkPath);
+    let pathParts = relativeLinkPath.split(path.sep);
+    let pkgName = pathParts[0];
+
+    if (pkgName.startsWith('@')) {
+      pkgName += '/' + pathParts[1];
+    }
+
+    for (let workspace of workspaces) {
+      let dependencies = workspacesToDependencies[workspace.pkg.config.name];
+
+      if (!dependencies.has(pkgName)) {
+        continue;
+      }
+
+      let workspaceBinPath = path.join(workspace.pkg.nodeModulesBin, binName);
+
+      symlinksToCreate.push({
+        src: binPath,
+        dest: workspaceBinPath,
+        type: 'exec',
+      });
+    }
+  }
+
+  await Promise.all(directoriesToCreate.map(dirName => {
     return fs.mkdirp(dirName);
   }));
 

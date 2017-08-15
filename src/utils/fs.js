@@ -1,7 +1,11 @@
+// Parts of this source are modified from npm and lerna:
+// npm: https://github.com/npm/npm/blob/master/LICENSE
+// lerna: https://github.com/lerna/lerna/blob/master/LICENSE
 // @flow
 import fs from 'fs';
 import path from 'path';
 import _cmdShim from 'cmd-shim';
+import _readCmdShim from 'read-cmd-shim';
 import promisify from 'typeable-promisify';
 import makeDir from 'make-dir';
 import _rimraf from 'rimraf';
@@ -26,7 +30,7 @@ export function stat(filePath: string) {
   return promisify(cb => fs.stat(filePath, cb));
 }
 
-function lstat(filePath: string) {
+export function lstat(filePath: string) {
   return promisify(cb => fs.lstat(filePath, cb));
 }
 
@@ -80,4 +84,37 @@ export async function symlink(src: string, dest: string, type: 'exec' | 'junctio
   }  else {
     return await createPosixSymlink(src, dest, type);
   }
+}
+
+export async function readdir(dir: string) {
+  return promisify(cb => fs.readdir(dir, cb));
+}
+
+function readCmdShim(filePath: string) {
+  return promisify(cb => _readCmdShim(filePath, cb));
+}
+
+function _readlink(filePath: string) {
+  return promisify(cb => fs.readlink(filePath, cb));
+}
+
+// Copied from:
+// https://github.com/npm/npm/blob/d081cc6c8d73f2aa698aab36605377c95e916224/lib/utils/gently-rm.js#L280-L297
+export async function readlink(filePath: string) {
+  let stat = await lstat(filePath);
+  let result = null;
+
+  if (stat.isSymbolicLink()) {
+    result = await _readlink(filePath);
+  } else {
+    try {
+      result = await readCmdShim(filePath);
+    } catch (err) {
+      if (err.code !== 'ENOTASHIM' && err.code !== 'EISDIR') {
+        throw err;
+      }
+    }
+  }
+
+  return result;
 }
