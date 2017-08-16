@@ -1,7 +1,7 @@
 // @flow
-import type {Args, Opts} from './types';
-import commands from './commands';
+import pyarn from './lib'
+import cli from './cli';
 
-export default async function plerna(cmd: string, args: Args, opts: Opts) {
-  return await commands[cmd](args, opts);
-}
+pyarn.cli = cli;
+
+export default pyarn;

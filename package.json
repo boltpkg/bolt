@@ -8,23 +8,27 @@
     "pyarn": "./bin.js"
   },
   "files": [
-    "lib",
+    "dist",
+    "index.js",
     "bin.js"
   ],
   "scripts": {
     "test": "jest",
-    "build": "babel src -d lib",
+    "build": "BUILD=legacy babel src -d dist/legacy && babel src -d dist/modern",
     "prepublish": "yarn build"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "flow-bin": "^0.51.0",
     "jest": "^20.0.4"
   },
   "dependencies": {
+    "babel-runtime": "^6.25.0",
     "chalk": "^2.0.1",
     "clean-stack": "^1.3.0",
     "cmd-shim": "^2.0.2",
@@ -43,7 +47,7 @@
     "rimraf": "^2.6.1",
     "semver": "^5.4.1",
     "sort-object": "^3.0.2",
-    "typeable-promisify": "^2.0.0"
+    "typeable-promisify": "^2.0.1"
   },
   "jest": {
     "resetMocks": true

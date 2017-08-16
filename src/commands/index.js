@@ -1,16 +1,7 @@
 // @flow
-import help from './help';
-import install from './install';
-import normalize from './normalize';
-import publish from './publish';
-import workspace from './workspace';
-import workspaces from './workspaces';
-
-export default {
-  help: help,
-  install: install,
-  normalize: normalize,
-  publish: publish,
-  workspace: workspace,
-  workspaces: workspaces,
-};
+export {default as help} from './help';
+export {default as install} from './install';
+export {default as normalize} from './normalize';
+export {default as publish} from './publish';
+export {default as workspace} from './workspace';
+export {default as workspaces} from './workspaces';
