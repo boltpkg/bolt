@@ -10,7 +10,7 @@ import * as fs from './utils/fs';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 
-type Task = (workspace: Workspace) => Promise<mixed>;
+export type Task = (workspace: Workspace) => Promise<mixed>;
 
 export default class Project {
   pkg: Package;
