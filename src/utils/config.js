@@ -24,7 +24,7 @@ export async function writeConfigFile(filePath: string, config: Config) {
   await fs.writeFile(filePath, contents);
 }
 
-export async function getPackageStack(cwd: string) {
+async function getPackageStack(cwd: string) {
   let stack = [];
   let searching = cwd;
 
