@@ -21,7 +21,7 @@ export default class Project {
 
   static async init(cwd: string) {
     let filePath = await getProjectConfig(cwd);
-    if (!filePath) throw new Error(`Unable to find workspace root of project in ${cwd}`);
+    if (!filePath) throw new Error(`Unable to find root of project in ${cwd}`);
     let pkg = await Package.init(filePath);
     return new Project(pkg);
   }
