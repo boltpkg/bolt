@@ -9,6 +9,7 @@ import {getProjectConfig} from './utils/config';
 import * as fs from './utils/fs';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
+import {PError} from './utils/errors';
 
 export type Task = (workspace: Workspace) => Promise<mixed>;
 
@@ -21,7 +22,7 @@ export default class Project {
 
   static async init(cwd: string) {
     let filePath = await getProjectConfig(cwd);
-    if (!filePath) throw new Error(`Unable to find root of project in ${cwd}`);
+    if (!filePath) throw new PError(`Unable to find root of project in ${cwd}`);
     let pkg = await Package.init(filePath);
     return new Project(pkg);
   }

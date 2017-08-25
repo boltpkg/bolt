@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import * as logger from './utils/logger';
 import * as processes from './utils/processes';
 import * as commands from './commands/index';
+import {PError} from './utils/errors';
 import cleanStack from 'clean-stack';
 import pyarn from './lib';
 
@@ -51,7 +52,12 @@ export default async function run(argv: Array<string>, exit: boolean = false) {
   try {
     await pyarn(command, args, opts);
   } catch (err) {
-    logger.error(cleanStack(err.stack));
+    if (err instanceof PError) {
+      logger.error(err.message);
+    } else {
+      logger.error(cleanStack(err.stack));
+    }
+
     if (exit) {
       process.exit(1);
     } else {

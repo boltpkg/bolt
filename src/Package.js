@@ -8,6 +8,7 @@ import * as semver from 'semver';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import sortObject from 'sort-object';
+import {PError} from './utils/errors';
 
 export default class Package {
   filePath: string;
@@ -29,7 +30,7 @@ export default class Package {
   static async init(filePath: string) {
     let config = await readConfigFile(filePath);
     if (!config) {
-      throw new Error(`Could not find package.json in ${filePath}`);
+      throw new PError(`Could not find package.json in ${filePath}`);
     }
     return new Package(filePath, config);
   }
