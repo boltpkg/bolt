@@ -5,3 +5,4 @@ export {default as normalize} from './normalize';
 export {default as publish} from './publish';
 export {default as workspace} from './workspace';
 export {default as workspaces} from './workspaces';
+export {default as run} from './run';

@@ -2,6 +2,7 @@
 import pkgUp from 'pkg-up';
 import detectIndent from 'detect-indent';
 import parseJson from 'parse-json';
+import multimatch from 'multimatch';
 import * as path from 'path';
 import * as fs from './fs';
 import type {Config} from '../types';
@@ -23,7 +24,8 @@ export async function writeConfigFile(filePath: string, config: Config) {
   await fs.writeFile(filePath, contents);
 }
 
-export async function getProjectConfig(cwd: string) {
+export async function getPackageStack(cwd: string) {
+  let stack = [];
   let searching = cwd;
 
   while (searching) {
@@ -31,12 +33,39 @@ export async function getProjectConfig(cwd: string) {
 
     if (filePath) {
       let config = await readConfigFile(filePath);
-      if (config && config.pworkspaces) {
-        return filePath;
-      }
+      stack.unshift({ filePath, config });
       searching = path.dirname(path.dirname(filePath));
     } else {
-      return null;
+      searching = null;
     }
   }
+
+  return stack;
+}
+
+export async function getProjectConfig(cwd: string) {
+  let stack = await getPackageStack(cwd);
+
+  let highest = stack.pop();
+  let matches = [highest];
+
+  while (stack.length) {
+    let current = stack.pop();
+
+    if (current.config.pworkspaces) {
+      let patterns = current.config.pworkspaces;
+      let filePaths = matches.map(match => {
+        return path.relative(path.dirname(current.filePath), path.dirname(match.filePath));
+      });
+
+      let found = multimatch(filePaths, patterns);
+
+      if (found.length) {
+        matches.push(current);
+        highest = current;
+      }
+    }
+  }
+
+  return highest.filePath;
 }
