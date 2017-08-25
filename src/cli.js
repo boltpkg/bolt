@@ -31,10 +31,14 @@ export default async function run(argv: Array<string>, exit: boolean = false) {
     `,
   });
 
-  const [command, ...args] = cli.input;
-  const opts = cli.flags;
+  let [command, ...args] = cli.input;
+  let opts = cli.flags;
 
-  const start = Date.now();
+  if (!command) {
+    command = 'install';
+  }
+
+  let start = Date.now();
 
   logger.title(`pyarn ${command} v${cli.pkg.version}`);
 
