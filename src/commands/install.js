@@ -96,6 +96,11 @@ export default async function install(args: Args, opts: Opts) {
     let binName = path.basename(binPath);
 
     let linkFile = await fs.readlink(binPath);
+
+    if (!linkFile) {
+      throw new Error(`${binName} is not a symlink`);
+    }
+
     let linkPath = path.join(project.pkg.nodeModulesBin, linkFile);
 
     if (!pathIsInside(linkPath, project.pkg.nodeModules)) {

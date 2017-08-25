@@ -1,11 +1,5 @@
 // @flow
-import pyarn from './lib'
-import cli from './cli';
-import getPackages from './utils/getPackages';
-import runWorkspaceTasks from './utils/runWorkspaceTasks';
-
-pyarn.cli = cli;
-pyarn.getPackages = getPackages;
-pyarn.runWorkspaceTasks = runWorkspaceTasks;
-
-export default pyarn;
+export {default as run} from './lib';
+export {default as cli} from './cli';
+export {default as getPackages} from './utils/getPackages';
+export {default as runWorkspaceTasks} from './utils/runWorkspaceTasks';

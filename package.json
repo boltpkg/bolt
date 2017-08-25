@@ -13,8 +13,8 @@
     "bin.js"
   ],
   "scripts": {
-    "test": "jest",
-    "build": "BUILD=legacy babel src -d dist/legacy && babel src -d dist/modern",
+    "test": "./build/test.sh",
+    "build": "./build/build.sh",
     "prepublish": "yarn build"
   },
   "devDependencies": {
@@ -50,6 +50,12 @@
     "typeable-promisify": "^2.0.1"
   },
   "jest": {
-    "resetMocks": true
+    "resetMocks": true,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/build/",
+      "/dist/",
+      "/flow-typed/"
+    ]
   }
 }

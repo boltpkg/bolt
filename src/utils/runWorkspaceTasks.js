@@ -1,5 +1,5 @@
 // @flow
-import type Task from '../Project';
+import type {Task} from '../Project';
 import Project from '../Project';
 
 export default async function runWorkspaceTasks(task: Task, opts: { cwd?: string } = {}) {
