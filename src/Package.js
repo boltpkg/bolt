@@ -53,21 +53,6 @@ export default class Package {
     return allDependencies;
   }
 
-  async runScript(script: string, args: Array<string> = []) {
-    let spawnArgs = ['run', script, '-s'];
-
-    if (args.length) {
-      spawnArgs = spawnArgs.concat('--', args);
-    }
-
-    if (this.config.scripts && this.config.scripts[script]) {
-      await processes.spawn('yarn', spawnArgs, {
-        cwd: this.dir,
-        pkg: this,
-      });
-    }
-  }
-
   async updateDependencyVersionRange(depName: string, depType: string, versionRange: string) {
     let prevVersionRange = this.config[depType] && this.config[depType][depName];
     if (prevVersionRange === versionRange) return;

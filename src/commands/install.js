@@ -6,6 +6,7 @@ import * as fs from '../utils/fs';
 import * as path from 'path';
 import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
+import * as yarn from '../utils/yarn';
 import pathIsInside from 'path-is-inside';
 
 export default async function install(args: Args, opts: Opts) {
@@ -82,7 +83,7 @@ export default async function install(args: Args, opts: Opts) {
   }
 
   await Project.runWorkspaceTasks(workspaces, async workspace => {
-    await workspace.pkg.runScript('preinstall');
+    await yarn.run(workspace.pkg, 'preinstall');
   });
 
   logger.log('[1/2] Installing project dependencies...');
@@ -143,8 +144,8 @@ export default async function install(args: Args, opts: Opts) {
   }));
 
   await Project.runWorkspaceTasks(workspaces, async workspace => {
-    await workspace.pkg.runScript('postinstall');
-    await workspace.pkg.runScript('prepublish');
+    await yarn.run(workspace.pkg, 'postinstall');
+    await yarn.run(workspace.pkg, 'prepublish');
   });
 
   logger.success('Installed and linked workspaces.');
