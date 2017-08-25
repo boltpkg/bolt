@@ -37,8 +37,6 @@ export default async function install(args: Args, opts: Opts) {
     for (let [name, version] of dependencies) {
       let matched = projectDependencies.get(name);
 
-      console.log(name);
-
       if (dependencyGraph.has(name)) {
         continue;
       }
