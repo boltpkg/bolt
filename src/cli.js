@@ -17,8 +17,8 @@ export default async function run(argv: Array<string>, exit: boolean = false) {
       commands
         init         init a pyarn project
         install      install a pyarn project
-        add          sdd a dependency to a pyarn project
-        upgrade      ipgrade a dependency in a pyarn project
+        add          add a dependency to a pyarn project
+        upgrade      upgrade a dependency in a pyarn project
         remove       remove a dependency from a pyarn project
         exec         execute a command in a pyarn project
         run          run a script in a pyarn project
