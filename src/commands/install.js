@@ -87,7 +87,9 @@ export default async function install(args: Args, opts: Opts) {
 
   logger.log('[1/2] Installing project dependencies...');
 
-  await processes.spawn('yarn', ['install', '--non-interactive', '-s']);
+  await processes.spawn('yarn', ['install', '--non-interactive', '-s'], {
+    cwd: project.pkg.dir,
+  });
 
   logger.log('[2/2] Linking workspace dependencies...');
 

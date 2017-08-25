@@ -1,4 +1,14 @@
 {
-  "name": "baz",
-  "version": "1.0.0"
+  "name": "baz-workspace-package",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "echo preinstall",
+    "postinstall": "echo postinstall",
+    "prepublish": "echo prepublish"
+  },
+  "dependencies": {
+    "react": "^15.6.1",
+    "bar-workspace-package": "^1.0.0"
+  }
 }

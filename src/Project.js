@@ -36,10 +36,11 @@ export default class Project {
       let matchedPaths: Array<string> = await globby(patterns, { cwd });
 
       for (let matchedPath of matchedPaths) {
-        let stats = await fs.stat(matchedPath);
+        let dir = path.join(cwd, matchedPath);
+        let stats = await fs.stat(dir);
         if (!stats.isDirectory()) continue;
 
-        let filePath = path.join(cwd, matchedPath, 'package.json');
+        let filePath = path.join(dir, 'package.json');
         let wPkg = await Package.init(filePath);
         let workspace = await Workspace.init(wPkg);
 
