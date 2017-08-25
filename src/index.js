@@ -6,6 +6,6 @@ import runWorkspaceTasks from './utils/runWorkspaceTasks';
 
 pyarn.cli = cli;
 pyarn.getPackages = getPackages;
-pyarn.runWorkspaceTasks = runWorkspacesTasks;
+pyarn.runWorkspaceTasks = runWorkspaceTasks;
 
 export default pyarn;
