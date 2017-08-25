@@ -3,6 +3,7 @@ import meow from 'meow';
 import chalk from 'chalk';
 import * as logger from './utils/logger';
 import * as processes from './utils/processes';
+import * as commands from './commands/index';
 import cleanStack from 'clean-stack';
 import pyarn from './lib';
 
@@ -36,6 +37,9 @@ export default async function run(argv: Array<string>, exit: boolean = false) {
 
   if (!command) {
     command = 'install';
+  } else if (!commands[command]) {
+    args = [command, ...args];
+    command = 'run';
   }
 
   let start = Date.now();
