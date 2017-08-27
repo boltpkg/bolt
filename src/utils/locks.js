@@ -20,7 +20,7 @@ export async function lock(packages: Array<Package>) {
     await Promise.all(promises);
   } catch (err) {
     await unlock(locks);
-    throw new Error('Found a lock tag');
+    throw new Error('Found a lock tag', err);
   }
 }
 

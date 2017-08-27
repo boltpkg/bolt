@@ -10,6 +10,4 @@ export default async function publish() {
   let packages = workspaces.map(workspace => workspace.pkg);
 
   await locks.lock(packages);
-
-  // ...
 }
