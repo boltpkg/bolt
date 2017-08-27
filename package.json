@@ -4,6 +4,7 @@
   "main": "index.js",
   "author": "James Kyle <me@thejameskyle.com>",
   "license": "MIT",
+  "repository": "https://github.com/pyarn/pyarn",
   "bin": {
     "pyarn": "./bin.js"
   },

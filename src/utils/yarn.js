@@ -14,3 +14,10 @@ export async function run(pkg: Package, script: string, args: Array<string> = []
     pkg: pkg,
   });
 }
+
+export async function init(cwd: string) {
+  await processes.spawn('yarn', ['init', '-s'], {
+    cwd: cwd,
+    tty: true,
+  });
+}

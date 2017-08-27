@@ -6,3 +6,4 @@ export {default as publish} from './publish';
 export {default as workspace} from './workspace';
 export {default as workspaces} from './workspaces';
 export {default as run} from './run';
+export {default as init} from './init';

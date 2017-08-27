@@ -38,6 +38,7 @@ type SpawnOptions = {
   pkg?: Package,
   env?: Object,
   silent?: boolean,
+  tty?: boolean,
 };
 
 export function spawn(cmd: string, args: Array<string>, opts: SpawnOptions = {}) {
@@ -47,12 +48,18 @@ export function spawn(cmd: string, args: Array<string>, opts: SpawnOptions = {})
 
     let cmdStr = cmd + ' ' + args.join(' ');
 
-    let child = crossSpawn(cmd, args, {
+    let spawnOpts: child_process$spawnOpts = {
       cwd: opts.cwd,
       env: Object.assign({
         PATH: process.env.PATH,
       }, opts.env),
-    });
+    };
+
+    if (opts.tty) {
+      spawnOpts.stdio = 'inherit';
+    }
+
+    let child = crossSpawn(cmd, args, spawnOpts);
 
     processes.add(child);
 
