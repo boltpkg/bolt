@@ -5,20 +5,20 @@ import runWorkspaceTasks from './runWorkspaceTasks';
 
 export default async function updatePackageVersions(versions: {[name: string]: string}, opts: { cwd?: string } = {}) {
   const cwd = opts.cwd || process.cwd();
+  const project = await Project.init(cwd);
+  const workspaces = await project.getWorkspaces();
 
-  const updateWorkspacePackageVersion = (workspace: Workspace) => {
+  for (let workspace of workspaces) {
     const pkg = workspace.pkg;
     const promises = [];
 
-    for(let depName of Object.keys(versions)) {
+    for (let depName of Object.keys(versions)) {
       const depType = pkg.getDependencyType(depName);
       if (!depType) continue;
 
       promises.push(pkg.updateDependencyVersionRange(depName, depType, versions[depName]));
     }
 
-    return Promise.all(promises);
+    await Promise.all(promises);
   }
-
-  await runWorkspaceTasks(updateWorkspacePackageVersion, opts);
 }
