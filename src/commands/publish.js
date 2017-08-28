@@ -1,12 +1,11 @@
 // @flow
 import type {Args, Opts} from '../types';
 import {PError} from '../utils/errors';
+import getUnpublishedPackages from '../utils/getUnpublishedPackages';
 import * as logger from '../utils/logger';
 import * as locks from '../utils/locks';
-import getUnpublishedPackages from '../utils/getUnpublishedPackages';
-import Project from '../Project';
 import * as npm from '../utils/npm';
-import * as yarn from '../utils/yarn';
+import Project from '../Project';
 
 
 export default async function publish(args: Args, opts: Opts) {
@@ -25,7 +24,7 @@ export default async function publish(args: Args, opts: Opts) {
       const {name, version} = workspace.pkg.config;
       logger.info(`Publishing ${name} at ${version}`);
 
-      await npm.publish(workspace.pkg.config.name, { cwd: workspace.pkg.dir });
+      await npm.publish(name, { cwd: workspace.pkg.dir });
     });
 
     await locks.unlock(packages);

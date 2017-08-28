@@ -2,7 +2,7 @@
 import Project from '../Project';
 import * as locks from '../utils/locks';
 
-export default async function publish() {
+export default async function lock() {
   let cwd = process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
