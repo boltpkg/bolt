@@ -18,6 +18,14 @@ export function info(pkgName: string) {
   });
 }
 
+export function publish(pkgName: string, opts: { cwd?: string } = {}) {
+  return npmRequestLimit(async () => {
+    logger.info(`npm publish ${pkgName}`);
+
+    return await processes.spawn('npm', ['publish'], opts);
+  });
+}
+
 export function addTag(pkgName: string, pkgVersion: string, tag: string) {
   return npmRequestLimit(async () => {
     const pkgStr = `${pkgName}@${pkgVersion}`;
@@ -26,7 +34,7 @@ export function addTag(pkgName: string, pkgVersion: string, tag: string) {
     const result = await processes.spawn('npm', ['dist-tag', 'add', pkgStr, tag]);
     // An existing tag will return a warning to stderr, but a 0 status code
     if (result.stderr) {
-      throw new PError(`Could not lock ${pkgStr} as a lock already exists`);
+      throw new PError(`Could not add tag ${tag} to ${pkgStr} as one already exists`);
     }
     return result;
   });}
