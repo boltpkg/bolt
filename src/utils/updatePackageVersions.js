@@ -16,7 +16,7 @@ export default async function updatePackageVersions(versions: {[name: string]: s
       const depType = pkg.getDependencyType(depName);
       if (!depType) continue;
 
-      promises.push(pkg.updateDependencyVersionRange(depName, depType, versions[depName]));
+      promises.push(pkg.updateDependencyVersionRange(depName, depType, '^' + versions[depName]));
     }
 
     await Promise.all(promises);
