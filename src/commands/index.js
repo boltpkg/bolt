@@ -8,3 +8,4 @@ export {default as publishUnlock} from './publish-unlock';
 export {default as workspace} from './workspace';
 export {default as workspaces} from './workspaces';
 export {default as run} from './run';
+export {default as init} from './init';

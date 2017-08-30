@@ -4,6 +4,7 @@
   "main": "index.js",
   "author": "James Kyle <me@thejameskyle.com>",
   "license": "MIT",
+  "repository": "https://github.com/pyarn/pyarn",
   "bin": {
     "pyarn": "./bin.js"
   },
@@ -13,8 +14,12 @@
     "bin.js"
   ],
   "scripts": {
-    "test": "./build/test.sh",
-    "build": "./build/build.sh",
+    "clean": "rm -rf dist",
+    "flow": "flow status",
+    "test": "jest --coverage",
+    "build:legacy": "BABEL_ENV=legacy babel src -d dist/legacy",
+    "build:modern": "BABEL_ENV=modern babel src -d dist/modern",
+    "build": "yarn run clean && yarn build:legacy && yarn build:modern",
     "prepublish": "yarn build"
   },
   "devDependencies": {
