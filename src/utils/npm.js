@@ -49,7 +49,7 @@ export async function removeTag(pkgName: string, tag: string) {
     } catch (error) {
       // The dist tag not existing is unexpected, but shouldn't prevent execution
       if (error.code === 1 && error.stderr.includes('is not a dist-tag on')) {
-        logger.info(`No dist tag "${tag}" found for package ${pkgName}`);
+        logger.warn(`No dist tag "${tag}" found for package ${pkgName}`);
         return;
       }
       throw error;

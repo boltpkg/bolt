@@ -90,6 +90,17 @@ export async function readdir(dir: string) {
   return promisify(cb => fs.readdir(dir, cb));
 }
 
+// Return an empty array if a directory doesnt exist (but still throw if errof if dir is a file)
+export async function readdirSafe(dir: string) {
+  return stat(dir)
+    .catch(err => Promise.resolve([]))
+    .then(statsOrArray => {
+      if (statsOrArray instanceof Array) return statsOrArray;
+      if (!statsOrArray.isDirectory()) throw new Error(dir + ' is not a directory');
+      return readdir(dir)
+    });
+}
+
 function readCmdShim(filePath: string) {
   return promisify(cb => _readCmdShim(filePath, cb));
 }

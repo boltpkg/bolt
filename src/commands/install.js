@@ -95,8 +95,6 @@ export default async function install(args: Args, opts: Opts) {
 
   logger.log('[2/2] Linking workspace dependencies...');
 
-  await fs.mkdirp(project.pkg.nodeModulesBin);
-
   for (let binFile of await fs.readdir(project.pkg.nodeModulesBin)) {
     let binPath = path.join(project.pkg.nodeModulesBin, binFile);
     let binName = path.basename(binPath);
