@@ -3,7 +3,7 @@ import Project from '../Project';
 import * as yarn from '../utils/yarn';
 
 export default async function getDependencyGraph(opts: { cwd?: string } = {}) {
-  const cwd = process.cwd();
+  const cwd = opts.cwd || process.cwd();
   const project = await Project.init(cwd);
   const workspaces = await project.getWorkspaces();
 
