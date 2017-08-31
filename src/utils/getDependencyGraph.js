@@ -19,4 +19,6 @@ export default async function getDependencyGraph(opts: { cwd?: string } = {}) {
   dependencyGraph.forEach((pkgInfo, pkgName) => {
     simplifiedDependencyGraph.set(pkgName, pkgInfo.dependencies);
   });
+
+  return simplifiedDependencyGraph;
 }
