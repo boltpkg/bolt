@@ -5,8 +5,6 @@ import {mkdtempSync} from 'fs';
 import * as path from 'path';
 import {getFixturePath} from 'jest-fixtures';
 
-const FIXTURES_DIR = path.resolve(__dirname, '..', '..', '..', '__fixtures__');
-
 describe('readConfigFile', () => {
   it('should read a valid package.json file', async () => {
     let filePath = await getFixturePath(__dirname, 'simple-package', 'package.json');
