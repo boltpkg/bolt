@@ -1703,6 +1703,12 @@ jest-environment-node@^20.0.3:
     jest-mock "^20.0.3"
     jest-util "^20.0.3"
 
+jest-fixtures@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/jest-fixtures/-/jest-fixtures-0.2.0.tgz#41d8e7a38aea7f5415e6c6da7de3157a332cf0ab"
+  dependencies:
+    find-up "^2.1.0"
+
 jest-haste-map@^20.0.4:
   version "20.0.5"
   resolved "https://registry.yarnpkg.com/jest-haste-map/-/jest-haste-map-20.0.5.tgz#abad74efb1a005974a7b6517e11010709cab9112"

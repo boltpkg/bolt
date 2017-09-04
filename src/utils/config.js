@@ -45,6 +45,7 @@ async function getPackageStack(cwd: string) {
 
 export async function getProjectConfig(cwd: string) {
   let stack = await getPackageStack(cwd);
+  if (stack.length === 0) return null;
 
   let highest = stack.pop();
   let matches = [highest];
