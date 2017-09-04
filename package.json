@@ -63,6 +63,7 @@
       "/build/",
       "/dist/",
       "/flow-typed/"
-    ]
+    ],
+    "haste": {}
   }
 }
