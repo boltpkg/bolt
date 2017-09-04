@@ -11,7 +11,7 @@ import pathIsInside from 'path-is-inside';
 import {PError} from '../utils/errors';
 
 export default async function install(args: Args, opts: Opts) {
-  let cwd = process.cwd();
+  let cwd = typeof opts.cwd === 'string' ? opts.cwd : process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
 
