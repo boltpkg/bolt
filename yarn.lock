@@ -1703,11 +1703,12 @@ jest-environment-node@^20.0.3:
     jest-mock "^20.0.3"
     jest-util "^20.0.3"
 
-jest-fixtures@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/jest-fixtures/-/jest-fixtures-0.2.0.tgz#41d8e7a38aea7f5415e6c6da7de3157a332cf0ab"
+jest-fixtures@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/jest-fixtures/-/jest-fixtures-0.3.0.tgz#fa6700a7a9d7d0de3026e2141a7cc1c0de9f9fdc"
   dependencies:
     find-up "^2.1.0"
+    typeable-promisify "^2.0.1"
 
 jest-haste-map@^20.0.4:
   version "20.0.5"
@@ -2089,6 +2090,10 @@ minimist@~0.0.1:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   dependencies:
     minimist "0.0.8"
+
+mode-to-permissions@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/mode-to-permissions/-/mode-to-permissions-0.0.2.tgz#746aec5694b4fc25cae09bcdf5a2c73f3a0628bd"
 
 ms@2.0.0:
   version "2.0.0"
