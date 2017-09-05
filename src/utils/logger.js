@@ -28,10 +28,6 @@ export function error(message: string) {
   console.error(prefix(chalk.red('error'), message));
 }
 
-export function warn(message: string) {
-  console.error(prefix(chalk.yellow('warn'), message));
-}
-
 export function success(message: string) {
   console.log(prefix(chalk.green('success'), message));
 }
