@@ -2,10 +2,17 @@
 import multimatch from 'multimatch';
 import path from 'path';
 
-import type {Args, Opts} from '../types';
 import Workspace from '../Workspace';
+import * as logger from '../utils/logger';
 
-export default function filterWorkspaces(workspaces: [Workspace], opts: Opts) {
+type FilteringOpts = {
+  only: string,
+  ignore: string,
+  onlyFs: string,
+  ignoreFs: string,
+}
+
+export default function filterWorkspaces(workspaces: Array<Workspace>, opts: FilteringOpts) {
   const onlyPattern = opts.only || '**';
   const ignorePattern = opts.ignore ? `!${opts.ignore}` : '';
   const onlyFsPattern = opts.onlyFs || '**';
@@ -19,10 +26,14 @@ export default function filterWorkspaces(workspaces: [Workspace], opts: Opts) {
   const filteredByName = multimatch(workspaceNames, [onlyPattern, ignorePattern]);
   const filteredByDir = multimatch(workspaceDirs, [onlyFsPattern, ignoreFsPattern]);
 
-  return workspaces.filter(workspace => {
-    return (
-      filteredByName.includes(workspace.pkg.config.name) &&
+  const filteredWorkspaces = workspaces
+    .filter(workspace => filteredByName.includes(workspace.pkg.config.name) &&
       filteredByDir.includes(relativeDir(workspace))
     );
-  });
+
+  if (filteredWorkspaces.length === 0) {
+    logger.warn('No packages match the filters provided');
+  }
+
+  return filteredWorkspaces;
 }
