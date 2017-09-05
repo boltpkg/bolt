@@ -6,13 +6,13 @@ import Workspace from '../Workspace';
 import * as logger from '../utils/logger';
 
 type FilteringOpts = {
-  only: string,
-  ignore: string,
-  onlyFs: string,
-  ignoreFs: string,
+  only?: string,
+  ignore?: string,
+  onlyFs?: string,
+  ignoreFs?: string,
 }
 
-export default function filterWorkspaces(workspaces: Array<Workspace>, opts: FilteringOpts) {
+export default function filterWorkspaces(workspaces: Array<Workspace>, opts: FilteringOpts = {}) {
   const onlyPattern = opts.only || '**';
   const ignorePattern = opts.ignore ? `!${opts.ignore}` : '';
   const onlyFsPattern = opts.onlyFs || '**';
