@@ -59,6 +59,12 @@
   },
   "jest": {
     "resetMocks": true,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/build/",
+      "<rootDir>/dist/",
+      "<rootDir>/flow-typed/"
+    ],
     "haste": {}
   }
 }
