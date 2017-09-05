@@ -20,6 +20,10 @@ export function info(message: string) {
   console.error(prefix(chalk.cyan('info'), message));
 }
 
+export function warn(message: string) {
+  console.error(prefix(chalk.yellow('warn'), message));
+}
+
 export function error(message: string) {
   console.error(prefix(chalk.red('error'), message));
 }

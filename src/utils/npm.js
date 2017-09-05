@@ -22,7 +22,9 @@ export function publish(pkgName: string, opts: { cwd?: string } = {}) {
   return npmRequestLimit(async () => {
     logger.info(`npm publish ${pkgName}`);
 
-    return await processes.spawn('npm', ['publish'], opts);
+    return await processes.spawn('npm', ['publish'], {
+      cwd: opts.cwd,
+    });
   });
 }
 

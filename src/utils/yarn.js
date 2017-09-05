@@ -5,6 +5,8 @@ import * as processes from './processes';
 export async function run(pkg: Package, script: string, args: Array<string> = []) {
   let spawnArgs = ['run', script, '-s'];
 
+  if (!pkg.config.scripts || !pkg.config.scripts[script]) return;
+
   if (args.length) {
     spawnArgs = spawnArgs.concat('--', args);
   }

@@ -3,7 +3,7 @@
     "test": {
       "presets": [
         "flow",
-        ["env", { "loose": true }]
+        ["env", { "loose": true, "targets": { "node": "current" } }]
       ],
       "plugins": [
         "transform-class-properties",

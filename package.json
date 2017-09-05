@@ -1,6 +1,6 @@
 {
   "name": "pyarn",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "main": "index.js",
   "author": "James Kyle <me@thejameskyle.com>",
   "license": "MIT",
@@ -30,7 +30,9 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "flow-bin": "^0.51.0",
-    "jest": "^20.0.4"
+    "jest": "^20.0.4",
+    "jest-fixtures": "^0.3.2",
+    "mode-to-permissions": "^0.0.2"
   },
   "dependencies": {
     "babel-runtime": "^6.25.0",
@@ -59,9 +61,10 @@
     "resetMocks": true,
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/build/",
-      "/dist/",
-      "/flow-typed/"
-    ]
+      "<rootDir>/build/",
+      "<rootDir>/dist/",
+      "<rootDir>/flow-typed/"
+    ],
+    "haste": {}
   }
 }

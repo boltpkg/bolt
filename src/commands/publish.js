@@ -7,16 +7,15 @@ import * as locks from '../utils/locks';
 import * as npm from '../utils/npm';
 import Project from '../Project';
 
-
 export default async function publish(args: Args, opts: Opts) {
-  const cwd = process.cwd();
+  const cwd = typeof opts.cwd === 'string' ? opts.cwd : process.cwd();
   const project = await Project.init(cwd);
   const workspaces = await project.getWorkspaces();
   const packages = workspaces.map(workspace => workspace.pkg);
 
   try {
     await locks.lock(packages);
-    const unpublishedPackages = await getUnpublishedPackages(opts);
+    const unpublishedPackages = await getUnpublishedPackages({ cwd });
     const isUnpublished = workspace => unpublishedPackages.some(pkg => workspace.pkg.config.name === pkg.name);
     const unpublishedWorkspaces = workspaces.filter(isUnpublished);
 

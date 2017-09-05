@@ -1,4 +1,5 @@
 [ignore]
+.*/__fixtures__/.*
 
 [include]
 
