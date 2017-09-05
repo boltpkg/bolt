@@ -31,7 +31,8 @@
     "babel-preset-flow": "^6.23.0",
     "flow-bin": "^0.51.0",
     "jest": "^20.0.4",
-    "jest-fixtures": "^0.2.0"
+    "jest-fixtures": "^0.3.0",
+    "mode-to-permissions": "^0.0.2"
   },
   "dependencies": {
     "babel-runtime": "^6.25.0",
