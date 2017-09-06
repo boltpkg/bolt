@@ -39,10 +39,11 @@ export function addTag(pkgName: string, pkgVersion: string, tag: string) {
       throw new PError(`Could not add tag ${tag} to ${pkgStr} as one already exists`);
     }
     return result;
-  });}
+  });
+}
 
 
-export async function removeTag(pkgName: string, tag: string) {
+export function removeTag(pkgName: string, tag: string) {
   return npmRequestLimit(async () => {
     logger.info(`npm dist-tag rm ${pkgName} ${tag}`);
 
