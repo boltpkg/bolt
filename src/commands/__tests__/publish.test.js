@@ -1,8 +1,8 @@
 // @flow
-import publish from '../publish';
+import {publish, toPublishOptions} from '../publish';
 
 jest.unmock('../publish');
 
 test('pyarn publish', async () => {
-  // await publish([], {});
+  // await publish(toPublishOptions([], {}));
 });

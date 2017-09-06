@@ -1,8 +1,8 @@
 // @flow
-import help from '../help';
+import {help, toHelpOptions} from '../help';
 
 jest.unmock('../help');
 
 test('pyarn help', async () => {
-  await help([], {});
+  await help(toHelpOptions([], {}));
 });

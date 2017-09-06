@@ -1,6 +1,12 @@
 // @flow
-import type {Args, Opts} from '../types';
+import * as options from '../utils/options';
 
-export default async function help(args: Args, opts: Opts) {
+export type HelpOptions = {};
 
+export function toHelpOptions(args: options.Args, flags: options.Flags): HelpOptions {
+  return {};
+}
+
+export async function help(opts: HelpOptions) {
+  // ...
 }

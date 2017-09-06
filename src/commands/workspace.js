@@ -1,8 +1,38 @@
 // @flow
-import type {Args, Opts} from '../types';
-import * as commands from './ws/index';
+import * as options from '../utils/options';
 
-export default async function workspace(args: Args, opts: Opts) {
-  let [cmd, workspaceName, ...restArgs] = args;
-  return await commands[cmd](restArgs, opts);
+import {toWorkspaceAddOptions, workspaceAdd} from './ws/add';
+import {toWorkspaceRemoveOptions, workspaceRemove} from './ws/remove';
+import {toWorkspaceRunOptions, workspaceRun} from './ws/run';
+import {toWorkspaceUpgradeOptions, workspaceUpgrade} from './ws/upgrade';
+
+export type WorkspaceOptions = {|
+  command: string,
+  workspace: string,
+  commandArgs: options.Args,
+  commandFlags: options.Flags
+|};
+
+export function toWorkspaceOptions(args: options.Args, flags: options.Flags): WorkspaceOptions {
+  let [command, workspace, ...commandArgs] = args;
+  return {
+    command,
+    workspace,
+    commandArgs,
+    commandFlags: flags,
+  };
+}
+
+export async function workspace(opts: WorkspaceOptions) {
+  if (opts.command === 'add') {
+    await workspaceAdd(toWorkspaceAddOptions(opts.commandArgs, opts.commandFlags));
+  } else if (opts.command === 'remove') {
+    await workspaceRemove(toWorkspaceRemoveOptions(opts.commandArgs, opts.commandFlags));
+  } else if (opts.command === 'run') {
+    await workspaceRemove(toWorkspaceRemoveOptions(opts.commandArgs, opts.commandFlags));
+  } else if (opts.command === 'upgrade') {
+    await workspaceRemove(toWorkspaceRemoveOptions(opts.commandArgs, opts.commandFlags));
+  } else {
+    throw new Error(`Unknown workspace command: "${opts.command}"`);
+  }
 }

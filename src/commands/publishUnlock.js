@@ -1,9 +1,20 @@
 // @flow
 import Project from '../Project';
+import * as options from '../utils/options';
 import * as locks from '../utils/locks';
 
-export default async function unlock() {
-  let cwd = process.cwd();
+export type PublishUnlockOptions = {|
+  cwd?: string,
+|};
+
+export function toPublishUnlockOptions(args: options.Args, flags: options.Flags): PublishUnlockOptions {
+  return {
+    cwd: options.string(flags.cwd, 'cwd'),
+  };
+}
+
+export async function publishUnlock(opts: PublishUnlockOptions) {
+  let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
 

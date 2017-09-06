@@ -1,8 +1,8 @@
 // @flow
-import workspaces from '../workspaces';
+import {workspaces, toWorkspacesOptions} from '../workspaces';
 
 jest.unmock('../workspaces');
 
 test('pyarn workspaces', async () => {
-  await workspaces(['run', 'foo'], {});
+  await workspaces(toWorkspacesOptions(['run', 'foo'], {}));
 });

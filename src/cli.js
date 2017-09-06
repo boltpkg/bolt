@@ -3,13 +3,13 @@ import meow from 'meow';
 import chalk from 'chalk';
 import * as logger from './utils/logger';
 import * as processes from './utils/processes';
-import * as commands from './commands/index';
 import {PError} from './utils/errors';
 import cleanStack from 'clean-stack';
-import pyarn from './lib';
+import run from './run';
 
-export default async function run(argv: Array<string>, exit: boolean = false) {
-  const cli = meow({
+export default async function cli(argv: Array<string>, exit: boolean = false) {
+  const start = Date.now();
+  const {pkg, input, flags} = meow({
     argv,
     help: `
       usage
@@ -27,30 +27,15 @@ export default async function run(argv: Array<string>, exit: boolean = false) {
         workspaces   run a pyarn command inside all workspaces
         workspace    run a pyarn command inside a specific workspace
         help         get help with pyarn commands
-
-      pyarn-specific commands
-        normalize    normalize dependency version ranges across packages (useful when adopting pyarn)
     `,
   });
 
-  let [command, ...args] = cli.input;
-  let opts = cli.flags;
-
-  if (!command) {
-    command = 'install';
-  } else if (!commands[command]) {
-    args = [command, ...args];
-    command = 'run';
-  }
-
-  let start = Date.now();
-
-  logger.title(`pyarn ${command} v${cli.pkg.version}`);
+  logger.title(`pyarn v${pkg.version}`);
 
   processes.handleSignals();
 
   try {
-    await pyarn(command, args, opts);
+    await run(input, flags);
   } catch (err) {
     if (err instanceof PError) {
       logger.error(err.message);

@@ -1,5 +1,5 @@
 // @flow
-import type {Args, Opts} from '../types';
+import * as options from '../utils/options';
 import Project from '../Project';
 import * as processes from '../utils/processes';
 import * as fs from '../utils/fs';
@@ -9,6 +9,16 @@ import * as messages from '../utils/messages';
 import * as semver from 'semver';
 import * as npm from '../utils/npm';
 import chalk from 'chalk';
+
+export type NormalizeOptions = {|
+  cwd?: string,
+|};
+
+export function toNormalizeOptions(args: options.Args, flags: options.Flags): NormalizeOptions {
+  return {
+    cwd: options.string(flags.cwd, 'cwd'),
+  };
+}
 
 function getWorkspaceMap(workspaces) {
   let workspaceMap = new Map();
@@ -85,8 +95,8 @@ function getMaxPackageNameLength(pkgNames) {
   }, 0);
 }
 
-export default async function normalize(args: Args, opts: Opts) {
-  let cwd = process.cwd();
+export async function normalize(opts: NormalizeOptions) {
+  let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
 
