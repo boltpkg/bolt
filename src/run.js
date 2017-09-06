@@ -38,6 +38,6 @@ export default async function pyarn(args: options.Args, flags: options.Flags) {
   } else if (command === 'workspaces' || command === 'ws') {
     await workspaces(toWorkspacesOptions(commandArgs, flags));
   } else {
-    await run(toRunOptions([command, ...args], flags));
+    await run(toRunOptions(args, flags));
   }
 }
