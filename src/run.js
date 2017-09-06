@@ -8,6 +8,7 @@ import {toBuildOptions, build} from './commands/build';
 import {toCheckOptions, check} from './commands/check';
 import {toDocOptions, doc} from './commands/doc';
 import {toFormatOptions, format} from './commands/format';
+import {toGenerateOptions, generate} from './commands/generate';
 import {toHelpOptions, help} from './commands/help';
 import {toInitOptions, init} from './commands/init';
 import {toInstallOptions, install} from './commands/install';
@@ -37,6 +38,8 @@ export default async function pyarn(args: options.Args, flags: options.Flags) {
     await doc(toDocOptions(commandArgs, flags));
   } else if (command === 'format' || command === 'fmt') {
     await format(toFormatOptions(commandArgs, flags));
+  } else if (command === 'generate' || command === 'g') {
+    await generate(toGenerateOptions(commandArgs, flags));
   } else if (command === 'help') {
     await help(toHelpOptions(commandArgs, flags));
   } else if (command === 'init') {

@@ -57,3 +57,5 @@ yarn global add pyarn
 | └ `pyarn p add [dependency]`             | Add a dependency to the project package                    |
 | └ `pyarn p remove [dependency]`          | Remove a dependency from the project package               |
 | └ `pyarn p upgrade [dependency]`         | Upgrade a dependency on the project package                |
+| `pyarn generate/g [generator]`           | **Create files in your package using a generator:**        |
+| └ `pyarn g license [license]`            | Create a LICENSE file in your package (Default: MIT)       |

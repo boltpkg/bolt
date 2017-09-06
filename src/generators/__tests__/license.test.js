@@ -1,0 +1,2 @@
+// @flow
+test('generate license');
