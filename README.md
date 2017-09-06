@@ -1,88 +1,58 @@
 # pyarn
 
-This package implements the public api of Yarn Workspaces using a stripped down
-install process.
-
-pyarn gets around having to implement the entire Yarn Workspace install process
-using the following rules:
-
-1. You MUST specify ALL your dependencies in the **project** `package.json` in
-  addition to the **workspace** `package.json`
-2. Dependencies installed in multiple workspaces MUST depend on the same
-  version.
-
-For example, if you have two workspaces that both depend on `react`, you must
-add `react` to the root project `package.json` and they must all be on the same
-version (i.e. `^15.5.1`).
-
-You can still version workspaces independently and have different sets of
-dependencies in each workspace.
+pyarn is a super-powered wrapper around [Yarn](https://yarnpkg.com/) and
+[npm](https://www.npmjs.com/) that provides you with useful commands for
+working with your projects. The hope in the future is that a lot of these ideas
+will make it back into Yarn and/or npm.
 
 ## Installation
+
+First be sure that you have [Node/npm](https://nodejs.org/) and [Yarn](https://yarnpkg.com/docs/install/) installed. Then run the following command:
 
 ```sh
 yarn global add pyarn
 ```
 
-## Usage
+## Commands
 
-Create a repo that looks like this:
+> **Note:** pyarn is under active development and some of these commands have
+> not yet been implemented.
 
-```
-project/
-  package.json
-  packages/
-    foo/
-      package.json
-    bar/
-      package.json
-```
-
-In the root project `package.json`, you should specify a `pworkspaces` field
-like this:
-
-```json
-{
-  "name": "project",
-  "pworkspaces": [
-    "packages/*"
-  ]
-}
-```
-
-Add a dependency to both the project `package.json` and a workspace
-`package.json`.
-
-```js
-{
-  "dependencies": {
-    "react": "^15.5.1"
-  }
-}
-```
-
-Finally run `pyarn install` and you should get the proper `node_modules`.
-
-```
-pyarn install v0.1.0
-[1/3] Installing project dependencies...
-----------------------------------------
-yarn install v0.27.5
-info No lockfile found.
-[1/4] Resolving packages...
-[2/4] Fetching packages...
-[3/4] Linking dependencies...
-[4/4] Building fresh packages...
-success Saved lockfile.
-Done in 0.84s.
-----------------------------------------
-[2/3] Linking workspace dependencies...
-[3/3] Linking workspace cross-dependencies...
-success Installed and linked workspaces.
-Done in 1.21s.
-```
-
-## Status
-
-Right now only the `install` command is implemented. The plan is to implement
-the entire Yarn Workspace API.
+| Command                                  | Description                                                |
+| ---------------------------------------- | ---------------------------------------------------------- |
+| `pyarn`                                  | (Defaults to `pyarn install`)                              |
+| `pyarn [unknown command]`                | (Defaults to `pyarn run [unknown command]`)                |
+| `pyarn help`                             | View pyarn's help content                                  |
+| `pyarn help [command]`                   | View pyarn's help content for a single command             |
+| `pyarn init`                             | Create a new pyarn package in the current directory        |
+| └ `pyarn init --yes`                     | Skip the prompts and use defaults                          |
+| `pyarn install`                          | Install all the dependencies for a project                 |
+| `pyarn add [dependency]`                 | Add a dependency                                           |
+| `pyarn upgrade [dependency]`             | Upgrade a dependency                                       |
+| `pyarn version`                          | Updates the version of your package(s)                     |
+| `pyarn publish`                          | Publish new version(s) of your package(s) to npm           |
+| └ `pyarn publish-lock`                   | Lock your package(s) on the npm registry                   |
+| └ `pyarn publish-unlock`                 | Unlock your package(s) on the npm registry                 |
+| `pyarn run [script]`                     | Run a script in a package                                  |
+| `pyarn build`                            | Build your package(s) using Babel                          |
+| `pyarn fmt`                              | Format the files in your package(s) using Prettier         |
+| `pyarn lint`                             | Lint your package(s) using ESLint                          |
+| `pyarn doc`                              | Generate docs for your package(s) using documentation.js   |
+| `pyarn check`                            | Type check your package(s) using Flow                      |
+| `pyarn workspaces/ws`                    | **Run the following commands across all workspaces:**      |
+| └ `pyarn ws run [script]`                | Run a script in every package                              |
+| └ `pyarn ws upgrade [dependency]`        | Upgrade a dependency from every package that depends on it |
+| └ `pyarn ws remove [dependency]`         | Remove a dependency from every package that depends on it  |
+| └ `pyarn ws ... --only [name glob]`      | Filter workspaces by name                                  |
+| └ `pyarn ws ... --ignore [name glob]`    | Filter out workspaces by name                              |
+| └ `pyarn ws ... --only-fs [file glob]`   | Filter workspaces by file path                             |
+| └ `pyarn ws ... --ignore-fs [file glob]` | Filter out workspaces by file path                         |
+| `pyarn workspace/w [name]`               | **Run the following commands on a single workspace:**      |
+| └ `pyarn w [name] run [script]`          | Run a script in a single workspace                         |
+| └ `pyarn w [name] add [dependency]`      | Add a dependency to a single workspace                     |
+| └ `pyarn w [name] upgrade [dependency]`  | Upgrade a dependency in a single workspace                 |
+| `pyarn project/p`                        | **Run the following commands on your project package:**    |
+| └ `pyarn p run [script]`                 | Run a script on the project package                        |
+| └ `pyarn p add [dependency]`             | Add a dependency to the project package                    |
+| └ `pyarn p remove [dependency]`          | Remove a dependency from the project package               |
+| └ `pyarn p upgrade [dependency]`         | Upgrade a dependency on the project package                |
