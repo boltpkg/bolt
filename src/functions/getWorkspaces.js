@@ -1,7 +1,18 @@
 // @flow
 import Project from '../Project';
+import type {Config} from '../types';
 
-export default async function getPackages(opts: { cwd?: string } = {}) {
+type Options = {
+  cwd?: string,
+};
+
+type Packages = Array<{
+  dir: string,
+  name: string,
+  config: Config,
+}>;
+
+export default async function getWorkspaces(opts: Options = {}): Promise<Packages> {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
