@@ -1,12 +1,25 @@
 // @flow
-import type {Args, Opts} from '../types';
 import Project from '../Project';
+import * as options from '../utils/options';
 import * as yarn from '../utils/yarn';
 
-export default async function run(args: Args, opts: Opts) {
-  let cwd = process.cwd();
-  let project = await Project.init(cwd);
-  let [script, ...scriptArgs] = args;
+export type RunOptions = {|
+  cwd?: string,
+  script: string,
+  scriptArgs: options.Args,
+|};
 
-  await yarn.run(project.pkg, script, scriptArgs);
+export function toRunOptions(args: options.Args, flags: options.Flags): RunOptions {
+  let [script, ...scriptArgs] = args;
+  return {
+    cwd: options.string(flags.cwd, 'cwd'),
+    script,
+    scriptArgs,
+  };
+}
+
+export async function run(opts: RunOptions) {
+  let cwd = opts.cwd || process.cwd();
+  let project = await Project.init(cwd);
+  await yarn.run(project.pkg, opts.script, opts.scriptArgs);
 }

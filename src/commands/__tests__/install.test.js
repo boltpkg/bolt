@@ -1,5 +1,5 @@
 // @flow
-import install from '../install';
+import {install, toInstallOptions} from '../install';
 import * as processes from '../../utils/processes';
 import * as path from 'path';
 import * as fs from '../../utils/fs';
@@ -24,7 +24,7 @@ describe('install', () => {
 
   test('simple-package', async () => {
     let cwd = await getFixturePath(__dirname, 'simple-package');
-    await install([], { cwd });
+    await install(toInstallOptions([], { cwd }));
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
       'yarn',
       ['install', '--non-interactive', '-s'],

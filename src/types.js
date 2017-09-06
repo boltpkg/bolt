@@ -1,8 +1,5 @@
 // @flow
 
-export type Args = Array<string>;
-export type Opts = { [flag: string]: string | boolean };
-
 export type DependencySet = {
   [key: string]: string
 };

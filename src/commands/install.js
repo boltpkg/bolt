@@ -1,6 +1,6 @@
 // @flow
-import type {Args, Opts} from '../types';
 import Project from '../Project';
+import * as options from '../utils/options';
 import * as processes from '../utils/processes';
 import * as fs from '../utils/fs';
 import * as path from 'path';
@@ -10,8 +10,18 @@ import * as yarn from '../utils/yarn';
 import pathIsInside from 'path-is-inside';
 import {PError} from '../utils/errors';
 
-export default async function install(args: Args, opts: Opts) {
-  let cwd = typeof opts.cwd === 'string' ? opts.cwd : process.cwd();
+export type InstallOptions = {|
+  cwd?: string,
+|};
+
+export function toInstallOptions(args: options.Args, flags: options.Flags): InstallOptions {
+  return {
+    cwd: options.string(flags.cwd, 'cwd'),
+  };
+}
+
+export async function install(opts: InstallOptions) {
+  let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
 

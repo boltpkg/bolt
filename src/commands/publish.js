@@ -1,16 +1,22 @@
 // @flow
-import type {Args, Opts} from '../types';
+import * as options from '../utils/options';
 import {PError} from '../utils/errors';
 import * as logger from '../utils/logger';
 import * as locks from '../utils/locks';
 import * as npm from '../utils/npm';
 import Project from '../Project';
 
-async function getUnpublishedPackages(opts: { cwd?: string } = {}) {
-  const cwd = opts.cwd || process.cwd();
-  const project = await Project.init(cwd);
-  const workspaces = await project.getWorkspaces();
+export type PublishOptions = {|
+  cwd?: string,
+|};
 
+export function toPublishOptions(args: options.Args, flags: options.Flags): PublishOptions {
+  return {
+    cwd: options.string(flags.cwd, 'cwd'),
+  };
+}
+
+async function getUnpublishedPackages(workspaces) {
   const results = await Promise.all(workspaces.map(async workspace => {
     let config = workspace.pkg.config;
     let packageInfo = await npm.info(config.name);
@@ -27,15 +33,15 @@ async function getUnpublishedPackages(opts: { cwd?: string } = {}) {
   });
 }
 
-export default async function publish(args: Args, opts: Opts) {
-  const cwd = typeof opts.cwd === 'string' ? opts.cwd : process.cwd();
+export async function publish(opts: PublishOptions) {
+  const cwd = opts.cwd || process.cwd();
   const project = await Project.init(cwd);
   const workspaces = await project.getWorkspaces();
   const packages = workspaces.map(workspace => workspace.pkg);
 
   try {
     await locks.lock(packages);
-    const unpublishedPackages = await getUnpublishedPackages({ cwd });
+    const unpublishedPackages = await getUnpublishedPackages(workspaces);
     const isUnpublished = workspace => unpublishedPackages.some(pkg => workspace.pkg.config.name === pkg.name);
     const unpublishedWorkspaces = workspaces.filter(isUnpublished);
 
