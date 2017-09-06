@@ -36,7 +36,7 @@ yarn global add pyarn
 | `pyarn run [script]`                     | Run a script in a package                                  |
 | `pyarn build`                            | Build your package(s) using Babel                          |
 | `pyarn test`                             | Test your package(s) using Jest                            |
-| `pyarn fmt`                              | Format the files in your package(s) using Prettier         |
+| `pyarn format/fmt`                       | Format the files in your package(s) using Prettier         |
 | `pyarn lint`                             | Lint your package(s) using ESLint                          |
 | `pyarn doc`                              | Generate docs for your package(s) using documentation.js   |
 | `pyarn check`                            | Type check your package(s) using Flow                      |

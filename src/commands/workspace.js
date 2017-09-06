@@ -1,5 +1,6 @@
 // @flow
 import * as options from '../utils/options';
+import {PError} from '../utils/errors';
 
 import {toWorkspaceAddOptions, workspaceAdd} from './ws/add';
 import {toWorkspaceRemoveOptions, workspaceRemove} from './ws/remove';
@@ -29,10 +30,12 @@ export async function workspace(opts: WorkspaceOptions) {
   } else if (opts.command === 'remove') {
     await workspaceRemove(toWorkspaceRemoveOptions(opts.commandArgs, opts.commandFlags));
   } else if (opts.command === 'run') {
-    await workspaceRemove(toWorkspaceRemoveOptions(opts.commandArgs, opts.commandFlags));
+    await workspaceRun(toWorkspaceRunOptions(opts.commandArgs, opts.commandFlags));
   } else if (opts.command === 'upgrade') {
     await workspaceRemove(toWorkspaceRemoveOptions(opts.commandArgs, opts.commandFlags));
+  } else if (typeof opts.command !== 'undefined') {
+    await workspaceRun(toWorkspaceRunOptions([opts.command, ...opts.commandArgs], opts.commandFlags));
   } else {
-    throw new Error(`Unknown workspace command: "${opts.command}"`);
+    throw new PError(`You must specify a command to run in "pyarn project"`);
   }
 }
