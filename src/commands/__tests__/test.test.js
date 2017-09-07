@@ -1,4 +1,4 @@
 // @flow
-import {test as _test, toTestOptions} from '../test';
+import {test as test_, toTestOptions} from '../test';
 
 test('pyarn test');

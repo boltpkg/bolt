@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// @flow
 'use strict';
 
 var ver = process.versions.node;

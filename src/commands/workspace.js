@@ -36,6 +36,6 @@ export async function workspace(opts: WorkspaceOptions) {
   } else if (typeof opts.command !== 'undefined') {
     await workspaceRun(toWorkspaceRunOptions([opts.command, ...opts.commandArgs], opts.commandFlags));
   } else {
-    throw new PError(`You must specify a command to run in "pyarn project"`);
+    throw new PError(`You must specify a valid command to run in "pyarn workspace"`);
   }
 }

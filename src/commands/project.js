@@ -34,6 +34,6 @@ export async function project(opts: ProjectOptions) {
   } else if (typeof opts.command !== 'undefined') {
     await projectRun(toProjectRunOptions([opts.command, ...opts.commandArgs], opts.commandFlags));
   } else {
-    throw new PError(`You must specify a command to run in "pyarn project"`);
+    throw new PError(`You must specify a valid command to run in "pyarn project"`);
   }
 }
