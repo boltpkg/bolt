@@ -11,6 +11,7 @@ export type Scripts = {
 export type Config = {
   name: string,
   version: string,
+  private?: boolean,
   dependencies?: DependencySet,
   devDependencies?: DependencySet,
   peerDependencies?: DependencySet,
