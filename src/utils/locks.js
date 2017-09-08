@@ -15,14 +15,16 @@ export async function lock(packages: Array<Package>) {
 
   for (let pkg of packages) {
     let {name, version} = pkg.config;
-    let promise = npm.info(name).then(pkgInfo => {
-      if (pkgInfo['dist-tags'].LOCK_DIST_TAG) {
-        throw new PError(`Unable to get lock as a lock already exists for '${name}'`);
+    let promise = npm.infoAllow404(name).then(response => {
+      if (response.response !== '404') {
+        const pkgInfo = response.data;
+        if (pkgInfo['dist-tags'].LOCK_DIST_TAG) {
+          throw new PError(`Unable to get lock as a lock already exists for '${name}'`);
+        }
+        return npm.addTag(name, pkgInfo.version, LOCK_DIST_TAG).then(() => {
+          locks.push(pkg);
+        });
       }
-
-      return npm.addTag(name, pkgInfo.version, LOCK_DIST_TAG).then(() => {
-        locks.push(pkg);
-      });
     })
 
     promises.push(promise);
@@ -42,7 +44,9 @@ export async function unlock(packages: Array<Package>) {
   let promises = [];
 
   for (let pkg of packages) {
-    promises.push(npm.removeTag(pkg.config.name, LOCK_DIST_TAG));
+    const promise = npm.removeTag(pkg.config.name, LOCK_DIST_TAG)
+
+    promises.push(promise);
   }
 
   await Promise.all(promises);
