@@ -62,6 +62,6 @@
     "testMatch": ["<rootDir>/src/**/__tests__/*.js"]
   },
   "lint-staged": {
-    "*.{js,json}": ["prettier --write", "git add"]
+    "*.js": ["prettier --write", "git add"]
   }
 }
