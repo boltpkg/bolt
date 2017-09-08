@@ -44,9 +44,7 @@ export async function unlock(packages: Array<Package>) {
   let promises = [];
 
   for (let pkg of packages) {
-    const promise = npm.removeTag(pkg.config.name, LOCK_DIST_TAG)
-
-    promises.push(promise);
+    promises.push(npm.removeTag(pkg.config.name, LOCK_DIST_TAG));
   }
 
   await Promise.all(promises);
