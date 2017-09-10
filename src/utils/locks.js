@@ -17,7 +17,7 @@ export async function lock(packages: Array<Package>) {
     let {name, version} = pkg.config;
     let promise = npm.infoAllow404(name).then(response => {
       if (response.response !== '404') {
-        const pkgInfo = response.data;
+        const pkgInfo = response.data || {};
         if (pkgInfo['dist-tags'].LOCK_DIST_TAG) {
           throw new PError(`Unable to get lock as a lock already exists for '${name}'`);
         }

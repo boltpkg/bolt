@@ -26,14 +26,15 @@ async function getUnpublishedPackages(packages) {
 
     return {
       name: config.name,
-      previousVersion: config.version,
-      version: response.response !== '404' ? response.data.version : 'UNPUBLISHED',
+      localVersion: config.version,
+      isPublished: response.published,
+      publishedVersion: response.pkgInfo.version || '',
     };
   }));
 
   return results.filter(result => {
     // only publish if our version is higher than the one on npm
-    return result.version === 'UNPUBLISHED' || semver.gt(result.previousVersion, result.version);
+    return !result.isPublished || semver.gt(result.localVersion, result.publishedVersion);
   });
 }
 

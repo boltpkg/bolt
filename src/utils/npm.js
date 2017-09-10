@@ -21,11 +21,11 @@ export function info(pkgName: string) {
 export async function infoAllow404(pkgName: string) {
   try {
     const pkgInfo = await info(pkgName);
-    return { response: '200', data: pkgInfo };
+    return { published: true, pkgInfo };
   } catch(error) {
     if (error.stderr && error.stderr.startsWith('npm ERR! code E404')) {
       logger.warn(`Recieved 404 for npm info ${pkgName}`);
-      return { response: '404', data: {} };
+      return { published: false, pkgInfo: {} };
     }
     throw error;
   }
