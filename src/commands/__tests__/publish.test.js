@@ -47,7 +47,7 @@ describe('pyarn publish', () => {
   });
 
   test('should run publish on all unpublished packages', async () => {
-    untypedNpm.__mockInfoAllow404('foo', { response: '404', data: {}});
+    untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {}});
     const cwd = await getFixturePath(__dirname, 'simple-project');
 
     await publish({ cwd });

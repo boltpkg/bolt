@@ -17,8 +17,8 @@ npm.infoAllow404 = function(pkgName) {
   if (mockResponse) return Promise.resolve(mockResponse.mockResponse);
 
   return Promise.resolve({
-    response: '200',
-    data: {
+    published: true,
+    pkgInfo: {
       name: pkgName,
       version: '1.0.0',
     }
