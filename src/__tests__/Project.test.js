@@ -57,11 +57,8 @@ describe("Project", () => {
 
       expect(valid).toEqual(true);
       expect(graph).toBeInstanceOf(Map);
-
-      /**
-       Need to figure out if this workspace package should be included here or not, currently it is.
-      */
       expect(graph.size).toBe(4);
+
       const expectDependencies = (key, len) => {
         const val = graph.get(key);
         expect(val && val.dependencies && val.dependencies.length).toEqual(len);
