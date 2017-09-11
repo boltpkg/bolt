@@ -8,7 +8,11 @@
   "bin": {
     "pyarn": "./bin.js"
   },
-  "files": ["dist", "index.js", "bin.js"],
+  "files": [
+    "dist",
+    "index.js",
+    "bin.js"
+  ],
   "scripts": {
     "clean": "rm -rf dist",
     "flow": "flow status",
@@ -59,10 +63,15 @@
   },
   "jest": {
     "resetMocks": true,
-    "testMatch": ["<rootDir>/src/**/__tests__/*.js"]
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/*.js"
+    ]
   },
   "lint-staged": {
-    "*.js": ["prettier --write", "git add"]
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "prettier": {
     "singleQuote": true
