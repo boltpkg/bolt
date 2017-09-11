@@ -1,15 +1,15 @@
 // @flow
-import * as path from "path";
-import globby from "globby";
+import * as path from 'path';
+import globby from 'globby';
 
-import Package from "./Package";
-import Workspace from "./Workspace";
-import type { Config } from "./types";
-import { getProjectConfig } from "./utils/config";
-import * as fs from "./utils/fs";
-import * as logger from "./utils/logger";
-import * as messages from "./utils/messages";
-import { PError } from "./utils/errors";
+import Package from './Package';
+import Workspace from './Workspace';
+import type { Config } from './types';
+import { getProjectConfig } from './utils/config';
+import * as fs from './utils/fs';
+import * as logger from './utils/logger';
+import * as messages from './utils/messages';
+import { PError } from './utils/errors';
 
 export type Task = (workspace: Workspace) => Promise<mixed>;
 
@@ -41,7 +41,7 @@ export default class Project {
         let stats = await fs.stat(dir);
         if (!stats.isDirectory()) continue;
 
-        let filePath = path.join(dir, "package.json");
+        let filePath = path.join(dir, 'package.json');
         let wPkg = await Package.init(filePath);
         let workspace = await Workspace.init(wPkg);
 
@@ -73,7 +73,7 @@ export default class Project {
         let match = packagesByName[depName];
         if (!match) continue;
 
-        let actual = depVersion.replace(/^\^/, "");
+        let actual = depVersion.replace(/^\^/, '');
         let expected = match.config.version;
 
         if (actual !== expected) {
