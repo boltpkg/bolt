@@ -5,7 +5,7 @@ import parseJson from 'parse-json';
 import multimatch from 'multimatch';
 import * as path from 'path';
 import * as fs from './fs';
-import type {Config} from '../types';
+import type { Config } from '../types';
 
 async function findConfigFile(filePath: string): Promise<?string> {
   return await pkgUp(filePath);
@@ -56,7 +56,10 @@ export async function getProjectConfig(cwd: string) {
     if (current.config.pworkspaces) {
       let patterns = current.config.pworkspaces;
       let filePaths = matches.map(match => {
-        return path.relative(path.dirname(current.filePath), path.dirname(match.filePath));
+        return path.relative(
+          path.dirname(current.filePath),
+          path.dirname(match.filePath)
+        );
       });
 
       let found = multimatch(filePaths, patterns);

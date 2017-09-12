@@ -1,13 +1,12 @@
-const actualSpawn = require.requireActual('../npm');
+const actualNpm = require.requireActual('../npm');
 const npm = jest.genMockFromModule('../npm');
-
 
 let mockInfoResponses = [];
 
 npm.info = async function(pkgName) {
   return Promise.resolve({
     name: pkgName,
-    version: '1.0.0',
+    version: '1.0.0'
   });
 };
 
@@ -20,14 +19,14 @@ npm.infoAllow404 = function(pkgName) {
     published: true,
     pkgInfo: {
       name: pkgName,
-      version: '1.0.0',
+      version: '1.0.0'
     }
   });
 };
 
 /** Causes npm.infoAllow404 to return a specified mock response for a packageName */
 npm.__mockInfoAllow404 = (pkgName, mockResponse) => {
-  mockInfoResponses.push({pkgName, mockResponse});
+  mockInfoResponses.push({ pkgName, mockResponse });
 };
 
 npm.__clearMockInfoAllow404 = () => {

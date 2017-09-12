@@ -4,12 +4,12 @@ import globby from 'globby';
 
 import Package from './Package';
 import Workspace from './Workspace';
-import type {Config} from './types';
-import {getProjectConfig} from './utils/config';
+import type { Config } from './types';
+import { getProjectConfig } from './utils/config';
 import * as fs from './utils/fs';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
-import {PError} from './utils/errors';
+import { PError } from './utils/errors';
 
 export type Task = (workspace: Workspace) => Promise<mixed>;
 
@@ -78,7 +78,14 @@ export default class Project {
 
         if (actual !== expected) {
           valid = false;
-          logger.error(messages.packageMustDependOnCurrentVersion(name, depName, expected, depVersion));
+          logger.error(
+            messages.packageMustDependOnCurrentVersion(
+              name,
+              depName,
+              expected,
+              depVersion
+            )
+          );
           continue;
         }
 
