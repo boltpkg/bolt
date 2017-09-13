@@ -2,17 +2,21 @@
 import { getFixturePath } from 'jest-fixtures';
 
 import { add, toAddOptions } from '../add';
-import * as yarn from '../../utils/yarn';
-import * as config from '../../utils/config';
 import Package from '../../Package';
 import Project from '../../Project';
+import { symlinkWorkspaces as symlink } from '../../utils/install';
+import * as config from '../../utils/config';
+import * as yarn from '../../utils/yarn';
 
 jest.mock('../../utils/yarn');
 jest.mock('../../utils/config');
 jest.mock('../../utils/logger');
+jest.mock('../../utils/install');
 
+// Required because flow wont know about the .mock property on each mocked function
 const unsafeYarn: any & typeof yarn = yarn;
 const unsafeConfig: any & typeof config = config;
+const unsafeSymlink: any & typeof symlink = symlink;
 
 function expectMockAddCall(mockCall, expectedTarget, expectedPkgsToInstall) {
   expect(mockCall[0]).toBeInstanceOf(Package);
@@ -44,13 +48,18 @@ describe('pyarn add', () => {
   });
 
   describe('from a workspace in a Project', () => {
+    let pkgToInstallIn;
+
+    beforeEach(() => {
+      pkgToInstallIn =
+        workspaces
+          .map(workspace => workspace.pkg)
+          .find(pkg => pkg.config.name === 'foo') || {};
+    });
+
     describe('if the dependency is already installed in the project', () => {
       it('should add the same version that exists in the Project package', async () => {
         const packagesToAdd = ['left-pad']; // exists in the Project Package @^1.1.3
-        const pkgToInstallIn =
-          workspaces
-            .map(workspace => workspace.pkg)
-            .find(pkg => pkg.config.name === 'foo') || {};
 
         await add({ cwd: pkgToInstallIn.dir, pkgs: packagesToAdd });
 
@@ -68,10 +77,6 @@ describe('pyarn add', () => {
     describe('if the package is not installed in the project', () => {
       it('should add to project package and target package', async () => {
         const packagesToAdd = ['chalk'];
-        const pkgToInstallIn =
-          workspaces
-            .map(workspace => workspace.pkg)
-            .find(pkg => pkg.config.name === 'foo') || {};
 
         await add({ cwd: pkgToInstallIn.dir, pkgs: packagesToAdd });
 
@@ -90,6 +95,16 @@ describe('pyarn add', () => {
         // refactoring
         expect(mockConfigCalls[0][1].dependencies.chalk).toBeDefined();
       });
+    });
+
+    it('should symlink packages again', async () => {
+      const packagesToAdd = ['chalk'];
+
+      await add({ cwd: pkgToInstallIn.dir, pkgs: packagesToAdd });
+
+      const mockSymlinkCalls = unsafeSymlink.mock.calls;
+      expect(mockSymlinkCalls.length).toEqual(1);
+      expect(mockSymlinkCalls[0][0].cwd).toEqual(pkgToInstallIn.dir);
     });
   });
 });

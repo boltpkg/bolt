@@ -3,6 +3,7 @@ import * as logger from '../utils/logger';
 import * as options from '../utils/options';
 import * as yarn from '../utils/yarn';
 import { PError } from '../utils/errors';
+import { symlinkWorkspaces } from '../utils/install';
 import Project from '../Project';
 
 export type AddOptions = {
@@ -60,4 +61,7 @@ export async function add(opts: AddOptions) {
       installedVersion
     );
   }
+
+  // Now we can symlink packages back to the Project package
+  await symlinkWorkspaces({ cwd });
 }
