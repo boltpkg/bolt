@@ -83,7 +83,6 @@ describe('Project', () => {
       const workspaces = await project.getWorkspaces();
       const { valid, graph } = await project.getDependentsGraph(workspaces);
       const expectedDependents = {
-        'fixture-project-nested-workspaces': [],
         bar: ['foo', 'baz'],
         foo: [],
         baz: []
@@ -143,7 +142,6 @@ describe('Project', () => {
       const workspaces = await project.getWorkspaces();
       const { valid, graph } = await project.getDependentsGraph(workspaces);
       const expectedDependents = {
-        'nested-workspaces-transitive-dependents': [],
         'pkg-a': ['workspace-a', 'pkg-b'],
         'workspace-a': [],
         'pkg-b': ['pkg-c'],

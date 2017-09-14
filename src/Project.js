@@ -108,11 +108,6 @@ export default class Project {
       [string]: { pkg: Package, dependents: Array<string> }
     } = {};
 
-    dependentsLookup[this.pkg.config.name] = {
-      pkg: this.pkg,
-      dependents: []
-    };
-
     workspaces.forEach(workspace => {
       dependentsLookup[workspace.pkg.config.name] = {
         pkg: workspace.pkg,
