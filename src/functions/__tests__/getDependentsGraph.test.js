@@ -21,7 +21,6 @@ describe('function/getDependentsGraph', () => {
       Object.entries(expectedDependents).forEach(([pkg, dependents]) => {
         expect(dependentsGraph.get(pkg)).toEqual(dependents);
       });
-      console.log(dependentsGraph);
     });
   });
 });
