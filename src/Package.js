@@ -1,14 +1,14 @@
 // @flow
 import * as path from 'path';
-import {readConfigFile, writeConfigFile} from './utils/config';
-import type {Config} from './types';
-import {DEPENDENCY_TYPES} from './constants';
+import { readConfigFile, writeConfigFile } from './utils/config';
+import type { Config } from './types';
+import { DEPENDENCY_TYPES } from './constants';
 import * as processes from './utils/processes';
 import * as semver from 'semver';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import sortObject from 'sort-object';
-import {PError} from './utils/errors';
+import { PError } from './utils/errors';
 
 export default class Package {
   filePath: string;
@@ -54,21 +54,34 @@ export default class Package {
     return allDependencies;
   }
 
-  async updateDependencyVersionRange(depName: string, depType: string, versionRange: string) {
-    let prevVersionRange = this.config[depType] && this.config[depType][depName];
-    if (prevVersionRange === versionRange) return;
+  async setDependencyVersionRange(
+    depName: string,
+    depType: string,
+    versionRange: string
+  ) {
+    let prevVersionRange =
+      this.config[depType] && this.config[depType][depName];
+
+    if (prevVersionRange && prevVersionRange === versionRange) return;
 
     let newConfig = {
       ...this.config,
       [depType]: sortObject({
         ...this.config[depType],
-        [depName]: versionRange,
-      }),
+        [depName]: versionRange
+      })
     };
 
     await writeConfigFile(this.filePath, newConfig);
     this.config = newConfig;
-    logger.info(messages.updatedPackageDependency(this.config.name, depName, versionRange, prevVersionRange));
+    logger.info(
+      messages.updatedPackageDependency(
+        this.config.name,
+        depName,
+        versionRange,
+        prevVersionRange
+      )
+    );
   }
 
   getDependencyType(depName: string) {
@@ -85,7 +98,7 @@ export default class Package {
   //   let updated = false;
 
   //   if (semver.satisfies(version, current)) {
-  //     await this.updateDependencyVersionRange(depName, versionRange);
+  //     await this.setDependencyVersionRange(depName, versionRange);
   //     updated = true;
   //   }
 
