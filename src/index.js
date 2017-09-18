@@ -6,3 +6,6 @@ export { default as runWorkspaceTasks } from './functions/runWorkspaceTasks';
 export {
   default as updatePackageVersions
 } from './functions/updatePackageVersions';
+
+/** Commands */
+export { publish } from './commands/publish';
