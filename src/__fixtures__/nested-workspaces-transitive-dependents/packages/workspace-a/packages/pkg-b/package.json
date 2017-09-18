@@ -1,0 +1,8 @@
+{
+  "name": "pkg-b",
+  "version": "1.0.0",
+  "dependencies": {
+    "react": "^15.6.1",
+    "pkg-a": "^1.0.0"
+  }
+}
