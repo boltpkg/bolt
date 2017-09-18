@@ -1,5 +1,6 @@
 // @flow
 import * as options from '../../utils/options';
+import {PError} from '../../utils/errors';
 
 export type WorkspaceUpgradeOptions = {
   cwd?: string,
@@ -12,6 +13,5 @@ export function toWorkspaceUpgradeOptions(args: options.Args, flags: options.Fla
 }
 
 export async function workspaceUpgrade(opts: WorkspaceUpgradeOptions) {
-  let cwd = opts.cwd || process.cwd();
-  // ...
+  throw new PError('Unimplemented command "workspace upgrade"');
 }

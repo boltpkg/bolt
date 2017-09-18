@@ -3,13 +3,13 @@ import * as options from '../../utils/options';
 import Project from '../../Project';
 import * as yarn from '../../utils/yarn';
 
-export type WorkspaceRunOptions = {
+export type WorkspacesRunOptions = {
   cwd?: string,
   script: string,
   scriptArgs: options.Args,
 };
 
-export function toWorkspaceRunOptions(args: options.Args, flags: options.Flags): WorkspaceRunOptions {
+export function toWorkspacesRunOptions(args: options.Args, flags: options.Flags): WorkspacesRunOptions {
   let [script, ...scriptArgs] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
@@ -18,7 +18,7 @@ export function toWorkspaceRunOptions(args: options.Args, flags: options.Flags):
   };
 }
 
-export async function workspaceRun(opts: WorkspaceRunOptions) {
+export async function workspacesRun(opts: WorkspacesRunOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
