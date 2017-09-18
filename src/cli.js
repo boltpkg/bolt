@@ -237,16 +237,18 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
   } else if (commandMap.WHY[command]) {
     return commands.why(commands.toWhyOptions(commandArgs, flags));
   } else if (commandMap.WORKSPACE[command]) {
-    if (commandMap.WORKSPACE_ADD[subCommand]) {
-      return commands.workspaceAdd(commands.toWorkspaceAddOptions(subCommandArgs, flags));
-    } else if (commandMap.WORKSPACE_REMOVE[subCommand]) {
-      return commands.workspaceRemove(commands.toWorkspaceRemoveOptions(subCommandArgs, flags));
-    } else if (commandMap.WORKSPACE_RUN[subCommand] || typeof subCommand !== 'undefined') {
-      return commands.workspaceRun(commands.toWorkspaceRunOptions(subCommandArgs, flags));
-    } else if (commandMap.WORKSPACE_UPGRADE[subCommand]) {
-      return commands.workspaceUpgrade(commands.toWorkspaceUpgradeOptions(subCommandArgs, flags));
+    let [workspaceCommand, ...rest] = subCommandArgs;
+    let workspaceArgs = [subCommand, ...rest];
+    if (commandMap.WORKSPACE_ADD[workspaceCommand]) {
+      return commands.workspaceAdd(commands.toWorkspaceAddOptions(workspaceArgs, flags));
+    } else if (commandMap.WORKSPACE_REMOVE[workspaceCommand]) {
+      return commands.workspaceRemove(commands.toWorkspaceRemoveOptions(workspaceArgs, flags));
+    } else if (commandMap.WORKSPACE_RUN[workspaceCommand] || typeof subCommand !== 'undefined') {
+      return commands.workspaceRun(commands.toWorkspaceRunOptions(workspaceArgs, flags));
+    } else if (commandMap.WORKSPACE_UPGRADE[workspaceCommand]) {
+      return commands.workspaceUpgrade(commands.toWorkspaceUpgradeOptions(workspaceArgs, flags));
     } else {
-      return commands.workspaceRun(commands.toWorkspaceRunOptions(commandArgs, flags));
+      return commands.workspaceRun(commands.toWorkspaceRunOptions([subCommand, ...subCommandArgs], flags));
     }
   } else if (commandMap.WORKSPACES[command]) {
     if (commandMap.WORKSPACES_ADD[subCommand]) {
