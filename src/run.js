@@ -1,53 +1,63 @@
 // @flow
 import * as options from './utils/options';
 import * as logger from './utils/logger';
-import {PError} from './utils/errors';
+import { PError } from './utils/errors';
 
-import {toAddOptions, add} from './commands/add';
-import {toBinOptions, bin} from './commands/bin';
-import {toBuildOptions, build} from './commands/build';
-import {toCacheOptions, cache} from './commands/cache';
-import {toCheckOptions, check} from './commands/check';
-import {toConfigOptions, config} from './commands/config';
-import {toCreateOptions, create} from './commands/create';
-import {toDocOptions, doc} from './commands/doc';
-import {toFormatOptions, format} from './commands/format';
-import {toGenerateOptions, generate} from './commands/generate';
-import {toGlobalOptions, global_} from './commands/global';
-import {toHelpOptions, help} from './commands/help';
-import {toImportOptions, import_} from './commands/import';
-import {toInitOptions, init} from './commands/init';
-import {toInfoOptions, info} from './commands/info';
-import {toInstallOptions, install} from './commands/install';
-import {toLintOptions, lint} from './commands/lint';
-import {toLicensesOptions, licenses} from './commands/licenses';
-import {toLinkOptions, link} from './commands/link';
-import {toListOptions, list} from './commands/list';
-import {toLoginOptions, login} from './commands/login';
-import {toLogoutOptions, logout} from './commands/logout';
-import {toNormalizeOptions, normalize} from './commands/normalize';
-import {toOutdatedOptions, outdated} from './commands/outdated';
-import {toOwnerOptions, owner} from './commands/owner';
-import {toPackOptions, pack} from './commands/pack';
-import {toProjectOptions, project} from './commands/project';
-import {toPublishOptions, publish} from './commands/publish';
-import {toPublishLockOptions, publishLock} from './commands/publishLock';
-import {toPublishUnlockOptions, publishUnlock} from './commands/publishUnlock';
-import {toRemoveOptions, remove} from './commands/remove';
-import {toRunOptions, run} from './commands/run';
-import {toTagOptions, tag} from './commands/tag';
-import {toTeamOptions, team} from './commands/team';
-import {toTestOptions, test} from './commands/test';
-import {toUnlinkOptions, unlink} from './commands/unlink';
-import {toUpgradeOptions, upgrade} from './commands/upgrade';
-import {toUpgradeInteractiveOptions, upgradeInteractive} from './commands/upgradeInteractive';
-import {toVersionOptions, version} from './commands/version';
-import {toVersionsOptions, versions} from './commands/versions';
-import {toWhyOptions, why} from './commands/why';
-import {toWorkspaceOptions, workspace} from './commands/workspace';
-import {toWorkspacesOptions, workspaces} from './commands/workspaces';
+import { toAddOptions, add } from './commands/add';
+import { toBinOptions, bin } from './commands/bin';
+import { toBuildOptions, build } from './commands/build';
+import { toCacheOptions, cache } from './commands/cache';
+import { toCheckOptions, check } from './commands/check';
+import { toConfigOptions, config } from './commands/config';
+import { toCreateOptions, create } from './commands/create';
+import { toDocOptions, doc } from './commands/doc';
+import { toFormatOptions, format } from './commands/format';
+import { toGenerateOptions, generate } from './commands/generate';
+import { toGlobalOptions, global_ } from './commands/global';
+import { toHelpOptions, help } from './commands/help';
+import { toImportOptions, import_ } from './commands/import';
+import { toInitOptions, init } from './commands/init';
+import { toInfoOptions, info } from './commands/info';
+import { toInstallOptions, install } from './commands/install';
+import { toLintOptions, lint } from './commands/lint';
+import { toLicensesOptions, licenses } from './commands/licenses';
+import { toLinkOptions, link } from './commands/link';
+import { toListOptions, list } from './commands/list';
+import { toLoginOptions, login } from './commands/login';
+import { toLogoutOptions, logout } from './commands/logout';
+import { toNormalizeOptions, normalize } from './commands/normalize';
+import { toOutdatedOptions, outdated } from './commands/outdated';
+import { toOwnerOptions, owner } from './commands/owner';
+import { toPackOptions, pack } from './commands/pack';
+import { toProjectOptions, project } from './commands/project';
+import { toPublishOptions, publish } from './commands/publish';
+import { toPublishLockOptions, publishLock } from './commands/publishLock';
+import {
+  toPublishUnlockOptions,
+  publishUnlock
+} from './commands/publishUnlock';
+import { toRemoveOptions, remove } from './commands/remove';
+import { toRunOptions, run } from './commands/run';
+import { toTagOptions, tag } from './commands/tag';
+import { toTeamOptions, team } from './commands/team';
+import { toTestOptions, test } from './commands/test';
+import { toUnlinkOptions, unlink } from './commands/unlink';
+import { toUpgradeOptions, upgrade } from './commands/upgrade';
+import {
+  toUpgradeInteractiveOptions,
+  upgradeInteractive
+} from './commands/upgradeInteractive';
+import { toVersionOptions, version } from './commands/version';
+import { toVersionsOptions, versions } from './commands/versions';
+import { toWhyOptions, why } from './commands/why';
+import { toWorkspaceOptions, workspace } from './commands/workspace';
+import { toWorkspacesOptions, workspaces } from './commands/workspaces';
 
 export default async function pyarn(args: options.Args, flags: options.Flags) {
+  if (!Array.isArray(args)) {
+    logger.error('pyarn must be called with an array of args, not a string');
+    return;
+  }
   let [command, ...commandArgs] = args;
 
   if (command === 'add') {
