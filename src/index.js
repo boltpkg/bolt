@@ -7,6 +7,5 @@ export {
   default as updatePackageVersions
 } from './functions/updatePackageVersions';
 
-// Allows consumers to run any command they can run from the command line
-// pyarn.run(['publish'], { access: 'public' });
-export { default as run } from './run';
+/** Commands */
+export { publish } from './commands/publish';
