@@ -1,5 +1,6 @@
 // @flow
 import * as options from '../../utils/options';
+import {PError} from '../../utils/errors';
 
 export type WorkspaceRemoveOptions = {
   cwd?: string,
@@ -12,6 +13,5 @@ export function toWorkspaceRemoveOptions(args: options.Args, flags: options.Flag
 }
 
 export async function workspaceRemove(opts: WorkspaceRemoveOptions) {
-  let cwd = opts.cwd || process.cwd();
-  // ...
+  throw new PError('Unimplemented command "workspace remove"');
 }
