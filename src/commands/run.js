@@ -32,6 +32,6 @@ export async function run(opts: RunOptions) {
   let validScript = await yarn.run(pkg, opts.script, opts.scriptArgs);
 
   if (!validScript) {
-    throw new PError(`Package at "${pkgPath}" does not have a script named "${opts.script}"`);
+    throw new PError(`Package at "${pkg.dir}" does not have a script named "${opts.script}"`);
   }
 }

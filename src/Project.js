@@ -144,4 +144,10 @@ export default class Project {
 
     await Promise.all(promises);
   }
+
+  getWorkspaceByName(workspaces: Array<Workspace>, workspaceName: string) {
+    return workspaces.find(workspace => {
+      return workspace.pkg.config.name === workspaceName;
+    });
+  }
 }
