@@ -1,7 +1,9 @@
 // @flow
-import Project from '../Project';
+import Package from '../Package';
 import * as options from '../utils/options';
+import * as config from '../utils/config';
 import * as yarn from '../utils/yarn';
+import { PError } from '../utils/errors';
 
 export type RunOptions = {|
   cwd?: string,
@@ -20,6 +22,16 @@ export function toRunOptions(args: options.Args, flags: options.Flags): RunOptio
 
 export async function run(opts: RunOptions) {
   let cwd = opts.cwd || process.cwd();
-  let project = await Project.init(cwd);
-  await yarn.run(project.pkg, opts.script, opts.scriptArgs);
+  let pkgPath = await config.findConfigFile(cwd);
+
+  if (!pkgPath) {
+    throw new PError(`Unable to find package from "${cwd}"`);
+  }
+
+  let pkg = await Package.init(pkgPath);
+  let validScript = await yarn.run(pkg, opts.script, opts.scriptArgs);
+
+  if (!validScript) {
+    throw new PError(`Package at "${pkgPath}" does not have a script named "${opts.script}"`);
+  }
 }

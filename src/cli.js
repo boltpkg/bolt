@@ -185,10 +185,12 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
       return commands.projectAdd(commands.toProjectAddOptions(subCommandArgs, flags));
     } else if (commandMap.PROJECT_REMOVE[subCommand]) {
       return commands.projectRemove(commands.toProjectRemoveOptions(subCommandArgs, flags));
-    } else if (commandMap.PROJECT_RUN[subCommand] || typeof subCommand !== 'undefined') {
+    } else if (commandMap.PROJECT_RUN[subCommand]) {
       return commands.projectRun(commands.toProjectRunOptions(subCommandArgs, flags));
     } else if (commandMap.PROJECT_UPGRADE[subCommand]) {
       return commands.projectUpgrade(commands.toProjectUpgradeOptions(subCommandArgs, flags));
+    } else {
+      return commands.projectRun(commands.toProjectRunOptions(commandArgs, flags));
     }
   } else if (commandMap.PUBLISH[command]) {
     return commands.publish(commands.toPublishOptions(commandArgs, flags));
@@ -243,17 +245,23 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
       return commands.workspaceRun(commands.toWorkspaceRunOptions(subCommandArgs, flags));
     } else if (commandMap.WORKSPACE_UPGRADE[subCommand]) {
       return commands.workspaceUpgrade(commands.toWorkspaceUpgradeOptions(subCommandArgs, flags));
+    } else {
+      return commands.workspaceRun(commands.toWorkspaceRunOptions(commandArgs, flags));
     }
   } else if (commandMap.WORKSPACES[command]) {
     if (commandMap.WORKSPACES_ADD[subCommand]) {
       return commands.workspacesAdd(commands.toWorkspacesAddOptions(subCommandArgs, flags));
     } else if (commandMap.WORKSPACES_REMOVE[subCommand]) {
       return commands.workspacesRemove(commands.toWorkspacesRemoveOptions(subCommandArgs, flags));
-    } else if (commandMap.WORKSPACES_RUN[subCommand] || typeof subCommand !== 'undefined') {
+    } else if (commandMap.WORKSPACES_RUN[subCommand]) {
       return commands.workspacesRun(commands.toWorkspacesRunOptions(subCommandArgs, flags));
     } else if (commandMap.WORKSPACES_UPGRADE[subCommand]) {
       return commands.workspacesUpgrade(commands.toWorkspacesUpgradeOptions(subCommandArgs, flags));
+    } else {
+      return commands.workspacesRun(commands.toWorkspacesRunOptions(commandArgs, flags));
     }
+  } else {
+    return commands.run(commands.toRunOptions(args, flags));
   }
 
   throw new PError(`You must specify a valid command`);
