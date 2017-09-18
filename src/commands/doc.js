@@ -1,13 +1,24 @@
 // @flow
 import * as options from '../utils/options';
 import {PError} from '../utils/errors';
+import {run} from './run';
 
-export type DocOptions = {};
+export type DocOptions = {|
+  cwd?: string,
+  args: options.Args,
+|};
 
 export function toDocOptions(args: options.Args, flags: options.Flags): DocOptions {
-  return {};
+  return {
+    cwd: options.string(flags.cwd, 'cwd'),
+    args: args,
+  };
 }
 
 export async function doc(opts: DocOptions) {
-  throw new PError('Unimplemented command "doc"');
+  await run({
+    cwd: opts.cwd,
+    script: 'doc',
+    scriptArgs: opts.args,
+  });
 }

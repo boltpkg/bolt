@@ -1,13 +1,25 @@
 // @flow
 import * as options from '../utils/options';
 import {PError} from '../utils/errors';
+import {run} from './run';
 
-export type CheckOptions = {};
+export type CheckOptions = {|
+  cwd?: string,
+  args: options.Args,
+|};
+
 
 export function toCheckOptions(args: options.Args, flags: options.Flags): CheckOptions {
-  return {};
+  return {
+    cwd: options.string(flags.cwd, 'cwd'),
+    args: args,
+  };
 }
 
 export async function check(opts: CheckOptions) {
-  throw new PError('Unimplemented command "check"');
+  await run({
+    cwd: opts.cwd,
+    script: 'check',
+    scriptArgs: opts.args,
+  });
 }

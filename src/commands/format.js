@@ -1,13 +1,24 @@
 // @flow
 import * as options from '../utils/options';
 import {PError} from '../utils/errors';
+import {run} from './run';
 
-export type FormatOptions = {};
+export type FormatOptions = {|
+  cwd?: string,
+  args: options.Args,
+|};
 
 export function toFormatOptions(args: options.Args, flags: options.Flags): FormatOptions {
-  return {};
+  return {
+    cwd: options.string(flags.cwd, 'cwd'),
+    args: args,
+  };
 }
 
 export async function format(opts: FormatOptions) {
-  throw new PError('Unimplemented command "format"');
+  await run({
+    cwd: opts.cwd,
+    script: 'format',
+    scriptArgs: opts.args,
+  });
 }

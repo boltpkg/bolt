@@ -1,13 +1,24 @@
 // @flow
 import * as options from '../utils/options';
 import {PError} from '../utils/errors';
+import {run} from './run';
 
-export type BuildOptions = {};
+export type BuildOptions = {|
+  cwd?: string,
+  args: options.Args,
+|};
 
 export function toBuildOptions(args: options.Args, flags: options.Flags): BuildOptions {
-  return {};
+  return {
+    cwd: options.string(flags.cwd, 'cwd'),
+    args: args,
+  };
 }
 
 export async function build(opts: BuildOptions) {
-  throw new PError('Unimplemented command "build"');
+  await run({
+    cwd: opts.cwd,
+    script: 'build',
+    scriptArgs: opts.args,
+  });
 }
