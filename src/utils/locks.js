@@ -2,8 +2,8 @@
 import Package from '../Package';
 import * as logger from './logger';
 import * as npm from './npm';
-import {settleAll} from './promises';
-import {PError} from './errors';
+import { settleAll } from './promises';
+import { PError } from './errors';
 
 const LOCK_DIST_TAG = 'pyarn-lock';
 
@@ -14,18 +14,20 @@ export async function lock(packages: Array<Package>) {
   logger.info('Attempting to get locks for all packages');
 
   for (let pkg of packages) {
-    let {name, version} = pkg.config;
+    let { name, version } = pkg.config;
     let promise = npm.infoAllow404(name).then(response => {
-      if (response.response !== '404') {
-        const pkgInfo = response.data || {};
+      if (response.published) {
+        const pkgInfo = response.pkgInfo || {};
         if (pkgInfo['dist-tags'].LOCK_DIST_TAG) {
-          throw new PError(`Unable to get lock as a lock already exists for '${name}'`);
+          throw new PError(
+            `Unable to get lock as a lock already exists for '${name}'`
+          );
         }
         return npm.addTag(name, pkgInfo.version, LOCK_DIST_TAG).then(() => {
           locks.push(pkg);
         });
       }
-    })
+    });
 
     promises.push(promise);
   }
@@ -36,7 +38,9 @@ export async function lock(packages: Array<Package>) {
     logger.error(err.message);
     // Note: We only unlock the locks *we* just locked, as the other ones are currently being used
     await unlock(locks);
-    throw new PError('Unable to lock all packages, someone else may be releasing');
+    throw new PError(
+      'Unable to lock all packages, someone else may be releasing'
+    );
   }
 }
 
