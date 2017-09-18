@@ -36,7 +36,6 @@ export class ChildProcessError extends Error {
 type SpawnOptions = {
   cwd?: string,
   pkg?: Package,
-  env?: Object,
   silent?: boolean,
   tty?: boolean,
 };
@@ -50,12 +49,11 @@ export function spawn(cmd: string, args: Array<string>, opts: SpawnOptions = {})
 
     let spawnOpts: child_process$spawnOpts = {
       cwd: opts.cwd,
-      env: Object.assign({
-        PATH: process.env.PATH,
-      }, opts.env),
+      env: process.env,
     };
 
     if (opts.tty) {
+      spawnOpts.shell = true;
       spawnOpts.stdio = 'inherit';
     }
 

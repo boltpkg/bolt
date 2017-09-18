@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as fs from './fs';
 import type {Config} from '../types';
 
-async function findConfigFile(filePath: string): Promise<?string> {
+export async function findConfigFile(filePath: string): Promise<?string> {
   return await pkgUp(filePath);
 }
 
