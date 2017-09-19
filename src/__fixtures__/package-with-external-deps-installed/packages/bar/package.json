@@ -1,0 +1,7 @@
+{
+  "name": "bar",
+  "version": "1.0.0",
+  "devDependencies": {
+    "global-dep": "^1.0.0"
+  }
+}

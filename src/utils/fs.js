@@ -14,7 +14,10 @@ export function readFile(filePath: string): Promise<string> {
   return promisify(cb => fs.readFile(filePath, cb));
 }
 
-export function writeFile(filePath: string, fileContents: string): Promise<string> {
+export function writeFile(
+  filePath: string,
+  fileContents: string
+): Promise<string> {
   return promisify(cb => fs.writeFile(filePath, fileContents, cb));
 }
 
@@ -74,14 +77,18 @@ async function createWindowsSymlink(src, dest, type) {
   }
 }
 
-export async function symlink(src: string, dest: string, type: 'exec' | 'junction') {
+export async function symlink(
+  src: string,
+  dest: string,
+  type: 'exec' | 'junction'
+) {
   if (dest.includes(path.sep)) {
     await mkdirp(path.dirname(dest));
   }
 
   if (process.platform === 'win32') {
     return await createWindowsSymlink(src, dest, type);
-  }  else {
+  } else {
     return await createPosixSymlink(src, dest, type);
   }
 }
@@ -96,8 +103,9 @@ export async function readdirSafe(dir: string) {
     .catch(err => Promise.resolve([]))
     .then(statsOrArray => {
       if (statsOrArray instanceof Array) return statsOrArray;
-      if (!statsOrArray.isDirectory()) throw new Error(dir + ' is not a directory');
-      return readdir(dir)
+      if (!statsOrArray.isDirectory())
+        throw new Error(dir + ' is not a directory');
+      return readdir(dir);
     });
 }
 
