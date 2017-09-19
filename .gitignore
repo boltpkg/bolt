@@ -2,3 +2,4 @@ node_modules
 *.log
 dist
 coverage
+!**/__fixtures__/**/node_modules/
