@@ -1,0 +1,10 @@
+{
+  "name": "fixture-project-nested-workspaces-with-scoped-packages",
+  "description": "Same as scoped-workspaces but packages all have scoped names",
+  "private": true,
+  "version": "1.0.0",
+  "pworkspaces": ["packages/*"],
+  "dependencies": {
+    "react": "^15.6.1"
+  }
+}

@@ -1,6 +1,7 @@
 // @flow
 import * as path from 'path';
 import globby from 'globby';
+import multimatch from 'multimatch';
 
 import Package from './Package';
 import Workspace from './Workspace';
@@ -149,5 +150,46 @@ export default class Project {
     return workspaces.find(workspace => {
       return workspace.pkg.config.name === workspaceName;
     });
+  }
+
+  filterWorkspaces(
+    workspaces: Array<Workspace>,
+    opts: {
+      only?: string,
+      ignore?: string,
+      onlyFs?: string,
+      ignoreFs?: string
+    }
+  ) {
+    const onlyPattern = opts.only || '**';
+    const ignorePattern = opts.ignore ? `!${opts.ignore}` : '';
+    const onlyFsPattern = opts.onlyFs || '**';
+    const ignoreFsPattern = opts.ignoreFs ? `!${opts.ignoreFs}` : '';
+    const relativeDir = (workspace: Workspace) =>
+      path.relative(this.pkg.dir, workspace.pkg.dir);
+
+    const workspaceNames = workspaces.map(ws => ws.pkg.config.name);
+    const workspaceDirs = workspaces.map(ws => relativeDir(ws));
+
+    const filteredByName = multimatch(workspaceNames, [
+      onlyPattern,
+      ignorePattern
+    ]);
+    const filteredByDir = multimatch(workspaceDirs, [
+      onlyFsPattern,
+      ignoreFsPattern
+    ]);
+
+    const filteredWorkspaces = workspaces.filter(
+      workspace =>
+        filteredByName.includes(workspace.pkg.config.name) &&
+        filteredByDir.includes(relativeDir(workspace))
+    );
+
+    if (filteredWorkspaces.length === 0) {
+      logger.warn('No packages match the filters provided');
+    }
+
+    return filteredWorkspaces;
   }
 }
