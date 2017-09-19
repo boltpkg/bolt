@@ -3,7 +3,11 @@ import type Package from '../Package';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
 
-export async function run(pkg: Package, script: string, args: Array<string> = []) {
+export async function run(
+  pkg: Package,
+  script: string,
+  args: Array<string> = []
+) {
   let spawnArgs = ['run', '-s', script];
 
   if (args.length) {
@@ -17,7 +21,7 @@ export async function run(pkg: Package, script: string, args: Array<string> = []
   }
 
   if (!validScript) {
-    let bins = await fs.readdir(pkg.nodeModulesBin);
+    let bins = await fs.readdirSafe(pkg.nodeModulesBin);
 
     if (bins.includes(script)) {
       validScript = true;
@@ -28,7 +32,7 @@ export async function run(pkg: Package, script: string, args: Array<string> = []
     await processes.spawn('yarn', spawnArgs, {
       cwd: pkg.dir,
       pkg: pkg,
-      tty: true,
+      tty: true
     });
   }
 
@@ -38,6 +42,6 @@ export async function run(pkg: Package, script: string, args: Array<string> = []
 export async function init(cwd: string) {
   await processes.spawn('yarn', ['init', '-s'], {
     cwd: cwd,
-    tty: true,
+    tty: true
   });
 }

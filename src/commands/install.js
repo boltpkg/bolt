@@ -8,15 +8,18 @@ import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
 import * as yarn from '../utils/yarn';
 import pathIsInside from 'path-is-inside';
-import {PError} from '../utils/errors';
+import { PError } from '../utils/errors';
 
 export type InstallOptions = {|
-  cwd?: string,
+  cwd?: string
 |};
 
-export function toInstallOptions(args: options.Args, flags: options.Flags): InstallOptions {
+export function toInstallOptions(
+  args: options.Args,
+  flags: options.Flags
+): InstallOptions {
   return {
-    cwd: options.string(flags.cwd, 'cwd'),
+    cwd: options.string(flags.cwd, 'cwd')
   };
 }
 
@@ -27,7 +30,7 @@ export async function install(opts: InstallOptions) {
 
   let {
     graph: dependencyGraph,
-    valid: dependencyGraphValid,
+    valid: dependencyGraphValid
   } = await project.getDependencyGraph(workspaces);
 
   let projectDependencies = project.pkg.getAllDependencies();
@@ -55,13 +58,22 @@ export async function install(opts: InstallOptions) {
 
       if (!matched) {
         valid = false;
-        logger.error(messages.depMustBeAddedToProject(workspace.pkg.config.name, name));
+        logger.error(
+          messages.depMustBeAddedToProject(workspace.pkg.config.name, name)
+        );
         continue;
       }
 
       if (version !== matched) {
         valid = false;
-        logger.error(messages.depMustMatchProject(workspace.pkg.config.name, name, matched, version));
+        logger.error(
+          messages.depMustMatchProject(
+            workspace.pkg.config.name,
+            name,
+            matched,
+            version
+          )
+        );
         continue;
       }
 
@@ -100,12 +112,12 @@ export async function install(opts: InstallOptions) {
   logger.log('[1/2] Installing project dependencies...');
 
   await processes.spawn('yarn', ['install', '--non-interactive', '-s'], {
-    cwd: project.pkg.dir,
+    cwd: project.pkg.dir
   });
 
   logger.log('[2/2] Linking workspace dependencies...');
 
-  for (let binFile of await fs.readdir(project.pkg.nodeModulesBin)) {
+  for (let binFile of await fs.readdirSafe(project.pkg.nodeModulesBin)) {
     let binPath = path.join(project.pkg.nodeModulesBin, binFile);
     let binName = path.basename(binPath);
 
@@ -118,7 +130,9 @@ export async function install(opts: InstallOptions) {
     let linkPath = path.join(project.pkg.nodeModulesBin, linkFile);
 
     if (!pathIsInside(linkPath, project.pkg.nodeModules)) {
-      throw new PError(`${binName} is linked to a location outside of project node_modules: ${linkPath}`);
+      throw new PError(
+        `${binName} is linked to a location outside of project node_modules: ${linkPath}`
+      );
     }
 
     let relativeLinkPath = path.relative(project.pkg.nodeModules, linkPath);
@@ -141,18 +155,22 @@ export async function install(opts: InstallOptions) {
       symlinksToCreate.push({
         src: binPath,
         dest: workspaceBinPath,
-        type: 'exec',
+        type: 'exec'
       });
     }
   }
 
-  await Promise.all(directoriesToCreate.map(dirName => {
-    return fs.mkdirp(dirName);
-  }));
+  await Promise.all(
+    directoriesToCreate.map(dirName => {
+      return fs.mkdirp(dirName);
+    })
+  );
 
-  await Promise.all(symlinksToCreate.map(async ({ src, dest, type }) => {
-    await fs.symlink(src, dest, type);
-  }));
+  await Promise.all(
+    symlinksToCreate.map(async ({ src, dest, type }) => {
+      await fs.symlink(src, dest, type);
+    })
+  );
 
   await Project.runWorkspaceTasks(workspaces, async workspace => {
     await yarn.run(workspace.pkg, 'postinstall');
