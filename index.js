@@ -1,6 +1,5 @@
 'use strict';
 
-require('array-includes/polyfill');
 var ver = process.versions.node;
 var majorVer = parseInt(ver.split('.')[0], 10);
 

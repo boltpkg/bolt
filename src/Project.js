@@ -2,6 +2,7 @@
 import * as path from 'path';
 import globby from 'globby';
 import multimatch from 'multimatch';
+import includes from 'array-includes';
 
 import Package from './Package';
 import Workspace from './Workspace';
@@ -182,8 +183,8 @@ export default class Project {
 
     const filteredWorkspaces = workspaces.filter(
       workspace =>
-        filteredByName.includes(workspace.pkg.config.name) &&
-        filteredByDir.includes(relativeDir(workspace))
+        includes(filteredByName, workspace.pkg.config.name) &&
+        includes(filteredByDir, relativeDir(workspace))
     );
 
     if (filteredWorkspaces.length === 0) {
