@@ -5,33 +5,39 @@ import type Package from '../Package';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
 
+type Dependency = {
+  name: string,
+  version?: string
+};
+
 export async function add(
   pkg: Package,
-  dependency: {
-    name: string,
-    version?: string,
-    type?:
-      | 'dependencies'
-      | 'devDependencies'
-      | 'peerDependencies'
-      | 'optionalDependencies'
-  }
+  dependencies: Array<Dependency>,
+  type?:
+    | 'dependencies'
+    | 'devDependencies'
+    | 'peerDependencies'
+    | 'optionalDependencies'
 ) {
   const spawnArgs = ['add'];
-  if (dependency.version) {
-    spawnArgs.push(`${dependency.name}@${dependency.version}`);
-  } else {
-    spawnArgs.push(dependency.name);
-  }
+  if (!dependencies.length) return;
 
-  if (dependency.type) {
+  dependencies.forEach(dep => {
+    if (dep.version) {
+      spawnArgs.push(`${dep.name}@${dep.version}`);
+    } else {
+      spawnArgs.push(dep.name);
+    }
+  });
+
+  if (type) {
     const typeToFlagMap = {
       dependencies: '',
       devDependencies: '--dev',
       peerDependencies: '--peer',
       optionalDependencies: '--optional'
     };
-    const flag = typeToFlagMap[dependency.type];
+    const flag = typeToFlagMap[type];
     if (flag) spawnArgs.push(flag);
   }
 
