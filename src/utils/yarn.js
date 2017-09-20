@@ -5,6 +5,43 @@ import type Package from '../Package';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
 
+export async function add(
+  pkg: Package,
+  dependency: {
+    name: string,
+    version?: string,
+    type?:
+      | 'dependencies'
+      | 'devDependencies'
+      | 'peerDependencies'
+      | 'optionalDependencies'
+  }
+) {
+  const spawnArgs = ['add'];
+  if (dependency.version) {
+    spawnArgs.push(`${dependency.name}@${dependency.version}`);
+  } else {
+    spawnArgs.push(dependency.name);
+  }
+
+  if (dependency.type) {
+    const typeToFlagMap = {
+      dependencies: '',
+      devDependencies: '--dev',
+      peerDependencies: '--peer',
+      optionalDependencies: '--optional'
+    };
+    const flag = typeToFlagMap[dependency.type];
+    if (flag) spawnArgs.push(flag);
+  }
+
+  await processes.spawn('yarn', spawnArgs, {
+    cwd: pkg.dir,
+    pkg: pkg,
+    tty: true
+  });
+}
+
 export async function run(
   pkg: Package,
   script: string,
