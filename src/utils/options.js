@@ -3,7 +3,7 @@
 export type Args = Array<string>;
 
 export type Flags = {
-  [key: string]: boolean | string,
+  [key: string]: boolean | string
 };
 
 export function string(val: mixed, name: string): string | void {
@@ -20,4 +20,15 @@ export function boolean(val: mixed, name: string): boolean | void {
   } else {
     return val;
   }
+}
+
+export function toFilterOpts(flags: Flags) {
+  let filterOpts = {};
+
+  if (flags.only) filterOpts.only = string(flags.only, 'only');
+  if (flags.onlyFs) filterOpts.onlyFs = string(flags.onlyFs, 'onlyFs');
+  if (flags.ignore) filterOpts.ignore = string(flags.ignore, 'ignore');
+  if (flags.ignoreFs) filterOpts.ignoreFs = string(flags.ignoreFs, 'ignoreFs');
+
+  return filterOpts;
 }
