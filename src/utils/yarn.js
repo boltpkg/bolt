@@ -1,4 +1,6 @@
 // @flow
+import includes from 'array-includes';
+
 import type Package from '../Package';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
@@ -23,7 +25,7 @@ export async function run(
   if (!validScript) {
     let bins = await fs.readdirSafe(pkg.nodeModulesBin);
 
-    if (bins.includes(script)) {
+    if (includes(bins, script)) {
       validScript = true;
     }
   }
