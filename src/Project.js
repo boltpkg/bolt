@@ -6,7 +6,7 @@ import includes from 'array-includes';
 
 import Package from './Package';
 import Workspace from './Workspace';
-import type { Config } from './types';
+import type { Config, FilterOpts } from './types';
 import { getProjectConfig } from './utils/config';
 import * as fs from './utils/fs';
 import * as logger from './utils/logger';
@@ -153,15 +153,7 @@ export default class Project {
     });
   }
 
-  filterWorkspaces(
-    workspaces: Array<Workspace>,
-    opts: {
-      only?: string,
-      ignore?: string,
-      onlyFs?: string,
-      ignoreFs?: string
-    }
-  ) {
+  filterWorkspaces(workspaces: Array<Workspace>, opts: FilterOpts) {
     const onlyPattern = opts.only || '**';
     const ignorePattern = opts.ignore ? `!${opts.ignore}` : '';
     const onlyFsPattern = opts.onlyFs || '**';

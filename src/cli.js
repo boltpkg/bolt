@@ -3,7 +3,7 @@ import meow from 'meow';
 import chalk from 'chalk';
 import * as logger from './utils/logger';
 import * as processes from './utils/processes';
-import {PError} from './utils/errors';
+import { PError } from './utils/errors';
 import cleanStack from 'clean-stack';
 import * as commands from './commands';
 import * as options from './utils/options';
@@ -83,11 +83,11 @@ const commandMap = {
   WORKSPACE_REMOVE: { remove: true, rm: true },
   WORKSPACE_RUN: { run: true },
   WORKSPACE_UPGRADE: { upgrade: true },
-  WORKSPACES: { workspace: true, w: true },
+  WORKSPACES: { workspaces: true, ws: true },
   WORKSPACES_ADD: { add: true },
   WORKSPACES_REMOVE: { remove: true, rm: true },
   WORKSPACES_RUN: { run: true },
-  WORKSPACES_UPGRADE: { upgrade: true },
+  WORKSPACES_UPGRADE: { upgrade: true }
 };
 
 function runCommandFromCli(args: options.Args, flags: options.Flags) {
@@ -102,23 +102,43 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.build(commands.toBuildOptions(commandArgs, flags));
   } else if (commandMap.CACHE_CLEAN[command]) {
     if (commandMap.CACHE_DIR[command]) {
-      return commands.cacheClean(commands.toCacheCleanOptions(subCommandArgs, flags));
+      return commands.cacheClean(
+        commands.toCacheCleanOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.CACHE_DIR[command]) {
-      return commands.cacheDir(commands.toCacheDirOptions(subCommandArgs, flags));
-    } else if (commandMap.CACHE_LIST[command] || typeof subCommand === 'undefined') {
-      return commands.cacheList(commands.toCacheListOptions(subCommandArgs, flags));
+      return commands.cacheDir(
+        commands.toCacheDirOptions(subCommandArgs, flags)
+      );
+    } else if (
+      commandMap.CACHE_LIST[command] ||
+      typeof subCommand === 'undefined'
+    ) {
+      return commands.cacheList(
+        commands.toCacheListOptions(subCommandArgs, flags)
+      );
     }
   } else if (commandMap.CHECK[command]) {
     return commands.check(commands.toCheckOptions(commandArgs, flags));
   } else if (commandMap.CONFIG[command]) {
     if (commandMap.CONFIG_DELETE[subCommand]) {
-      return commands.configDelete(commands.toConfigDeleteOptions(subCommandArgs, flags));
+      return commands.configDelete(
+        commands.toConfigDeleteOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.CONFIG_GET[subCommand]) {
-      return commands.configGet(commands.toConfigGetOptions(subCommandArgs, flags));
-    } else if (commandMap.CONFIG_LIST[subCommand] || typeof subCommand === 'undefined') {
-      return commands.configList(commands.toConfigListOptions(subCommandArgs, flags));
+      return commands.configGet(
+        commands.toConfigGetOptions(subCommandArgs, flags)
+      );
+    } else if (
+      commandMap.CONFIG_LIST[subCommand] ||
+      typeof subCommand === 'undefined'
+    ) {
+      return commands.configList(
+        commands.toConfigListOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.CONFIG_SET[subCommand]) {
-      return commands.configSet(commands.toConfigSetOptions(subCommandArgs, flags));
+      return commands.configSet(
+        commands.toConfigSetOptions(subCommandArgs, flags)
+      );
     }
   } else if (commandMap.CREATE[command]) {
     return commands.create(commands.toCreateOptions(commandArgs, flags));
@@ -130,15 +150,28 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.generate(commands.toGenerateOptions(commandArgs, flags));
   } else if (commandMap.GLOBAL[command]) {
     if (commandMap.GLOBAL_ADD[subCommand]) {
-      return commands.globalAdd(commands.toGlobalAddOptions(subCommandArgs, flags));
+      return commands.globalAdd(
+        commands.toGlobalAddOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.GLOBAL_BIN[subCommand]) {
-      return commands.globalBin(commands.toGlobalBinOptions(subCommandArgs, flags));
-    } else if (commandMap.GLOBAL_LIST[subCommand] || typeof subCommand === 'undefined') {
-      return commands.globalList(commands.toGlobalListOptions(subCommandArgs, flags));
+      return commands.globalBin(
+        commands.toGlobalBinOptions(subCommandArgs, flags)
+      );
+    } else if (
+      commandMap.GLOBAL_LIST[subCommand] ||
+      typeof subCommand === 'undefined'
+    ) {
+      return commands.globalList(
+        commands.toGlobalListOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.GLOBAL_REMOVE[subCommand]) {
-      return commands.globalRemove(commands.toGlobalRemoveOptions(subCommandArgs, flags));
+      return commands.globalRemove(
+        commands.toGlobalRemoveOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.GLOBAL_UPGRADE[subCommand]) {
-      return commands.globalUpgrade(commands.toGlobalUpgradeOptions(subCommandArgs, flags));
+      return commands.globalUpgrade(
+        commands.toGlobalUpgradeOptions(subCommandArgs, flags)
+      );
     }
   } else if (commandMap.HELP[command]) {
     return commands.help(commands.toHelpOptions(commandArgs, flags));
@@ -152,9 +185,16 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.install(commands.toInstallOptions(commandArgs, flags));
   } else if (commandMap.LICENSES[command]) {
     if (commandMap.LICENSES_GENERATE_DISCLAIMER[subCommand]) {
-      return commands.licensesGenerateDisclaimer(commands.toLicensesGenerateDisclaimerOptions(subCommandArgs, flags));
-    } else if (commandMap.LICENSES_LIST[subCommand] || typeof subCommand === 'undefined') {
-      return commands.licensesList(commands.toLicensesListOptions(subCommandArgs, flags));
+      return commands.licensesGenerateDisclaimer(
+        commands.toLicensesGenerateDisclaimerOptions(subCommandArgs, flags)
+      );
+    } else if (
+      commandMap.LICENSES_LIST[subCommand] ||
+      typeof subCommand === 'undefined'
+    ) {
+      return commands.licensesList(
+        commands.toLicensesListOptions(subCommandArgs, flags)
+      );
     }
   } else if (commandMap.LINK[command]) {
     return commands.link(commands.toLinkOptions(commandArgs, flags));
@@ -172,32 +212,55 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.outdated(commands.toOutdatedOptions(commandArgs, flags));
   } else if (commandMap.OWNER[command]) {
     if (commandMap.OWNER_ADD[subCommand]) {
-      return commands.ownerAdd(commands.toOwnerAddOptions(subCommandArgs, flags));
-    } else if (commandMap.OWNER_LIST[subCommand] || typeof subCommand === 'undefined') {
-      return commands.ownerList(commands.toOwnerListOptions(subCommandArgs, flags));
+      return commands.ownerAdd(
+        commands.toOwnerAddOptions(subCommandArgs, flags)
+      );
+    } else if (
+      commandMap.OWNER_LIST[subCommand] ||
+      typeof subCommand === 'undefined'
+    ) {
+      return commands.ownerList(
+        commands.toOwnerListOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.OWNER_REMOVE[subCommand]) {
-      return commands.ownerRemove(commands.toOwnerRemoveOptions(subCommandArgs, flags));
+      return commands.ownerRemove(
+        commands.toOwnerRemoveOptions(subCommandArgs, flags)
+      );
     }
   } else if (commandMap.PACK[command]) {
     return commands.pack(commands.toPackOptions(commandArgs, flags));
   } else if (commandMap.PROJECT[command]) {
     if (commandMap.PROJECT_ADD[subCommand]) {
-      return commands.projectAdd(commands.toProjectAddOptions(subCommandArgs, flags));
+      return commands.projectAdd(
+        commands.toProjectAddOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.PROJECT_REMOVE[subCommand]) {
-      return commands.projectRemove(commands.toProjectRemoveOptions(subCommandArgs, flags));
+      return commands.projectRemove(
+        commands.toProjectRemoveOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.PROJECT_RUN[subCommand]) {
-      return commands.projectRun(commands.toProjectRunOptions(subCommandArgs, flags));
+      return commands.projectRun(
+        commands.toProjectRunOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.PROJECT_UPGRADE[subCommand]) {
-      return commands.projectUpgrade(commands.toProjectUpgradeOptions(subCommandArgs, flags));
+      return commands.projectUpgrade(
+        commands.toProjectUpgradeOptions(subCommandArgs, flags)
+      );
     } else {
-      return commands.projectRun(commands.toProjectRunOptions(commandArgs, flags));
+      return commands.projectRun(
+        commands.toProjectRunOptions(commandArgs, flags)
+      );
     }
   } else if (commandMap.PUBLISH[command]) {
     return commands.publish(commands.toPublishOptions(commandArgs, flags));
   } else if (commandMap.PUBLISH_LOCK[command]) {
-    return commands.publishLock(commands.toPublishLockOptions(commandArgs, flags));
+    return commands.publishLock(
+      commands.toPublishLockOptions(commandArgs, flags)
+    );
   } else if (commandMap.PUBLISH_UNLOCK[command]) {
-    return commands.publishUnlock(commands.toPublishUnlockOptions(commandArgs, flags));
+    return commands.publishUnlock(
+      commands.toPublishUnlockOptions(commandArgs, flags)
+    );
   } else if (commandMap.REMOVE[command]) {
     return commands.remove(commands.toRemoveOptions(commandArgs, flags));
   } else if (commandMap.RUN[command]) {
@@ -205,22 +268,38 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
   } else if (commandMap.TAG[command]) {
     if (commandMap.TAG_ADD[subCommand]) {
       return commands.tagAdd(commands.toTagAddOptions(subCommandArgs, flags));
-    } else if (commandMap.TAG_LIST[subCommand] || typeof subCommand === 'undefined') {
+    } else if (
+      commandMap.TAG_LIST[subCommand] ||
+      typeof subCommand === 'undefined'
+    ) {
       return commands.tagList(commands.toTagListOptions(subCommandArgs, flags));
     } else if (commandMap.TAG_REMOVE[subCommand]) {
-      return commands.tagRemove(commands.toTagRemoveOptions(subCommandArgs, flags));
+      return commands.tagRemove(
+        commands.toTagRemoveOptions(subCommandArgs, flags)
+      );
     }
   } else if (commandMap.TEAM[command]) {
     if (commandMap.TEAM_ADD[subCommand]) {
       return commands.teamAdd(commands.toTeamAddOptions(subCommandArgs, flags));
     } else if (commandMap.TEAM_CREATE[subCommand]) {
-      return commands.teamCreate(commands.toTeamCreateOptions(subCommandArgs, flags));
+      return commands.teamCreate(
+        commands.toTeamCreateOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.TEAM_DESTROY[subCommand]) {
-      return commands.teamDestroy(commands.toTeamDestroyOptions(subCommandArgs, flags));
-    } else if (commandMap.TEAM_LIST[subCommand] || typeof subCommand === 'undefined') {
-      return commands.teamList(commands.toTeamListOptions(subCommandArgs, flags));
+      return commands.teamDestroy(
+        commands.toTeamDestroyOptions(subCommandArgs, flags)
+      );
+    } else if (
+      commandMap.TEAM_LIST[subCommand] ||
+      typeof subCommand === 'undefined'
+    ) {
+      return commands.teamList(
+        commands.toTeamListOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.TEAM_REMOVE[subCommand]) {
-      return commands.teamRemove(commands.toTeamRemoveOptions(subCommandArgs, flags));
+      return commands.teamRemove(
+        commands.toTeamRemoveOptions(subCommandArgs, flags)
+      );
     }
   } else if (commandMap.TEST[command]) {
     return commands.test(commands.toTestOptions(commandArgs, flags));
@@ -229,7 +308,9 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
   } else if (commandMap.UPGRADE[command]) {
     return commands.upgrade(commands.toUpgradeOptions(commandArgs, flags));
   } else if (commandMap.UPGRADE_INTERACTIVE[command]) {
-    return commands.upgradeInteractive(commands.toUpgradeInteractiveOptions(commandArgs, flags));
+    return commands.upgradeInteractive(
+      commands.toUpgradeInteractiveOptions(commandArgs, flags)
+    );
   } else if (commandMap.VERSION[command]) {
     return commands.version(commands.toVersionOptions(commandArgs, flags));
   } else if (commandMap.VERSIONS[command]) {
@@ -240,27 +321,50 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     let [workspaceCommand, ...rest] = subCommandArgs;
     let workspaceArgs = [subCommand, ...rest];
     if (commandMap.WORKSPACE_ADD[workspaceCommand]) {
-      return commands.workspaceAdd(commands.toWorkspaceAddOptions(workspaceArgs, flags));
+      return commands.workspaceAdd(
+        commands.toWorkspaceAddOptions(workspaceArgs, flags)
+      );
     } else if (commandMap.WORKSPACE_REMOVE[workspaceCommand]) {
-      return commands.workspaceRemove(commands.toWorkspaceRemoveOptions(workspaceArgs, flags));
-    } else if (commandMap.WORKSPACE_RUN[workspaceCommand] || typeof subCommand !== 'undefined') {
-      return commands.workspaceRun(commands.toWorkspaceRunOptions(workspaceArgs, flags));
+      return commands.workspaceRemove(
+        commands.toWorkspaceRemoveOptions(workspaceArgs, flags)
+      );
+    } else if (
+      commandMap.WORKSPACE_RUN[workspaceCommand] ||
+      typeof subCommand !== 'undefined'
+    ) {
+      return commands.workspaceRun(
+        commands.toWorkspaceRunOptions(workspaceArgs, flags)
+      );
     } else if (commandMap.WORKSPACE_UPGRADE[workspaceCommand]) {
-      return commands.workspaceUpgrade(commands.toWorkspaceUpgradeOptions(workspaceArgs, flags));
+      return commands.workspaceUpgrade(
+        commands.toWorkspaceUpgradeOptions(workspaceArgs, flags)
+      );
     } else {
-      return commands.workspaceRun(commands.toWorkspaceRunOptions([subCommand, ...subCommandArgs], flags));
+      return commands.workspaceRun(
+        commands.toWorkspaceRunOptions([subCommand, ...subCommandArgs], flags)
+      );
     }
   } else if (commandMap.WORKSPACES[command]) {
     if (commandMap.WORKSPACES_ADD[subCommand]) {
-      return commands.workspacesAdd(commands.toWorkspacesAddOptions(subCommandArgs, flags));
+      return commands.workspacesAdd(
+        commands.toWorkspacesAddOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.WORKSPACES_REMOVE[subCommand]) {
-      return commands.workspacesRemove(commands.toWorkspacesRemoveOptions(subCommandArgs, flags));
+      return commands.workspacesRemove(
+        commands.toWorkspacesRemoveOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.WORKSPACES_RUN[subCommand]) {
-      return commands.workspacesRun(commands.toWorkspacesRunOptions(subCommandArgs, flags));
+      return commands.workspacesRun(
+        commands.toWorkspacesRunOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.WORKSPACES_UPGRADE[subCommand]) {
-      return commands.workspacesUpgrade(commands.toWorkspacesUpgradeOptions(subCommandArgs, flags));
+      return commands.workspacesUpgrade(
+        commands.toWorkspacesUpgradeOptions(subCommandArgs, flags)
+      );
     } else {
-      return commands.workspacesRun(commands.toWorkspacesRunOptions(commandArgs, flags));
+      return commands.workspacesRun(
+        commands.toWorkspacesRunOptions(commandArgs, flags)
+      );
     }
   } else {
     return commands.run(commands.toRunOptions(args, flags));
@@ -271,7 +375,7 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
 
 export default async function cli(argv: Array<string>, exit: boolean = false) {
   const start = Date.now();
-  const {pkg, input, flags} = meow({
+  const { pkg, input, flags } = meow({
     argv,
     help: `
       usage
@@ -289,7 +393,7 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
         workspaces   run a pyarn command inside all workspaces
         workspace    run a pyarn command inside a specific workspace
         help         get help with pyarn commands
-    `,
+    `
   });
 
   logger.title(`pyarn v${pkg.version}`);

@@ -5,7 +5,7 @@ export type DependencySet = {
 };
 
 export type Scripts = {
-  [script: string]: string,
+  [script: string]: string
 };
 
 export type Config = {
@@ -18,5 +18,12 @@ export type Config = {
   optionalDependencies?: DependencySet,
   bundledDependencies?: DependencySet,
   pworkspaces?: Array<string>,
-  scripts?: Scripts,
+  scripts?: Scripts
+};
+
+export type FilterOpts = {
+  only?: string,
+  ignore?: string,
+  onlyFs?: string,
+  ignoreFs?: string
 };
