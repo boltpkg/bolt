@@ -1,0 +1,11 @@
+{
+  "name": "baz",
+  "version": "1.0.0",
+  "dependencies": {
+    "bar": "^1.0.0"
+  },
+  "bin": {
+    "baz-1": "./baz-bin-1.js",
+    "baz-2": "./baz-bin-2.js"
+  }
+}

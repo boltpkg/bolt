@@ -1,6 +1,7 @@
 // @flow
 import chalk from 'chalk';
 import type Workspace from '../Workspace';
+import type Package from '../Package';
 
 function normalPkg(str) {
   return chalk.cyan(`"${str}"`);
@@ -121,4 +122,11 @@ export function couldntRemoveDependencies(deps: Array<string>) {
   return `Could not remove dependencies:\n${deps
     .map(depName => ` - ${normalPkg(depName)}`)
     .join('\n')}`;
+}
+
+export function couldntSymlinkDependencyNotExists(
+  pkgName: string,
+  depName: string
+) {
+  return `Could not symlink ${depName} in ${pkgName} as no dependency exists`;
 }

@@ -12,6 +12,11 @@ export type Config = {
   name: string,
   version: string,
   private?: boolean,
+  bin?:
+    | string
+    | {
+        [key: string]: string
+      },
   dependencies?: DependencySet,
   devDependencies?: DependencySet,
   peerDependencies?: DependencySet,

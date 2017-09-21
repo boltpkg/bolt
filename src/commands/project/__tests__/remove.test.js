@@ -10,7 +10,7 @@ jest.mock('../../../utils/yarn');
 
 describe('pyarn project remove', () => {
   test('removing a project dependency only used by the project', async () => {
-    let { tempDir } = await copyFixtureIntoTempDir(
+    let tempDir = await copyFixtureIntoTempDir(
       __dirname,
       'package-with-external-deps-installed'
     );

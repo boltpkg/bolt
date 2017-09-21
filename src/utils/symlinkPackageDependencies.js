@@ -24,6 +24,8 @@ export default async function symlinkPackageDependencies(
     graph: dependencyGraph,
     valid: dependencyGraphValid
   } = await project.getDependencyGraph(workspaces);
+  const internalDeps =
+    (dependencyGraph.get(pkg.config.name) || {}).dependencies || [];
 
   const directoriesToCreate = [];
   const symlinksToCreate = [];
@@ -36,31 +38,44 @@ export default async function symlinkPackageDependencies(
 
   directoriesToCreate.push(pkg.nodeModules, pkg.nodeModulesBin);
 
-  for (let [name, version] of pkgDependencies) {
-    const matched = projectDeps.get(name);
+  for (let depName of dependencies) {
+    const versionInProject = projectDeps.get(depName);
+    const versionInPkg = pkgDependencies.get(depName);
 
-    // If dependency is internal we can ignore it
-    if (dependencyGraph.has(name)) {
+    // If dependency is internal we can ignore it (we symlink below)
+    if (dependencyGraph.has(depName)) {
       continue;
     }
 
-    // If dependency is not in the Project deps, warn user (but don't throw yet)
-    if (!matched) {
+    if (!versionInProject) {
       valid = false;
-      logger.error(messages.depMustBeAddedToProject(pkg.config.name, name));
+      logger.error(messages.depMustBeAddedToProject(pkg.config.name, depName));
       continue;
     }
 
-    if (version !== matched) {
+    if (!versionInPkg) {
       valid = false;
       logger.error(
-        messages.depMustMatchProject(pkg.config.name, name, matched, version)
+        messages.couldntSymlinkDependencyNotExists(pkg.config.name, depName)
       );
       continue;
     }
 
-    let src = path.join(project.pkg.nodeModules, name);
-    let dest = path.join(pkg.nodeModules, name);
+    if (versionInProject !== versionInPkg) {
+      valid = false;
+      logger.error(
+        messages.depMustMatchProject(
+          pkg.config.name,
+          depName,
+          versionInProject,
+          versionInPkg
+        )
+      );
+      continue;
+    }
+
+    let src = path.join(project.pkg.nodeModules, depName);
+    let dest = path.join(pkg.nodeModules, depName);
 
     symlinksToCreate.push({ src, dest, type: 'junction' });
   }
@@ -69,21 +84,12 @@ export default async function symlinkPackageDependencies(
    * Calculate all the internal dependencies that need to be symlinked *
   **********************************************************************/
 
-  for (let [name, node] of dependencyGraph) {
-    const nodeModules = path.join(node.pkg.dir, 'node_modules');
+  for (let dependency of internalDeps) {
+    const depWorkspace = dependencyGraph.get(dependency) || {};
+    const src = depWorkspace.pkg.dir;
+    const dest = path.join(pkg.nodeModules, dependency);
 
-    for (let dependency of node.dependencies) {
-      const depWorkspace = dependencyGraph.get(dependency);
-
-      if (!depWorkspace) {
-        throw new PError(`Missing workspace: "${dependency}"`);
-      }
-
-      let src = depWorkspace.pkg.dir;
-      let dest = path.join(nodeModules, dependency);
-
-      symlinksToCreate.push({ src, dest, type: 'junction' });
-    }
+    symlinksToCreate.push({ src, dest, type: 'junction' });
   }
 
   if (!dependencyGraphValid || !valid) {
@@ -93,35 +99,46 @@ export default async function symlinkPackageDependencies(
   /********************************************************
    * Calculate all the bin files that need to be symlinked *
   *********************************************************/
+  const projectBinFiles = await fs.readdirSafe(project.pkg.nodeModulesBin);
 
-  for (let binFile of await fs.readdirSafe(project.pkg.nodeModulesBin)) {
+  // TODO: For now, we'll search through each of the bin files in the Project and find which ones are
+  // dependencies we are symlinking. In the future, we should really be going through each dependency
+  // and all of its dependencies and checking which ones expose bins so that all the transitive ones
+  // are included too
+
+  for (let binFile of projectBinFiles) {
     const binPath = path.join(project.pkg.nodeModulesBin, binFile);
     const binName = path.basename(binPath);
 
-    const linkFile = await fs.readlink(binPath);
+    // read the symlink to find the actual bin file (path will be relative to the symlink)
+    const actualBinFileRelative = await fs.readlink(binPath);
 
-    if (!linkFile) {
+    if (!actualBinFileRelative) {
       throw new PError(`${binName} is not a symlink`);
     }
 
-    const linkPath = path.join(project.pkg.nodeModulesBin, linkFile);
+    const actualBinFile = path.join(
+      project.pkg.nodeModulesBin,
+      actualBinFileRelative
+    );
 
-    if (!pathIsInside(linkPath, project.pkg.nodeModules)) {
+    if (!pathIsInside(actualBinFile, project.pkg.nodeModules)) {
       throw new PError(
-        `${binName} is linked to a location outside of project node_modules: ${linkPath}`
+        `${binName} is linked to a location outside of project node_modules: ${actualBinFileRelative}`
       );
     }
 
-    const relativeLinkPath = path.relative(project.pkg.nodeModules, linkPath);
-    const pathParts = relativeLinkPath.split(path.sep);
+    // To find the name of the dep that created the bin we'll get its path from node_modules and
+    // use the first one or two parts (two if the package is scoped)
+    const binFileRelativeToNodeModules = path.relative(
+      project.pkg.nodeModules,
+      actualBinFile
+    );
+    const pathParts = binFileRelativeToNodeModules.split(path.sep);
     let pkgName = pathParts[0];
 
     if (pkgName.startsWith('@')) {
       pkgName += '/' + pathParts[1];
-    }
-
-    if (!includes(dependencies, pkgName)) {
-      continue;
     }
 
     let workspaceBinPath = path.join(pkg.nodeModulesBin, binName);
@@ -131,6 +148,46 @@ export default async function symlinkPackageDependencies(
       dest: workspaceBinPath,
       type: 'exec'
     });
+  }
+
+  /*****************************************************************
+   * Calculate all the internal bin files that need to be symlinked *
+  ******************************************************************/
+
+  // TODO: Same as above, we should really be making sure we get all the transitive bins as well
+
+  for (let dependency of internalDeps) {
+    const depWorkspace = dependencyGraph.get(dependency) || {};
+    const depBinFiles =
+      depWorkspace.pkg &&
+      depWorkspace.pkg.config &&
+      depWorkspace.pkg.config.bin;
+
+    if (!depBinFiles) {
+      continue;
+    }
+
+    if (!includes(dependencies, dependency)) {
+      // dependency is not one we are supposed to symlink right now
+      continue;
+    }
+
+    if (typeof depBinFiles === 'string') {
+      // package may be scoped, name will only be the second part
+      const binName = dependency.split('/').pop();
+      const src = path.join(depWorkspace.pkg.dir, depBinFiles);
+      const dest = path.join(pkg.nodeModulesBin, binName);
+
+      symlinksToCreate.push({ src, dest, type: 'exec' });
+      continue;
+    }
+
+    for (let [binName, binPath] of Object.entries(depBinFiles)) {
+      const src = path.join(depWorkspace.pkg.dir, String(binPath));
+      const dest = path.join(pkg.nodeModulesBin, binName);
+
+      symlinksToCreate.push({ src, dest, type: 'exec' });
+    }
   }
 
   /**********************************
