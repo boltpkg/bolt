@@ -27,11 +27,7 @@ export default async function updatePackageVersions(
       let depType = pkg.getDependencyType(depName);
       if (!depType) continue;
       promises.push(
-        pkg.updateDependencyVersionRange(
-          depName,
-          depType,
-          '^' + versions[depName]
-        )
+        pkg.setDependencyVersionRange(depName, depType, '^' + versions[depName])
       );
       updatedPackages.add(pkg.filePath);
     }

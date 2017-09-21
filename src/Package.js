@@ -1,14 +1,18 @@
 // @flow
 import * as path from 'path';
-import {readConfigFile, writeConfigFile} from './utils/config';
-import type {Config} from './types';
-import {DEPENDENCY_TYPES} from './constants';
+import {
+  findConfigFile,
+  readConfigFile,
+  writeConfigFile
+} from './utils/config';
+import type { Config } from './types';
+import { DEPENDENCY_TYPES } from './constants';
 import * as processes from './utils/processes';
 import * as semver from 'semver';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import sortObject from 'sort-object';
-import {PError} from './utils/errors';
+import { PError } from './utils/errors';
 
 export default class Package {
   filePath: string;
@@ -35,6 +39,14 @@ export default class Package {
     return new Package(filePath, config);
   }
 
+  static async closest(filePath: string) {
+    let pkgPath = await findConfigFile(filePath);
+    if (!pkgPath) {
+      throw new PError(`Could not find package.json from "${filePath}"`);
+    }
+    return await Package.init(pkgPath);
+  }
+
   getWorkspacesConfig() {
     return this.config.pworkspaces || [];
   }
@@ -54,21 +66,61 @@ export default class Package {
     return allDependencies;
   }
 
-  async updateDependencyVersionRange(depName: string, depType: string, versionRange: string) {
-    let prevVersionRange = this.config[depType] && this.config[depType][depName];
+  async setDependencyVersionRange(
+    depName: string,
+    depType: string,
+    versionRange: string | null
+  ) {
+    let prevDeps = this.config[depType];
+    let prevVersionRange = (prevDeps && prevDeps[depName]) || null;
     if (prevVersionRange === versionRange) return;
+
+    await this._updateDependencies(depType, {
+      ...prevDeps,
+      [depName]: versionRange
+    });
+
+    let pkgName = this.config.name;
+
+    if (versionRange === null) {
+      logger.info(messages.removedPackageDependency(pkgName, depName));
+    } else if (prevVersionRange === null) {
+      logger.info(
+        messages.addedPackageDependency(pkgName, depName, versionRange)
+      );
+    } else {
+      logger.info(
+        messages.updatedPackageDependency(
+          pkgName,
+          depName,
+          versionRange,
+          prevVersionRange
+        )
+      );
+    }
+  }
+
+  async _updateDependencies(
+    depType: string,
+    dependencies: { [key: string]: string | null }
+  ) {
+    let cleaned = {};
+
+    for (let depName of Object.keys(dependencies)) {
+      let versionRange = dependencies[depName];
+
+      if (typeof versionRange === 'string') {
+        cleaned[depName] = versionRange;
+      }
+    }
 
     let newConfig = {
       ...this.config,
-      [depType]: sortObject({
-        ...this.config[depType],
-        [depName]: versionRange,
-      }),
+      [depType]: sortObject(cleaned)
     };
 
     await writeConfigFile(this.filePath, newConfig);
     this.config = newConfig;
-    logger.info(messages.updatedPackageDependency(this.config.name, depName, versionRange, prevVersionRange));
   }
 
   getDependencyType(depName: string) {
@@ -91,4 +143,8 @@ export default class Package {
 
   //   return updated;
   // }
+
+  isSamePackage(pkg: Package) {
+    return pkg.dir === this.dir;
+  }
 }

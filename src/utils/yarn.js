@@ -82,3 +82,10 @@ export async function init(cwd: string) {
     tty: true
   });
 }
+
+export async function remove(dependencies: Array<string>, cwd: string) {
+  await processes.spawn('yarn', ['remove', ...dependencies], {
+    cwd,
+    tty: true
+  });
+}
