@@ -75,7 +75,7 @@ export default class Package {
     let prevVersionRange = (prevDeps && prevDeps[depName]) || null;
     if (prevVersionRange === versionRange) return;
 
-    await this.updateDependencies(depType, {
+    await this._updateDependencies(depType, {
       ...prevDeps,
       [depName]: versionRange
     });
@@ -100,7 +100,7 @@ export default class Package {
     }
   }
 
-  async updateDependencies(
+  async _updateDependencies(
     depType: string,
     dependencies: { [key: string]: string | null }
   ) {
