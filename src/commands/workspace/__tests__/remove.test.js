@@ -29,6 +29,9 @@ describe('pyarn workspace remove', () => {
     expect(
       await pathExists(path.join(tempDir, 'node_modules', 'foo-dep'))
     ).toBe(true);
+    expect(
+      fs.readFileSync(path.join(workspaceDir, 'package.json'), 'utf-8')
+    ).not.toContain('foo-dep');
   });
 
   test('removing a workspace dependency that doesnt exist in that package', async () => {
@@ -64,5 +67,8 @@ describe('pyarn workspace remove', () => {
     expect(
       await pathExists(path.join(tempDir, 'node_modules', 'foo-dep'))
     ).toBe(true);
+    expect(
+      fs.readFileSync(path.join(fooWorkspaceDir, 'package.json'), 'utf-8')
+    ).not.toContain('foo-dep');
   });
 });

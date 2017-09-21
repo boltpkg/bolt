@@ -60,17 +60,31 @@ export function unableToUpdateDepVersion(
   )} to version ${goodVer(version)}`;
 }
 
+export function addedPackageDependency(
+  pkgName: string,
+  depName: string,
+  versionRange: string
+) {
+  return `Added package ${normalPkg(pkgName)} dependency ${normalPkg(
+    depName
+  )} at version ${goodVer(versionRange)}`;
+}
+
 export function updatedPackageDependency(
   pkgName: string,
   depName: string,
   versionRange: string,
-  prevVersionRange?: string
+  prevVersionRange: string
 ) {
-  let str = `Updated package ${normalPkg(pkgName)} dependency ${normalPkg(
+  return `Updated package ${normalPkg(pkgName)} dependency ${normalPkg(
     depName
-  )} to version ${goodVer(versionRange)}`;
-  if (prevVersionRange) str += ` from ${badVer(prevVersionRange)}`;
-  return str;
+  )} to version ${goodVer(versionRange)} from ${badVer(prevVersionRange)}`;
+}
+
+export function removedPackageDependency(pkgName: string, depName: string) {
+  return `Removed package ${normalPkg(pkgName)} dependency ${normalPkg(
+    depName
+  )}`;
 }
 
 export function unableToNormalizeVersionRanges(

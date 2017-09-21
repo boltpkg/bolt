@@ -39,7 +39,13 @@ async function removeDependenciesFromPackage(
 
   for (let depName of matchedDependencies) {
     let filePath = path.join(pkg.nodeModules, depName);
+    let depType = pkg.getDependencyType(depName);
+
+    // Delete directory
     await fs.rimraf(filePath);
+
+    // Remove from package.json
+    await pkg.setDependencyVersionRange(depName, depType, null);
   }
 
   // TODO: Remove node_modules/.bin links

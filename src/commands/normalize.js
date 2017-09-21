@@ -11,12 +11,15 @@ import * as npm from '../utils/npm';
 import chalk from 'chalk';
 
 export type NormalizeOptions = {|
-  cwd?: string,
+  cwd?: string
 |};
 
-export function toNormalizeOptions(args: options.Args, flags: options.Flags): NormalizeOptions {
+export function toNormalizeOptions(
+  args: options.Args,
+  flags: options.Flags
+): NormalizeOptions {
   return {
-    cwd: options.string(flags.cwd, 'cwd'),
+    cwd: options.string(flags.cwd, 'cwd')
   };
 }
 
@@ -68,9 +71,11 @@ function getAllDependencies(packageDependencyMap) {
 async function getInfoForPackageNames(pkgNames) {
   let info = {};
 
-  await Promise.all(pkgNames.map(async pkgName => {
-    info[pkgName] = await npm.info(pkgName);
-  }));
+  await Promise.all(
+    pkgNames.map(async pkgName => {
+      info[pkgName] = await npm.info(pkgName);
+    })
+  );
 
   return info;
 }
@@ -103,7 +108,11 @@ export async function normalize(opts: NormalizeOptions) {
   let workspaceMap = getWorkspaceMap(workspaces);
 
   let projectDependencies = project.pkg.getAllDependencies();
-  let packageDependencyMap = getPackageDependencyMap(project, projectDependencies, workspaces);
+  let packageDependencyMap = getPackageDependencyMap(
+    project,
+    projectDependencies,
+    workspaces
+  );
   let allDependencies = getAllDependencies(packageDependencyMap);
 
   let finalVersions = new Map();
@@ -137,7 +146,7 @@ export async function normalize(opts: NormalizeOptions) {
       let depType = pkg.getDependencyType(depName);
 
       if (prevVersion && depType) {
-        await pkg.updateDependencyVersionRange(depName, depType, newVersion);
+        await pkg.setDependencyVersionRange(depName, depType, newVersion);
       }
     }
 
@@ -152,7 +161,11 @@ export async function normalize(opts: NormalizeOptions) {
     let isUpdating = projectDependencies.has(depName);
 
     if (finalVersion && (isWorkspace ? isUpdating : true)) {
-      await project.pkg.updateDependencyVersionRange(depName, depType, finalVersion);
+      await project.pkg.setDependencyVersionRange(
+        depName,
+        depType,
+        finalVersion
+      );
     }
   }
 
