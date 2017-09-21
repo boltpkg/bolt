@@ -22,7 +22,7 @@ describe('pyarn remove', () => {
     expect(yarn.remove).toHaveBeenCalledWith(['project-only-dep'], tempDir);
   });
 
-  test.only('removing a workspace dependency', async () => {
+  test('removing a workspace dependency', async () => {
     let { tempDir } = await copyFixtureIntoTempDir(
       __dirname,
       'package-with-external-deps-installed'
