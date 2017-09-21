@@ -43,4 +43,26 @@ describe('pyarn workspace remove', () => {
       )
     ).rejects.toBeInstanceOf(Error);
   });
+
+  test('removing a workspace dependency from inside another directory', async () => {
+    let { tempDir } = await copyFixtureIntoTempDir(
+      __dirname,
+      'package-with-external-deps-installed'
+    );
+
+    let fooWorkspaceDir = path.join(tempDir, 'packages', 'foo');
+    let barWorkspaceDir = path.join(tempDir, 'packages', 'bar');
+
+    await workspaceRemove(
+      toWorkspaceRemoveOptions(['foo', 'foo-dep'], { cwd: barWorkspaceDir })
+    );
+
+    expect(yarn.remove).toHaveBeenCalledTimes(0);
+    expect(
+      await pathExists(path.join(fooWorkspaceDir, 'node_modules', 'foo-dep'))
+    ).toBe(false);
+    expect(
+      await pathExists(path.join(tempDir, 'node_modules', 'foo-dep'))
+    ).toBe(true);
+  });
 });
