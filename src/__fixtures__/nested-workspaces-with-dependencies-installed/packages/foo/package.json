@@ -1,0 +1,9 @@
+{
+  "name": "foo",
+  "version": "1.0.0",
+  "pworkspaces": ["packages/*"],
+  "dependencies": {
+    "bar": "^1.0.0",
+    "semver": "^5.4.1"
+  }
+}

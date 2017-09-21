@@ -1,23 +1,15 @@
 // @flow
 import includes from 'array-includes';
 
+import type { Dependency, configDependencyType } from '../types';
 import type Package from '../Package';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
 
-type Dependency = {
-  name: string,
-  version?: string
-};
-
 export async function add(
   pkg: Package,
   dependencies: Array<Dependency>,
-  type?:
-    | 'dependencies'
-    | 'devDependencies'
-    | 'peerDependencies'
-    | 'optionalDependencies'
+  type?: configDependencyType
 ) {
   const spawnArgs = ['add'];
   if (!dependencies.length) return;

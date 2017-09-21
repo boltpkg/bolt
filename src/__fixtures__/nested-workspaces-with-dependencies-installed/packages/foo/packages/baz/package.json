@@ -1,0 +1,9 @@
+{
+  "name": "baz",
+  "version": "1.0.0",
+  "dependencies": {
+    "bar": "^1.0.0",
+    "uuid": "^3.1.0",
+    "right-pad": "^1.0.1"
+  }
+}

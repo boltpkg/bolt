@@ -27,3 +27,14 @@ export type FilterOpts = {
   onlyFs?: string,
   ignoreFs?: string
 };
+
+export type Dependency = {
+  name: string,
+  version?: string
+};
+
+export type configDependencyType =
+  | 'dependencies'
+  | 'devDependencies'
+  | 'peerDependencies'
+  | 'optionalDependencies';

@@ -1,0 +1,13 @@
+{
+  "name": "@lbatchelor/bar",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "echo preinstall",
+    "postinstall": "echo postinstall",
+    "prepublish": "echo prepublish"
+  },
+  "dependencies": {
+    "react": "^15.6.1"
+  }
+}

@@ -4,6 +4,7 @@
   "name": "fixture-project-nested-workspaces",
   "pworkspaces": ["packages/*"],
   "dependencies": {
-    "react": "^15.6.1"
+    "react": "^15.6.1",
+    "left-pad": "^1.1.3"
   }
 }
