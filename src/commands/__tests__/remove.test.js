@@ -22,7 +22,7 @@ describe('pyarn remove', () => {
     expect(yarn.remove).toHaveBeenCalledWith(['project-only-dep'], tempDir);
   });
 
-  test('removing a workspace dependency', async () => {
+  test.only('removing a workspace dependency', async () => {
     let { tempDir } = await copyFixtureIntoTempDir(
       __dirname,
       'package-with-external-deps-installed'
@@ -39,6 +39,9 @@ describe('pyarn remove', () => {
     expect(
       await pathExists(path.join(tempDir, 'node_modules', 'foo-dep'))
     ).toBe(true);
+    expect(
+      fs.readFileSync(path.join(workspaceDir, 'package.json'), 'utf-8')
+    ).not.toContain('foo-dep');
   });
 
   test('removing a dependency that does not exist', async () => {

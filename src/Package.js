@@ -66,33 +66,61 @@ export default class Package {
     return allDependencies;
   }
 
-  async updateDependencyVersionRange(
+  async setDependencyVersionRange(
     depName: string,
     depType: string,
-    versionRange: string
+    versionRange: string | null
   ) {
-    let prevVersionRange =
-      this.config[depType] && this.config[depType][depName];
+    let prevDeps = this.config[depType];
+    let prevVersionRange = (prevDeps && prevDeps[depName]) || null;
     if (prevVersionRange === versionRange) return;
+
+    await this.updateDependencies(depType, {
+      ...prevDeps,
+      [depName]: versionRange
+    });
+
+    let pkgName = this.config.name;
+
+    if (versionRange === null) {
+      logger.info(messages.removedPackageDependency(pkgName, depName));
+    } else if (prevVersionRange === null) {
+      logger.info(
+        messages.addedPackageDependency(pkgName, depName, versionRange)
+      );
+    } else {
+      logger.info(
+        messages.updatedPackageDependency(
+          pkgName,
+          depName,
+          versionRange,
+          prevVersionRange
+        )
+      );
+    }
+  }
+
+  async updateDependencies(
+    depType: string,
+    dependencies: { [key: string]: string | null }
+  ) {
+    let cleaned = {};
+
+    for (let depName of Object.keys(dependencies)) {
+      let versionRange = dependencies[depName];
+
+      if (typeof versionRange === 'string') {
+        cleaned[depName] = versionRange;
+      }
+    }
 
     let newConfig = {
       ...this.config,
-      [depType]: sortObject({
-        ...this.config[depType],
-        [depName]: versionRange
-      })
+      [depType]: sortObject(cleaned)
     };
 
     await writeConfigFile(this.filePath, newConfig);
     this.config = newConfig;
-    logger.info(
-      messages.updatedPackageDependency(
-        this.config.name,
-        depName,
-        versionRange,
-        prevVersionRange
-      )
-    );
   }
 
   getDependencyType(depName: string) {

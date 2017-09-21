@@ -33,6 +33,12 @@ describe('pyarn workspaces remove', () => {
     expect(
       await pathExists(path.join(tempDir, 'node_modules', 'global-dep'))
     ).toBe(true);
+    expect(
+      fs.readFileSync(path.join(fooWorkspaceDir, 'package.json'), 'utf-8')
+    ).not.toContain('global-dep');
+    expect(
+      fs.readFileSync(path.join(barWorkspaceDir, 'package.json'), 'utf-8')
+    ).not.toContain('global-dep');
   });
 
   test('removing a dependency that only exists in some of the workspaces', async () => {
@@ -54,6 +60,9 @@ describe('pyarn workspaces remove', () => {
     expect(
       await pathExists(path.join(tempDir, 'node_modules', 'foo-dep'))
     ).toBe(true);
+    expect(
+      fs.readFileSync(path.join(workspaceDir, 'package.json'), 'utf-8')
+    ).not.toContain('foo-dep');
   });
 
   test('removing a dependency that doesnt exist in any of the workspaces', async () => {
