@@ -4,6 +4,6 @@
   "pworkspaces": ["packages/*"],
   "dependencies": {
     "react": "^15.6.1",
-    "bar": "^1.0.0"
+    "@scoped/bar": "^1.0.0"
   }
 }
