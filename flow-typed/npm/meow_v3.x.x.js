@@ -2,14 +2,17 @@
 // flow-typed version: b43dff3e0e/meow_v3.x.x/flow_>=v0.25.x
 
 declare module 'meow' {
-  declare type options = string | Array<string> | {
-    description?: string,
-    help: string,
-    version?: string | boolean,
-    pkg?: string | Object,
-    argv?: Array<string>,
-    inferType?: boolean
-  };
+  declare type options =
+    | string
+    | Array<string>
+    | {
+        description?: string,
+        help: string,
+        version?: string | boolean,
+        pkg?: string | Object,
+        argv?: Array<string>,
+        inferType?: boolean
+      };
 
   declare type minimistOptions = {
     string?: string | Array<string>,
@@ -17,19 +20,23 @@ declare module 'meow' {
     alias?: { [arg: string]: string | Array<string> },
     default?: { [arg: string]: any },
     stopEarly?: boolean,
-    // TODO: Strings as keys don't work...
-    // '--'? boolean,
+    '--'?: boolean,
     unknown?: (param: string) => boolean
+  };
+
+  declare type Flags = {
+    '--'?: Array<string>,
+    [flag: string]: string | boolean
   };
 
   declare module.exports: (
     options: options,
-    minimistOptions?: minimistOptions,
+    minimistOptions?: minimistOptions
   ) => {
     input: Array<string>,
-    flags: { [flag: string]: string | boolean },
+    flags: Flags,
     pkg: Object,
     help: string,
     showHelp: Function
-  }
+  };
 }
