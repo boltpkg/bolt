@@ -86,6 +86,7 @@ describe('install', () => {
     }
   });
 
+  // This is re-testing symlinkPackageDependencies, but we'd rather be explicit here
   test('should install (symlink) all deps in workspaces', async () => {
     const cwd = await copyFixtureIntoTempDir(
       __dirname,
@@ -99,6 +100,7 @@ describe('install', () => {
     for (let workspace of workspaces) {
       assertNodeModulesExists(workspace);
       assertDependenciesSymlinked(workspace);
+      // TODO: assertBinfileSymlinked (currently tested partially in symlinkPackageDependencies)
     }
   });
 });
