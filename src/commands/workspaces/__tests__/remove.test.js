@@ -11,7 +11,7 @@ jest.mock('../../../utils/yarn');
 
 describe('pyarn workspaces remove', () => {
   test('removing a dependency from all workspaces', async () => {
-    let { tempDir } = await copyFixtureIntoTempDir(
+    let tempDir = await copyFixtureIntoTempDir(
       __dirname,
       'package-with-external-deps-installed'
     );
@@ -42,7 +42,7 @@ describe('pyarn workspaces remove', () => {
   });
 
   test('removing a dependency that only exists in some of the workspaces', async () => {
-    let { tempDir } = await copyFixtureIntoTempDir(
+    let tempDir = await copyFixtureIntoTempDir(
       __dirname,
       'package-with-external-deps-installed'
     );
@@ -66,7 +66,7 @@ describe('pyarn workspaces remove', () => {
   });
 
   test('removing a dependency that doesnt exist in any of the workspaces', async () => {
-    let { tempDir } = await copyFixtureIntoTempDir(
+    let tempDir = await copyFixtureIntoTempDir(
       __dirname,
       'package-with-external-deps-installed'
     );
@@ -79,7 +79,7 @@ describe('pyarn workspaces remove', () => {
   });
 
   test('removing a dependency that doesnt exist in any of the filtered workspaces', async () => {
-    let { tempDir } = await copyFixtureIntoTempDir(
+    let tempDir = await copyFixtureIntoTempDir(
       __dirname,
       'package-with-external-deps-installed'
     );

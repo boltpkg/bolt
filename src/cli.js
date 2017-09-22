@@ -23,6 +23,7 @@ const commandMap = {
   CONFIG_SET: { set: true },
   CREATE: { create: true },
   DOC: { doc: true },
+  EXEC: { exec: true },
   FORMAT: { format: true, fmt: true },
   GENERATE: { generate: true },
   GLOBAL: { global: true },
@@ -53,6 +54,7 @@ const commandMap = {
   PACK: { pack: true },
   PROJECT: { project: true, p: true },
   PROJECT_ADD: { add: true },
+  PROJECT_EXEC: { exec: true },
   PROJECT_REMOVE: { remove: true, rm: true },
   PROJECT_RUN: { run: true },
   PROJECT_UPGRADE: { upgrade: true },
@@ -80,11 +82,13 @@ const commandMap = {
   WHY: { why: true },
   WORKSPACE: { workspace: true, w: true },
   WORKSPACE_ADD: { add: true },
+  WORKSPACE_EXEC: { exec: true },
   WORKSPACE_REMOVE: { remove: true, rm: true },
   WORKSPACE_RUN: { run: true },
   WORKSPACE_UPGRADE: { upgrade: true },
   WORKSPACES: { workspaces: true, ws: true },
   WORKSPACES_ADD: { add: true },
+  WORKSPACES_EXEC: { exec: true },
   WORKSPACES_REMOVE: { remove: true, rm: true },
   WORKSPACES_RUN: { run: true },
   WORKSPACES_UPGRADE: { upgrade: true }
@@ -144,6 +148,8 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.create(commands.toCreateOptions(commandArgs, flags));
   } else if (commandMap.DOC[command]) {
     return commands.doc(commands.toDocOptions(commandArgs, flags));
+  } else if (commandMap.EXEC[command]) {
+    return commands.exec(commands.toExecOptions(commandArgs, flags));
   } else if (commandMap.FORMAT[command]) {
     return commands.format(commands.toFormatOptions(commandArgs, flags));
   } else if (commandMap.GENERATE[command]) {
@@ -233,6 +239,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     if (commandMap.PROJECT_ADD[subCommand]) {
       return commands.projectAdd(
         commands.toProjectAddOptions(subCommandArgs, flags)
+      );
+    } else if (commandMap.PROJECT_EXEC[subCommand]) {
+      return commands.projectExec(
+        commands.toProjectExecOptions(subCommandArgs, flags)
       );
     } else if (commandMap.PROJECT_REMOVE[subCommand]) {
       return commands.projectRemove(
@@ -324,6 +334,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
       return commands.workspaceAdd(
         commands.toWorkspaceAddOptions(workspaceArgs, flags)
       );
+    } else if (commandMap.WORKSPACE_EXEC[workspaceCommand]) {
+      return commands.workspaceExec(
+        commands.toWorkspaceExecOptions(workspaceArgs, flags)
+      );
     } else if (commandMap.WORKSPACE_REMOVE[workspaceCommand]) {
       return commands.workspaceRemove(
         commands.toWorkspaceRemoveOptions(workspaceArgs, flags)
@@ -348,6 +362,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     if (commandMap.WORKSPACES_ADD[subCommand]) {
       return commands.workspacesAdd(
         commands.toWorkspacesAddOptions(subCommandArgs, flags)
+      );
+    } else if (commandMap.WORKSPACES_EXEC[subCommand]) {
+      return commands.workspacesExec(
+        commands.toWorkspacesExecOptions(subCommandArgs, flags)
       );
     } else if (commandMap.WORKSPACES_REMOVE[subCommand]) {
       return commands.workspacesRemove(
@@ -375,9 +393,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
 
 export default async function cli(argv: Array<string>, exit: boolean = false) {
   const start = Date.now();
-  const { pkg, input, flags } = meow({
-    argv,
-    help: `
+  const { pkg, input, flags } = meow(
+    {
+      argv,
+      help: `
       usage
         $ pyarn [command] <...args> <...opts>
 
@@ -394,7 +413,11 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
         workspace    run a pyarn command inside a specific workspace
         help         get help with pyarn commands
     `
-  });
+    },
+    {
+      '--': true
+    }
+  );
 
   logger.title(`pyarn v${pkg.version}`);
 

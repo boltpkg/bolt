@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "name": "project-with-bins",
+  "version": "1.0.0",
+  "pworkspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "dep-with-bin": "^1.0.0"
+  }
+}
