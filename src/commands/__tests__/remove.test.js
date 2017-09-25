@@ -55,7 +55,7 @@ describe('pyarn remove', () => {
     ).rejects.toBeInstanceOf(Error);
   });
 
-  test.only('removing a dependency that is used by a workspace', async () => {
+  test('removing a dependency that is used by a workspace', async () => {
     let tempDir = await copyFixtureIntoTempDir(
       __dirname,
       'package-with-external-deps-installed'

@@ -39,8 +39,8 @@ export default async function symlinkPackageDependencies(
   directoriesToCreate.push(pkg.nodeModules, pkg.nodeModulesBin);
 
   for (let depName of dependencies) {
-    const versionInProject = projectDeps.get(depName);
-    const versionInPkg = pkgDependencies.get(depName);
+    const versionInProject = project.pkg.getDependencyVersionRange(depName);
+    const versionInPkg = pkg.getDependencyVersionRange(depName);
 
     // If dependency is internal we can ignore it (we symlink below)
     if (dependencyGraph.has(depName)) {

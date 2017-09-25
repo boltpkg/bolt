@@ -132,6 +132,15 @@ export default class Package {
     return null;
   }
 
+  getDependencyVersionRange(depName: string) {
+    for (let depType of DEPENDENCY_TYPES) {
+      if (this.config[depType] && this.config[depType][depName]) {
+        return this.config[depType][depName];
+      }
+    }
+    return null;
+  }
+
   // async maybeUpdateDependencyVersionRange(depName: string, current: string, version: string) {
   //   let versionRange = '^' + version;
   //   let updated = false;
