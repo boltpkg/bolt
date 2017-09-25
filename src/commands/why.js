@@ -1,10 +1,13 @@
 // @flow
 import * as options from '../utils/options';
-import {PError} from '../utils/errors';
+import { PError } from '../utils/errors';
 
 export type WhyOptions = {};
 
-export function toWhyOptions(args: options.Args, flags: options.Flags): WhyOptions {
+export function toWhyOptions(
+  args: options.Args,
+  flags: options.Flags
+): WhyOptions {
   return {};
 }
 

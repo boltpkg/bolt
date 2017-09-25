@@ -1,18 +1,20 @@
 // @flow
 import Project from '../Project';
-import type {Config} from '../types';
+import type { Config } from '../types';
 
 type Options = {
-  cwd?: string,
+  cwd?: string
 };
 
 type Packages = Array<{
   dir: string,
   name: string,
-  config: Config,
+  config: Config
 }>;
 
-export default async function getWorkspaces(opts: Options = {}): Promise<Packages> {
+export default async function getWorkspaces(
+  opts: Options = {}
+): Promise<Packages> {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
@@ -20,6 +22,6 @@ export default async function getWorkspaces(opts: Options = {}): Promise<Package
   return workspaces.map(workspace => ({
     dir: workspace.pkg.dir,
     name: workspace.pkg.config.name,
-    config: workspace.pkg.config,
+    config: workspace.pkg.config
   }));
 }

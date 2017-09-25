@@ -1,10 +1,13 @@
 // @flow
 import * as options from '../utils/options';
-import {PError} from '../utils/errors';
+import { PError } from '../utils/errors';
 
 export type OutdatedOptions = {};
 
-export function toOutdatedOptions(args: options.Args, flags: options.Flags): OutdatedOptions {
+export function toOutdatedOptions(
+  args: options.Args,
+  flags: options.Flags
+): OutdatedOptions {
   return {};
 }
 

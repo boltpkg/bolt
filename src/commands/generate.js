@@ -1,10 +1,13 @@
 // @flow
 import * as options from '../utils/options';
-import {PError} from '../utils/errors';
+import { PError } from '../utils/errors';
 
 export type GenerateOptions = {};
 
-export function toGenerateOptions(args: options.Args, flags: options.Flags): GenerateOptions {
+export function toGenerateOptions(
+  args: options.Args,
+  flags: options.Flags
+): GenerateOptions {
   return {};
 }
 

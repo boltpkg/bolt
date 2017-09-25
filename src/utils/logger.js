@@ -3,9 +3,14 @@ import chalk from 'chalk';
 import type Package from '../Package';
 
 export function prefix(prefix: string, message: string | Buffer) {
-  return message.toString().trimRight().split('\n').map(line => {
-    return prefix + ' ' + line;
-  }).join('\n');
+  return message
+    .toString()
+    .trimRight()
+    .split('\n')
+    .map(line => {
+      return prefix + ' ' + line;
+    })
+    .join('\n');
 }
 
 export function log(message: string) {

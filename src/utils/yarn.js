@@ -34,7 +34,7 @@ export async function run(
     await processes.spawn('yarn', spawnArgs, {
       cwd: pkg.dir,
       pkg: pkg,
-      tty: true,
+      tty: true
     });
   }
 
@@ -44,13 +44,13 @@ export async function run(
 export async function init(cwd: string) {
   await processes.spawn('yarn', ['init', '-s'], {
     cwd: cwd,
-    tty: true,
+    tty: true
   });
 }
 
 export async function remove(dependencies: Array<string>, cwd: string) {
   await processes.spawn('yarn', ['remove', ...dependencies], {
     cwd,
-    tty: true,
+    tty: true
   });
 }

@@ -3,12 +3,14 @@ import Project from '../Project';
 import * as yarn from '../utils/yarn';
 
 type Options = {
-  cwd?: string,
+  cwd?: string
 };
 
 type DependencyGraph = Map<string, Array<string>>;
 
-export default async function getDependencyGraph(opts: Options = {}): Promise<DependencyGraph> {
+export default async function getDependencyGraph(
+  opts: Options = {}
+): Promise<DependencyGraph> {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

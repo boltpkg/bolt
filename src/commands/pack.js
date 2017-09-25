@@ -1,10 +1,13 @@
 // @flow
 import * as options from '../utils/options';
-import {PError} from '../utils/errors';
+import { PError } from '../utils/errors';
 
 export type PackOptions = {};
 
-export function toPackOptions(args: options.Args, flags: options.Flags): PackOptions {
+export function toPackOptions(
+  args: options.Args,
+  flags: options.Flags
+): PackOptions {
   return {};
 }
 

@@ -1,10 +1,13 @@
 // @flow
 import * as options from '../utils/options';
-import {PError} from '../utils/errors';
+import { PError } from '../utils/errors';
 
 export type HelpOptions = {};
 
-export function toHelpOptions(args: options.Args, flags: options.Flags): HelpOptions {
+export function toHelpOptions(
+  args: options.Args,
+  flags: options.Flags
+): HelpOptions {
   return {};
 }
 

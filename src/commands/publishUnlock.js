@@ -4,12 +4,15 @@ import * as options from '../utils/options';
 import * as locks from '../utils/locks';
 
 export type PublishUnlockOptions = {|
-  cwd?: string,
+  cwd?: string
 |};
 
-export function toPublishUnlockOptions(args: options.Args, flags: options.Flags): PublishUnlockOptions {
+export function toPublishUnlockOptions(
+  args: options.Args,
+  flags: options.Flags
+): PublishUnlockOptions {
   return {
-    cwd: options.string(flags.cwd, 'cwd'),
+    cwd: options.string(flags.cwd, 'cwd')
   };
 }
 
