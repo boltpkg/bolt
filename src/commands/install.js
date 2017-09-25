@@ -44,7 +44,7 @@ export async function install(opts: InstallOptions) {
   for (let workspace of workspaces) {
     let dependencies = workspace.pkg.getAllDependencies();
 
-    workspacesToDependencies[workspace.pkg.config.name] = dependencies;
+    workspacesToDependencies[workspace.pkg.config.getName()] = dependencies;
 
     directoriesToCreate.push(workspace.pkg.nodeModules);
     directoriesToCreate.push(workspace.pkg.nodeModulesBin);
@@ -59,7 +59,7 @@ export async function install(opts: InstallOptions) {
       if (!matched) {
         valid = false;
         logger.error(
-          messages.depMustBeAddedToProject(workspace.pkg.config.name, name)
+          messages.depMustBeAddedToProject(workspace.pkg.config.getName(), name)
         );
         continue;
       }
@@ -68,7 +68,7 @@ export async function install(opts: InstallOptions) {
         valid = false;
         logger.error(
           messages.depMustMatchProject(
-            workspace.pkg.config.name,
+            workspace.pkg.config.getName(),
             name,
             matched,
             version
@@ -144,7 +144,8 @@ export async function install(opts: InstallOptions) {
     }
 
     for (let workspace of workspaces) {
-      let dependencies = workspacesToDependencies[workspace.pkg.config.name];
+      let dependencies =
+        workspacesToDependencies[workspace.pkg.config.getName()];
 
       if (!dependencies.has(pkgName)) {
         continue;

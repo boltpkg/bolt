@@ -38,7 +38,7 @@ export function success(message: string) {
 }
 
 function prompt(pkg) {
-  return (pkg ? '(' + pkg.config.name + ') ' : '') + '$ ';
+  return (pkg ? '(' + pkg.config.getName() + ') ' : '') + '$ ';
 }
 
 export function stdout(cmd: string, data: Buffer, pkg?: Package) {

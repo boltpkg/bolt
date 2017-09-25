@@ -1,10 +1,10 @@
 // @flow
 import Project from '../Project';
-import type { Config } from '../types';
+import type { JSONValue } from '../types';
 
 type WorkspaceInfo = {
   dir: string,
-  config: Config
+  config: JSONValue
 };
 
 type Task = (workspace: WorkspaceInfo) => Promise<mixed>;
@@ -24,7 +24,7 @@ export default async function runWorkspaceTasks(
   await Project.runWorkspaceTasks(workspaces, workspace => {
     return task({
       dir: workspace.pkg.dir,
-      config: workspace.pkg.config
+      config: workspace.pkg.config.json
     });
   });
 }

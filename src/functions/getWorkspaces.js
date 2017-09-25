@@ -1,6 +1,6 @@
 // @flow
 import Project from '../Project';
-import type { Config } from '../types';
+import type { JSONValue } from '../types';
 
 type Options = {
   cwd?: string
@@ -9,7 +9,7 @@ type Options = {
 type Packages = Array<{
   dir: string,
   name: string,
-  config: Config
+  config: JSONValue
 }>;
 
 export default async function getWorkspaces(
@@ -21,7 +21,7 @@ export default async function getWorkspaces(
 
   return workspaces.map(workspace => ({
     dir: workspace.pkg.dir,
-    name: workspace.pkg.config.name,
-    config: workspace.pkg.config
+    name: workspace.pkg.config.getName(),
+    config: workspace.pkg.config.json
   }));
 }

@@ -5,5 +5,5 @@ export const DEPENDENCY_TYPES = [
   'devDependencies',
   'peerDependencies',
   'bundledDependencies',
-  'optionalDependencies',
+  'optionalDependencies'
 ];
