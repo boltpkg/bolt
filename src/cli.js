@@ -393,10 +393,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
 
 export default async function cli(argv: Array<string>, exit: boolean = false) {
   const start = Date.now();
-  const { pkg, input, flags } = meow(
-    {
-      argv,
-      help: `
+
+  const { pkg, input, flags } = meow({
+    argv,
+    help: `
       usage
         $ pyarn [command] <...args> <...opts>
 
@@ -412,12 +412,11 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
         workspaces   run a pyarn command inside all workspaces
         workspace    run a pyarn command inside a specific workspace
         help         get help with pyarn commands
-    `
-    },
-    {
+    `,
+    flags: {
       '--': true
     }
-  );
+  });
 
   logger.title(`pyarn v${pkg.version}`);
 
