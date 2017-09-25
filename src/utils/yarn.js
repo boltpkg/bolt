@@ -17,8 +17,9 @@ export async function run(
   }
 
   let validScript = false;
+  let scripts = pkg.config.getScripts();
 
-  if (pkg.config.scripts && pkg.config.scripts[script]) {
+  if (scripts && scripts[script]) {
     validScript = true;
   }
 

@@ -14,7 +14,8 @@ export async function lock(packages: Array<Package>) {
   logger.info('Attempting to get locks for all packages');
 
   for (let pkg of packages) {
-    let { name, version } = pkg.config;
+    let name = pkg.config.getName();
+    let version = pkg.config.getVersion();
     let promise = npm.infoAllow404(name).then(response => {
       if (response.published) {
         const pkgInfo = response.pkgInfo || {};
@@ -48,7 +49,7 @@ export async function unlock(packages: Array<Package>) {
   let promises = [];
 
   for (let pkg of packages) {
-    promises.push(npm.removeTag(pkg.config.name, LOCK_DIST_TAG));
+    promises.push(npm.removeTag(pkg.config.getName(), LOCK_DIST_TAG));
   }
 
   await Promise.all(promises);

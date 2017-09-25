@@ -26,11 +26,11 @@ async function getUnpublishedPackages(packages) {
   const results = await Promise.all(
     packages.map(async pkg => {
       let config = pkg.config;
-      let response = await npm.infoAllow404(config.name);
+      let response = await npm.infoAllow404(config.getName());
 
       return {
-        name: config.name,
-        localVersion: config.version,
+        name: config.getName(),
+        localVersion: config.getVersion(),
         isPublished: response.published,
         publishedVersion: response.pkgInfo.version || ''
       };
@@ -52,13 +52,15 @@ export async function publish(opts: PublishOptions) {
   const workspaces = await project.getWorkspaces();
   const packages = workspaces
     .map(workspace => workspace.pkg)
-    .filter(pkg => !pkg.config.private);
+    .filter(pkg => !pkg.config.getPrivate());
 
   try {
     await locks.lock(packages);
     const unpublishedPackages = await getUnpublishedPackages(packages);
     const isUnpublished = workspace =>
-      unpublishedPackages.some(pkg => workspace.pkg.config.name === pkg.name);
+      unpublishedPackages.some(
+        pkg => workspace.pkg.config.getName() === pkg.name
+      );
     const unpublishedWorkspaces = workspaces.filter(isUnpublished);
 
     if (unpublishedPackages.length === 0) {
@@ -66,7 +68,8 @@ export async function publish(opts: PublishOptions) {
     }
 
     await Project.runWorkspaceTasks(unpublishedWorkspaces, async workspace => {
-      const { name, version } = workspace.pkg.config;
+      const name = workspace.pkg.config.getName();
+      const version = workspace.pkg.config.getVersion();
       logger.info(`Publishing ${name} at ${version}`);
 
       await npm.publish(name, { cwd: workspace.pkg.dir, access: opts.access });

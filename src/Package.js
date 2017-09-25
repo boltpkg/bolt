@@ -1,11 +1,6 @@
 // @flow
 import * as path from 'path';
-import {
-  findConfigFile,
-  readConfigFile,
-  writeConfigFile
-} from './utils/config';
-import type { Config } from './types';
+import Config from './Config';
 import { DEPENDENCY_TYPES } from './constants';
 import * as processes from './utils/processes';
 import * as semver from 'semver';
@@ -32,7 +27,7 @@ export default class Package {
   }
 
   static async init(filePath: string) {
-    let config = await readConfigFile(filePath);
+    let config = await Config.init(filePath);
     if (!config) {
       throw new PError(`Could not find package.json in ${filePath}`);
     }
@@ -40,22 +35,22 @@ export default class Package {
   }
 
   static async closest(filePath: string) {
-    let pkgPath = await findConfigFile(filePath);
+    let pkgPath = await Config.findConfigFile(filePath);
     if (!pkgPath) {
       throw new PError(`Could not find package.json from "${filePath}"`);
     }
     return await Package.init(pkgPath);
   }
 
-  getWorkspacesConfig() {
-    return this.config.pworkspaces || [];
+  getWorkspacesConfig(): Array<string> {
+    return this.config.getPworkspaces() || [];
   }
 
   getAllDependencies() {
     let allDependencies = new Map();
 
     for (let type of DEPENDENCY_TYPES) {
-      let deps = this.config[type];
+      let deps = this.config.getDeps(type);
       if (!deps) continue;
 
       for (let name of Object.keys(deps)) {
@@ -71,7 +66,7 @@ export default class Package {
     depType: string,
     versionRange: string | null
   ) {
-    let prevDeps = this.config[depType];
+    let prevDeps = this.config.getDeps(depType);
     let prevVersionRange = (prevDeps && prevDeps[depName]) || null;
     if (prevVersionRange === versionRange) return;
 
@@ -80,7 +75,7 @@ export default class Package {
       [depName]: versionRange
     });
 
-    let pkgName = this.config.name;
+    let pkgName = this.config.getDescriptor();
 
     if (versionRange === null) {
       logger.info(messages.removedPackageDependency(pkgName, depName));
@@ -114,18 +109,16 @@ export default class Package {
       }
     }
 
-    let newConfig = {
-      ...this.config,
+    this.config.write({
+      ...this.config.getConfig(),
       [depType]: sortObject(cleaned)
-    };
-
-    await writeConfigFile(this.filePath, newConfig);
-    this.config = newConfig;
+    });
   }
 
   getDependencyType(depName: string) {
     for (let depType of DEPENDENCY_TYPES) {
-      if (this.config[depType] && this.config[depType][depName]) {
+      let deps = this.config.getDeps(depType);
+      if (deps && deps[depName]) {
         return depType;
       }
     }

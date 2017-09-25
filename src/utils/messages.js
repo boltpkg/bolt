@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 import type Workspace from '../Workspace';
 
-function normalPkg(str) {
+function normalPkg(str: string) {
   return chalk.cyan(`"${str}"`);
 }
 
@@ -107,7 +107,7 @@ export function cannotRemoveDependencyDependendOnByWorkspaces(
   return `Cannot remove dependency ${normalPkg(
     depName
   )} that is depended on by some workspaces:\n${workspaces
-    .map(workspace => ` - ${normalPkg(workspace.pkg.config.name)}`)
+    .map(workspace => ` - ${normalPkg(workspace.pkg.config.getName())}`)
     .join('\n')}`;
 }
 

@@ -3,11 +3,10 @@ import * as path from 'path';
 import globby from 'globby';
 import multimatch from 'multimatch';
 import includes from 'array-includes';
-
 import Package from './Package';
 import Workspace from './Workspace';
-import type { Config, FilterOpts } from './types';
-import { getProjectConfig } from './utils/config';
+import Config from './Config';
+import type { FilterOpts } from './types';
 import * as fs from './utils/fs';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
@@ -23,7 +22,7 @@ export default class Project {
   }
 
   static async init(cwd: string) {
-    let filePath = await getProjectConfig(cwd);
+    let filePath = await Config.getProjectConfig(cwd);
     if (!filePath) throw new PError(`Unable to find root of project in ${cwd}`);
     let pkg = await Package.init(filePath);
     return new Project(pkg);
@@ -56,18 +55,21 @@ export default class Project {
   }
 
   async getDependencyGraph(workspaces: Array<Workspace>) {
-    let graph = new Map();
+    let graph: Map<
+      string,
+      { pkg: Package, dependencies: Array<string> }
+    > = new Map();
     let packages = [this.pkg];
-    let packagesByName = { [this.pkg.config.name]: this.pkg };
+    let packagesByName = { [this.pkg.config.getName()]: this.pkg };
     let valid = true;
 
     for (let workspace of workspaces) {
       packages.push(workspace.pkg);
-      packagesByName[workspace.pkg.config.name] = workspace.pkg;
+      packagesByName[workspace.pkg.config.getName()] = workspace.pkg;
     }
 
     for (let pkg of packages) {
-      let name = pkg.config.name;
+      let name = pkg.config.getName();
       let dependencies = [];
       let allDependencies = pkg.getAllDependencies();
 
@@ -76,7 +78,7 @@ export default class Project {
         if (!match) continue;
 
         let actual = depVersion.replace(/^\^/, '');
-        let expected = match.config.version;
+        let expected = match.config.getVersion();
 
         if (actual !== expected) {
           valid = false;
@@ -111,14 +113,14 @@ export default class Project {
     } = {};
 
     workspaces.forEach(workspace => {
-      dependentsLookup[workspace.pkg.config.name] = {
+      dependentsLookup[workspace.pkg.config.getName()] = {
         pkg: workspace.pkg,
         dependents: []
       };
     });
 
     workspaces.forEach(workspace => {
-      const dependent = workspace.pkg.config.name;
+      const dependent = workspace.pkg.config.getName();
       const valFromDependencyGraph = dependencyGraph.get(dependent) || {};
       const dependencies = valFromDependencyGraph.dependencies || [];
 
@@ -149,7 +151,7 @@ export default class Project {
 
   getWorkspaceByName(workspaces: Array<Workspace>, workspaceName: string) {
     return workspaces.find(workspace => {
-      return workspace.pkg.config.name === workspaceName;
+      return workspace.pkg.config.getName() === workspaceName;
     });
   }
 
@@ -161,7 +163,7 @@ export default class Project {
     const relativeDir = (workspace: Workspace) =>
       path.relative(this.pkg.dir, workspace.pkg.dir);
 
-    const workspaceNames = workspaces.map(ws => ws.pkg.config.name);
+    const workspaceNames = workspaces.map(ws => ws.pkg.config.getName());
     const workspaceDirs = workspaces.map(ws => relativeDir(ws));
 
     const filteredByName = multimatch(workspaceNames, [
@@ -175,7 +177,7 @@ export default class Project {
 
     const filteredWorkspaces = workspaces.filter(
       workspace =>
-        includes(filteredByName, workspace.pkg.config.name) &&
+        includes(filteredByName, workspace.pkg.config.getName()) &&
         includes(filteredByDir, relativeDir(workspace))
     );
 
