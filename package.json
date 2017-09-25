@@ -8,11 +8,7 @@
   "bin": {
     "pyarn": "./bin.js"
   },
-  "files": [
-    "dist",
-    "index.js",
-    "bin.js"
-  ],
+  "files": ["dist", "index.js", "bin.js"],
   "scripts": {
     "clean": "rm -rf dist",
     "flow": "flow status",
@@ -52,7 +48,7 @@
     "find-up": "^2.1.0",
     "globby": "^6.1.0",
     "make-dir": "^1.0.0",
-    "meow": "^3.7.0",
+    "meow": "sindresorhus/meow#43401c3",
     "multimatch": "^2.1.0",
     "p-limit": "^1.1.0",
     "parse-json": "^2.2.0",
@@ -67,15 +63,10 @@
   },
   "jest": {
     "resetMocks": true,
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/*.js"
-    ]
+    "testMatch": ["<rootDir>/src/**/__tests__/*.js"]
   },
   "lint-staged": {
-    "*.js": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.js": ["prettier --write", "git add"]
   },
   "prettier": {
     "singleQuote": true
