@@ -41,6 +41,7 @@ export async function install(opts: InstallOptions) {
 
   let workspacesToDependencies = {};
 
+  /** Calculate all the external dependencies that need to be symlinked */
   for (let workspace of workspaces) {
     let dependencies = workspace.pkg.getAllDependencies();
 
@@ -84,6 +85,7 @@ export async function install(opts: InstallOptions) {
     }
   }
 
+  /** Calculate all the internal dependencies that need to be symlinked */
   for (let [name, node] of dependencyGraph) {
     let nodeModules = path.join(node.pkg.dir, 'node_modules');
 
@@ -116,6 +118,8 @@ export async function install(opts: InstallOptions) {
   });
 
   logger.log('[2/2] Linking workspace dependencies...');
+
+  /** Calculate all the bin files that need to be symlinked */
 
   for (let binFile of await fs.readdirSafe(project.pkg.nodeModulesBin)) {
     let binPath = path.join(project.pkg.nodeModulesBin, binFile);
