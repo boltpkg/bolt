@@ -2,6 +2,7 @@
 import meow from 'meow';
 import chalk from 'chalk';
 import * as logger from './utils/logger';
+import * as messages from './utils/messages';
 import * as processes from './utils/processes';
 import { BoltError } from './utils/errors';
 import cleanStack from 'clean-stack';
@@ -396,29 +397,17 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
 
   const { pkg, input, flags } = meow({
     argv,
-    help: `
-      usage
-        $ bolt [command] <...args> <...opts>
-
-      commands
-        init         init a bolt project
-        install      install a bolt project
-        add          add a dependency to a bolt project
-        upgrade      upgrade a dependency in a bolt project
-        remove       remove a dependency from a bolt project
-        exec         execute a command in a bolt project
-        run          run a script in a bolt project
-        publish      publish all the packages in a bolt project
-        workspaces   run a bolt command inside all workspaces
-        workspace    run a bolt command inside a specific workspace
-        help         get help with bolt commands
-    `,
+    help: messages.helpContent(),
     flags: {
       '--': true
     }
   });
 
-  logger.title(`bolt v${pkg.version}`);
+  logger.title(
+    messages.boltVersion(pkg.version),
+    messages.nodeVersion(process.versions.node),
+    { emoji: '⚡️' }
+  );
 
   processes.handleSignals();
 
@@ -441,5 +430,8 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
   const timing = (Date.now() - start) / 1000;
   const rounded = Math.round(timing * 100) / 100;
 
-  logger.log(`Done in ${rounded}s.`);
+  logger.info(messages.doneInSeconds(rounded), {
+    emoji: '🏁',
+    prefix: false
+  });
 }

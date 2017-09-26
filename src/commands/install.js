@@ -106,16 +106,24 @@ export async function install(opts: InstallOptions) {
   }
 
   await Project.runWorkspaceTasks(workspaces, async workspace => {
-    await yarn.run(workspace.pkg, 'preinstall');
+    if (await yarn.getScript(workspace.pkg, 'preinstall')) {
+      await yarn.run(workspace.pkg, 'preinstall');
+    }
   });
 
-  logger.log('[1/2] Installing project dependencies...');
+  logger.info(messages.installingProjectDependencies(), {
+    emoji: '📦',
+    prefix: false
+  });
 
   await processes.spawn('yarn', ['install', '--non-interactive', '-s'], {
     cwd: project.pkg.dir
   });
 
-  logger.log('[2/2] Linking workspace dependencies...');
+  logger.info(messages.linkingWorkspaceDependencies(), {
+    emoji: '🔗',
+    prefix: false
+  });
 
   for (let binFile of await fs.readdirSafe(project.pkg.nodeModulesBin)) {
     let binPath = path.join(project.pkg.nodeModulesBin, binFile);
@@ -174,9 +182,14 @@ export async function install(opts: InstallOptions) {
   );
 
   await Project.runWorkspaceTasks(workspaces, async workspace => {
-    await yarn.run(workspace.pkg, 'postinstall');
-    await yarn.run(workspace.pkg, 'prepublish');
+    if (await yarn.getScript(workspace.pkg, 'postinstall')) {
+      await yarn.run(workspace.pkg, 'postinstall');
+    }
+
+    if (await yarn.getScript(workspace.pkg, 'prepublish')) {
+      await yarn.run(workspace.pkg, 'prepublish');
+    }
   });
 
-  logger.success('Installed and linked workspaces.');
+  logger.success(messages.installedAndLinkedWorkspaces(), { emoji: '💥' });
 }

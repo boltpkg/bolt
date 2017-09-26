@@ -3,6 +3,7 @@ import semver from 'semver';
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as logger from '../utils/logger';
+import * as messages from '../utils/messages';
 import * as locks from '../utils/locks';
 import * as npm from '../utils/npm';
 import Project from '../Project';
@@ -64,13 +65,13 @@ export async function publish(opts: PublishOptions) {
     const unpublishedWorkspaces = workspaces.filter(isUnpublished);
 
     if (unpublishedPackages.length === 0) {
-      logger.warn('No unpublished packages to release');
+      logger.warn(messages.noUnpublishedPackagesToPublish());
     }
 
     await Project.runWorkspaceTasks(unpublishedWorkspaces, async workspace => {
       const name = workspace.pkg.config.getName();
       const version = workspace.pkg.config.getVersion();
-      logger.info(`Publishing ${name} at ${version}`);
+      logger.info(messages.publishingPackage(name, version));
 
       await npm.publish(name, { cwd: workspace.pkg.dir, access: opts.access });
     });
