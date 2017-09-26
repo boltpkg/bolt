@@ -1,4 +1,4 @@
 // @flow
-import {workspaceAdd, toWorkspaceAddOptions} from '../add';
+import { workspaceAdd, toWorkspaceAddOptions } from '../add';
 
-test('pyarn workspace add');
+test('bolt workspace add');

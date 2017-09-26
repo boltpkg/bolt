@@ -1,13 +1,16 @@
 // @flow
 import * as options from '../../utils/options';
-import {PError} from '../../utils/errors';
+import { BoltError } from '../../utils/errors';
 
 export type TeamListOptions = {};
 
-export function toTeamListOptions(args: options.Args, flags: options.Flags): TeamListOptions {
+export function toTeamListOptions(
+  args: options.Args,
+  flags: options.Flags
+): TeamListOptions {
   return {};
 }
 
 export async function teamList(opts: TeamListOptions) {
-  throw new PError('Unimplemented command "team list"');
+  throw new BoltError('Unimplemented command "team list"');
 }

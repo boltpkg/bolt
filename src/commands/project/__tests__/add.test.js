@@ -1,4 +1,4 @@
 // @flow
-import {projectAdd, toProjectAddOptions} from '../add';
+import { projectAdd, toProjectAddOptions } from '../add';
 
-test('pyarn project add');
+test('bolt project add');

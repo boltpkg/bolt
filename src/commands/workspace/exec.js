@@ -1,7 +1,7 @@
 // @flow
 import Project from '../../Project';
 import * as options from '../../utils/options';
-import { PError } from '../../utils/errors';
+import { BoltError } from '../../utils/errors';
 import execCommand from '../../utils/execCommand';
 
 export type WorkspaceExecOptions = {
@@ -35,7 +35,7 @@ export async function workspaceExec(opts: WorkspaceExecOptions) {
   );
 
   if (!workspace) {
-    throw new PError(
+    throw new BoltError(
       `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
     );
   }

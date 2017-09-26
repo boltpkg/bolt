@@ -1,4 +1,4 @@
 // @flow
-import {ownerAdd, toOwnerAddOptions} from '../add';
+import { ownerAdd, toOwnerAddOptions } from '../add';
 
-test('pyarn owner add');
+test('bolt owner add');

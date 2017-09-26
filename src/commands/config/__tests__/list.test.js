@@ -1,4 +1,4 @@
 // @flow
-import {configList, toConfigListOptions} from '../list';
+import { configList, toConfigListOptions } from '../list';
 
-test('pyarn config list');
+test('bolt config list');

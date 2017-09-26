@@ -1,4 +1,4 @@
 // @flow
-import {tagRemove, toTagRemoveOptions} from '../remove';
+import { tagRemove, toTagRemoveOptions } from '../remove';
 
-test('pyarn tag remove');
+test('bolt tag remove');

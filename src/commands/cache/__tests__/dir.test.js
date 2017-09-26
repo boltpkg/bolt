@@ -1,4 +1,4 @@
 // @flow
-import {cacheDir, toCacheDirOptions} from '../dir';
+import { cacheDir, toCacheDirOptions } from '../dir';
 
-test('pyarn cache dir');
+test('bolt cache dir');

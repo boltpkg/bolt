@@ -1,6 +1,6 @@
 // @flow
 import * as options from '../utils/options';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type LogoutOptions = {};
 
@@ -12,5 +12,5 @@ export function toLogoutOptions(
 }
 
 export async function logout(opts: LogoutOptions) {
-  throw new PError('Unimplemented command "logout"');
+  throw new BoltError('Unimplemented command "logout"');
 }

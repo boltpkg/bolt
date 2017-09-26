@@ -113,7 +113,7 @@ export function cannotRemoveDependencyDependendOnByWorkspaces(
 
 export function runWorkspacesRemoveDependency(depName: string) {
   return `Run ${cmd(
-    `pyarn workspaces remove ${depName}`
+    `bolt workspaces remove ${depName}`
   )} to remove from all workspaces`;
 }
 

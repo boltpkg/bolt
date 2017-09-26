@@ -2,7 +2,9 @@
   "private": true,
   "name": "simple-project",
   "version": "1.0.0",
-  "pworkspaces": [
-    "packages/*"
-  ]
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  }
 }

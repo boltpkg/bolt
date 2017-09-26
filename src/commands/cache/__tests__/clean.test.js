@@ -1,4 +1,4 @@
 // @flow
-import {cacheClean, toCacheCleanOptions} from '../clean';
+import { cacheClean, toCacheCleanOptions } from '../clean';
 
-test('pyarn cache clean');
+test('bolt cache clean');

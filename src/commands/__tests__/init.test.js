@@ -1,4 +1,4 @@
 // @flow
-import {init, toInitOptions} from '../init';
+import { init, toInitOptions } from '../init';
 
-test('pyarn init');
+test('bolt init');

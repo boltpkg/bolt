@@ -1,7 +1,7 @@
 {
   "name": "@scope/foo",
   "version": "1.0.0",
-  "pworkspaces": ["packages/*"],
+  "workspaces": ["packages/*"],
   "dependencies": {
     "react": "^15.6.1",
     "bar": "^1.0.0"

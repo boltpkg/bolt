@@ -1,4 +1,4 @@
 // @flow
-import {globalUpgrade, toGlobalUpgradeOptions} from '../upgrade';
+import { globalUpgrade, toGlobalUpgradeOptions } from '../upgrade';
 
-test('pyarn global upgrade');
+test('bolt global upgrade');

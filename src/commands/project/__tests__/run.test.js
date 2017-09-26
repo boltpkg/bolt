@@ -1,4 +1,4 @@
 // @flow
-import {projectRun, toProjectRunOptions} from '../run';
+import { projectRun, toProjectRunOptions } from '../run';
 
-test('pyarn project run');
+test('bolt project run');

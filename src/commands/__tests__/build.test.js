@@ -1,4 +1,4 @@
 // @flow
-import {build, toBuildOptions} from '../build';
+import { build, toBuildOptions } from '../build';
 
-test('pyarn build');
+test('bolt build');

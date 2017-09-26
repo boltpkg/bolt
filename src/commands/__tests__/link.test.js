@@ -1,4 +1,4 @@
 // @flow
-import {link, toLinkOptions} from '../link';
+import { link, toLinkOptions } from '../link';
 
-test('pyarn link');
+test('bolt link');

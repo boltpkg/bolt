@@ -9,7 +9,7 @@ import pathExists from 'path-exists';
 jest.mock('../../utils/logger');
 jest.mock('../../utils/yarn');
 
-describe('pyarn remove', () => {
+describe('bolt remove', () => {
   test('removing a project dependency only used by the project', async () => {
     let tempDir = await copyFixtureIntoTempDir(
       __dirname,

@@ -7,7 +7,7 @@ import * as messages from './messages';
 import * as yarn from './yarn';
 import * as fs from './fs';
 import * as path from 'path';
-import { PError } from './errors';
+import { BoltError } from './errors';
 
 const UNINSTALL_SCRIPTS = ['preuninstall', 'uninstall', 'postuninstall'];
 
@@ -130,7 +130,7 @@ export default async function removeDependenciesFromPackages(
 
   // If there are any invalid dependencies specified, then error
   if (invalid.length) {
-    throw new PError(messages.couldntRemoveDependencies(invalid));
+    throw new BoltError(messages.couldntRemoveDependencies(invalid));
   }
 
   // Get an array of workspaces that we're removing from.

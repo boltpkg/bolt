@@ -1,4 +1,7 @@
 // @flow
-import {licensesGenerateDisclaimer, toLicensesGenerateDisclaimerOptions} from '../generateDisclaimer';
+import {
+  licensesGenerateDisclaimer,
+  toLicensesGenerateDisclaimerOptions
+} from '../generateDisclaimer';
 
-test('pyarn licenses generate-disclaimer');
+test('bolt licenses generate-disclaimer');

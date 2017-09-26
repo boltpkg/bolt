@@ -1,4 +1,4 @@
 // @flow
-import {tagAdd, toTagAddOptions} from '../add';
+import { tagAdd, toTagAddOptions } from '../add';
 
-test('pyarn tag add');
+test('bolt tag add');

@@ -1,4 +1,4 @@
 // @flow
-import {format, toFormatOptions} from '../format';
+import { format, toFormatOptions } from '../format';
 
-test('pyarn format');
+test('bolt format');

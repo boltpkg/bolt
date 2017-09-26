@@ -1,4 +1,4 @@
 // @flow
-import {teamAdd, toTeamAddOptions} from '../add';
+import { teamAdd, toTeamAddOptions } from '../add';
 
-test('pyarn team add');
+test('bolt team add');

@@ -8,7 +8,7 @@ import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
 import * as yarn from '../utils/yarn';
 import pathIsInside from 'path-is-inside';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type InstallOptions = {|
   cwd?: string
@@ -91,7 +91,7 @@ export async function install(opts: InstallOptions) {
       let depWorkspace = dependencyGraph.get(dependency);
 
       if (!depWorkspace) {
-        throw new PError(`Missing workspace: "${dependency}"`);
+        throw new BoltError(`Missing workspace: "${dependency}"`);
       }
 
       let src = depWorkspace.pkg.dir;
@@ -102,7 +102,7 @@ export async function install(opts: InstallOptions) {
   }
 
   if (!dependencyGraphValid || !valid) {
-    throw new PError('Cannot symlink invalid set of dependencies.');
+    throw new BoltError('Cannot symlink invalid set of dependencies.');
   }
 
   await Project.runWorkspaceTasks(workspaces, async workspace => {
@@ -124,13 +124,13 @@ export async function install(opts: InstallOptions) {
     let linkFile = await fs.readlink(binPath);
 
     if (!linkFile) {
-      throw new PError(`${binName} is not a symlink`);
+      throw new BoltError(`${binName} is not a symlink`);
     }
 
     let linkPath = path.join(project.pkg.nodeModulesBin, linkFile);
 
     if (!pathIsInside(linkPath, project.pkg.nodeModules)) {
-      throw new PError(
+      throw new BoltError(
         `${binName} is linked to a location outside of project node_modules: ${linkPath}`
       );
     }

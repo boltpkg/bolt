@@ -3,7 +3,7 @@ import meow from 'meow';
 import chalk from 'chalk';
 import * as logger from './utils/logger';
 import * as processes from './utils/processes';
-import { PError } from './utils/errors';
+import { BoltError } from './utils/errors';
 import cleanStack from 'clean-stack';
 import * as commands from './commands';
 import * as options from './utils/options';
@@ -388,7 +388,7 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.run(commands.toRunOptions(args, flags));
   }
 
-  throw new PError(`You must specify a valid command`);
+  throw new BoltError(`You must specify a valid command`);
 }
 
 export default async function cli(argv: Array<string>, exit: boolean = false) {
@@ -398,34 +398,34 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
     argv,
     help: `
       usage
-        $ pyarn [command] <...args> <...opts>
+        $ bolt [command] <...args> <...opts>
 
       commands
-        init         init a pyarn project
-        install      install a pyarn project
-        add          add a dependency to a pyarn project
-        upgrade      upgrade a dependency in a pyarn project
-        remove       remove a dependency from a pyarn project
-        exec         execute a command in a pyarn project
-        run          run a script in a pyarn project
-        publish      publish all the packages in a pyarn project
-        workspaces   run a pyarn command inside all workspaces
-        workspace    run a pyarn command inside a specific workspace
-        help         get help with pyarn commands
+        init         init a bolt project
+        install      install a bolt project
+        add          add a dependency to a bolt project
+        upgrade      upgrade a dependency in a bolt project
+        remove       remove a dependency from a bolt project
+        exec         execute a command in a bolt project
+        run          run a script in a bolt project
+        publish      publish all the packages in a bolt project
+        workspaces   run a bolt command inside all workspaces
+        workspace    run a bolt command inside a specific workspace
+        help         get help with bolt commands
     `,
     flags: {
       '--': true
     }
   });
 
-  logger.title(`pyarn v${pkg.version}`);
+  logger.title(`bolt v${pkg.version}`);
 
   processes.handleSignals();
 
   try {
     await runCommandFromCli(input, flags);
   } catch (err) {
-    if (err instanceof PError) {
+    if (err instanceof BoltError) {
       logger.error(err.message);
     } else {
       logger.error(cleanStack(err.stack));

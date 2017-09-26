@@ -1,6 +1,6 @@
 // @flow
 import * as options from '../utils/options';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type BinOptions = {};
 
@@ -12,5 +12,5 @@ export function toBinOptions(
 }
 
 export async function bin(opts: BinOptions) {
-  throw new PError('Unimplemented command "bin"');
+  throw new BoltError('Unimplemented command "bin"');
 }

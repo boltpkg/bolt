@@ -1,6 +1,6 @@
 // @flow
 import * as options from '../utils/options';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type CleanOptions = {};
 
@@ -12,5 +12,5 @@ export function toCleanOptions(
 }
 
 export async function clean(opts: CleanOptions) {
-  throw new PError('Unimplemented command "clean"');
+  throw new BoltError('Unimplemented command "clean"');
 }

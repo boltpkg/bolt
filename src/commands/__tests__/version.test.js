@@ -1,4 +1,4 @@
 // @flow
-import {version, toVersionOptions} from '../version';
+import { version, toVersionOptions } from '../version';
 
-test('pyarn version');
+test('bolt version');

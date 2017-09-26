@@ -1,4 +1,4 @@
 // @flow
-import {workspacesUpgrade, toWorkspacesUpgradeOptions} from '../upgrade';
+import { workspacesUpgrade, toWorkspacesUpgradeOptions } from '../upgrade';
 
-test('pyarn workspaces upgrade');
+test('bolt workspaces upgrade');

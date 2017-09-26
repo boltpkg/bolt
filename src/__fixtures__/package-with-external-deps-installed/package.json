@@ -2,9 +2,11 @@
   "private": true,
   "name": "package-with-external-deps-installed",
   "version": "1.0.0",
-  "pworkspaces": [
-    "packages/*"
-  ],
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  },
   "devDependencies": {
     "foo-dep": "^1.0.0",
     "global-dep": "^1.0.0",

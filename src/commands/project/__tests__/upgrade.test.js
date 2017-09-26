@@ -1,4 +1,4 @@
 // @flow
-import {projectUpgrade, toProjectUpgradeOptions} from '../upgrade';
+import { projectUpgrade, toProjectUpgradeOptions } from '../upgrade';
 
-test('pyarn project upgrade');
+test('bolt project upgrade');

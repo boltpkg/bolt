@@ -1,12 +1,12 @@
 {
-  "name": "pyarn",
+  "name": "bolt",
   "version": "0.11.1",
   "main": "index.js",
   "author": "James Kyle <me@thejameskyle.com>",
   "license": "MIT",
-  "repository": "https://github.com/pyarn/pyarn",
+  "repository": "https://github.com/boltpkg/bolt",
   "bin": {
-    "pyarn": "./bin.js"
+    "bolt": "./bin.js"
   },
   "files": ["dist", "index.js", "bin.js"],
   "scripts": {

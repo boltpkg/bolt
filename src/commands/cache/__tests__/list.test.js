@@ -1,4 +1,4 @@
 // @flow
-import {cacheList, toCacheListOptions} from '../list';
+import { cacheList, toCacheListOptions } from '../list';
 
-test('pyarn cache list');
+test('bolt cache list');

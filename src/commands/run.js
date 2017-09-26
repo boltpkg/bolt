@@ -2,7 +2,7 @@
 import Package from '../Package';
 import * as options from '../utils/options';
 import * as yarn from '../utils/yarn';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type RunOptions = {|
   cwd?: string,
@@ -28,7 +28,7 @@ export async function run(opts: RunOptions) {
   let validScript = await yarn.run(pkg, opts.script, opts.scriptArgs);
 
   if (!validScript) {
-    throw new PError(
+    throw new BoltError(
       `Package at "${pkg.dir}" does not have a script named "${opts.script}"`
     );
   }

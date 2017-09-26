@@ -1,13 +1,16 @@
 // @flow
 import * as options from '../../utils/options';
-import {PError} from '../../utils/errors';
+import { BoltError } from '../../utils/errors';
 
 export type ConfigGetOptions = {};
 
-export function toConfigGetOptions(args: options.Args, flags: options.Flags): ConfigGetOptions {
+export function toConfigGetOptions(
+  args: options.Args,
+  flags: options.Flags
+): ConfigGetOptions {
   return {};
 }
 
 export async function configGet(opts: ConfigGetOptions) {
-  throw new PError('Unimplemented command "config get"');
+  throw new BoltError('Unimplemented command "config get"');
 }

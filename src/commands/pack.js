@@ -1,6 +1,6 @@
 // @flow
 import * as options from '../utils/options';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type PackOptions = {};
 
@@ -12,5 +12,5 @@ export function toPackOptions(
 }
 
 export async function pack(opts: PackOptions) {
-  throw new PError('Unimplemented command "pack"');
+  throw new BoltError('Unimplemented command "pack"');
 }

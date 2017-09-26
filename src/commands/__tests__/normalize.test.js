@@ -1,4 +1,4 @@
 // @flow
-import {normalize, toNormalizeOptions} from '../normalize';
+import { normalize, toNormalizeOptions } from '../normalize';
 
-test('pyarn normalize');
+test('bolt normalize');

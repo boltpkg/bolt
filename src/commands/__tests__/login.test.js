@@ -1,4 +1,4 @@
 // @flow
-import {login, toLoginOptions} from '../login';
+import { login, toLoginOptions } from '../login';
 
-test('pyarn login');
+test('bolt login');

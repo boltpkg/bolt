@@ -1,4 +1,4 @@
 // @flow
-import {doc, toDocOptions} from '../doc';
+import { doc, toDocOptions } from '../doc';
 
-test('pyarn doc');
+test('bolt doc');

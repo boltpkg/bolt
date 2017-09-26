@@ -1,4 +1,4 @@
 // @flow
-import {publishUnlock, toPublishUnlockOptions} from '../publishUnlock';
+import { publishUnlock, toPublishUnlockOptions } from '../publishUnlock';
 
-test('pyarn publish-unlock');
+test('bolt publish-unlock');

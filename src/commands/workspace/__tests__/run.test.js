@@ -1,4 +1,4 @@
 // @flow
-import {workspaceRun, toWorkspaceRunOptions} from '../run';
+import { workspaceRun, toWorkspaceRunOptions } from '../run';
 
-test('pyarn workspace run');
+test('bolt workspace run');

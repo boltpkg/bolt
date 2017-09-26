@@ -1,13 +1,16 @@
 // @flow
 import * as options from '../../utils/options';
-import {PError} from '../../utils/errors';
+import { BoltError } from '../../utils/errors';
 
 export type ConfigDeleteOptions = {};
 
-export function toConfigDeleteOptions(args: options.Args, flags: options.Flags): ConfigDeleteOptions {
+export function toConfigDeleteOptions(
+  args: options.Args,
+  flags: options.Flags
+): ConfigDeleteOptions {
   return {};
 }
 
 export async function configDelete(opts: ConfigDeleteOptions) {
-  throw new PError('Unimplemented command "config delete"');
+  throw new BoltError('Unimplemented command "config delete"');
 }

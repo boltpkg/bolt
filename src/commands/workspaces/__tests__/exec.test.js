@@ -23,7 +23,7 @@ function assertSpawn(opts) {
   );
 }
 
-describe('pyarn workspaces exec', () => {
+describe('bolt workspaces exec', () => {
   test('running in a project', async () => {
     let projectDir = await copyFixtureIntoTempDir(
       __dirname,

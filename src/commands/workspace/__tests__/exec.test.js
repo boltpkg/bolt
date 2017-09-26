@@ -9,7 +9,7 @@ jest.mock('../../../utils/processes');
 const unsafeProcesses: any & typeof processes = processes;
 const binDir = path.join('node_modules', '.bin');
 
-describe('pyarn workspace exec', () => {
+describe('bolt workspace exec', () => {
   test('running in a project', async () => {
     let projectDir = await copyFixtureIntoTempDir(
       __dirname,

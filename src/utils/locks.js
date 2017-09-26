@@ -3,9 +3,9 @@ import Package from '../Package';
 import * as logger from './logger';
 import * as npm from './npm';
 import { settleAll } from './promises';
-import { PError } from './errors';
+import { BoltError } from './errors';
 
-const LOCK_DIST_TAG = 'pyarn-lock';
+const LOCK_DIST_TAG = 'bolt-lock';
 
 export async function lock(packages: Array<Package>) {
   let locks = [];
@@ -20,7 +20,7 @@ export async function lock(packages: Array<Package>) {
       if (response.published) {
         const pkgInfo = response.pkgInfo || {};
         if (pkgInfo['dist-tags'].LOCK_DIST_TAG) {
-          throw new PError(
+          throw new BoltError(
             `Unable to get lock as a lock already exists for '${name}'`
           );
         }
@@ -39,7 +39,7 @@ export async function lock(packages: Array<Package>) {
     logger.error(err.message);
     // Note: We only unlock the locks *we* just locked, as the other ones are currently being used
     await unlock(locks);
-    throw new PError(
+    throw new BoltError(
       'Unable to lock all packages, someone else may be releasing'
     );
   }

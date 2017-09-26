@@ -1,6 +1,6 @@
 // @flow
 import * as options from '../utils/options';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type LoginOptions = {};
 
@@ -12,5 +12,5 @@ export function toLoginOptions(
 }
 
 export async function login(opts: LoginOptions) {
-  throw new PError('Unimplemented command "login"');
+  throw new BoltError('Unimplemented command "login"');
 }

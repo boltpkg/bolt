@@ -1,7 +1,7 @@
 // @flow
 import semver from 'semver';
 import * as options from '../utils/options';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 import * as logger from '../utils/logger';
 import * as locks from '../utils/locks';
 import * as npm from '../utils/npm';
@@ -78,6 +78,6 @@ export async function publish(opts: PublishOptions) {
     await locks.unlock(packages);
   } catch (err) {
     logger.error(err.message);
-    throw new PError('Failed to publish');
+    throw new BoltError('Failed to publish');
   }
 }

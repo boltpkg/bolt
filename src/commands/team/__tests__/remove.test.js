@@ -1,4 +1,4 @@
 // @flow
-import {teamRemove, toTeamRemoveOptions} from '../remove';
+import { teamRemove, toTeamRemoveOptions } from '../remove';
 
-test('pyarn team remove');
+test('bolt team remove');

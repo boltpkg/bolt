@@ -7,7 +7,7 @@ import * as semver from 'semver';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import sortObject from 'sort-object';
-import { PError } from './utils/errors';
+import { BoltError } from './utils/errors';
 
 export default class Package {
   filePath: string;
@@ -29,7 +29,7 @@ export default class Package {
   static async init(filePath: string) {
     let config = await Config.init(filePath);
     if (!config) {
-      throw new PError(`Could not find package.json in ${filePath}`);
+      throw new BoltError(`Could not find package.json in ${filePath}`);
     }
     return new Package(filePath, config);
   }
@@ -37,13 +37,13 @@ export default class Package {
   static async closest(filePath: string) {
     let pkgPath = await Config.findConfigFile(filePath);
     if (!pkgPath) {
-      throw new PError(`Could not find package.json from "${filePath}"`);
+      throw new BoltError(`Could not find package.json from "${filePath}"`);
     }
     return await Package.init(pkgPath);
   }
 
   getWorkspacesConfig(): Array<string> {
-    return this.config.getPworkspaces() || [];
+    return this.config.getWorkspaces() || [];
   }
 
   getAllDependencies() {

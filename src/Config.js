@@ -6,7 +6,7 @@ import type { JSONValue, DependencySet } from './types';
 import * as fs from './utils/fs';
 import * as path from 'path';
 import multimatch from 'multimatch';
-import { PError } from './utils/errors';
+import { BoltError } from './utils/errors';
 
 async function getPackageStack(cwd: string) {
   let stack = [];
@@ -29,29 +29,33 @@ async function getPackageStack(cwd: string) {
 
 function toArrayOfStrings(value: JSONValue, message: string) {
   if (!Array.isArray(value)) {
-    throw new PError(message);
+    throw new BoltError(message);
   }
 
   return value.map(item => {
     if (typeof item !== 'string') {
-      throw new PError(message);
+      throw new BoltError(message);
     } else {
       return item;
     }
   });
 }
 
-function toObjectOfStrings(value: JSONValue, message: string) {
+function toObject(value: JSONValue, message: string) {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    throw new PError(message);
+    throw new BoltError(message);
+  } else {
+    return value;
   }
+}
 
-  let safeRef = value;
+function toObjectOfStrings(value: JSONValue, message: string) {
+  let safeRef = toObject(value, message);
   let safeCopy = {};
 
   Object.keys(safeRef).forEach(k => {
     if (typeof safeRef[k] !== 'string') {
-      throw new PError(message);
+      throw new BoltError(message);
     } else {
       safeCopy[k] = safeRef[k];
     }
@@ -98,7 +102,7 @@ export default class Config {
 
     while (stack.length) {
       let current = stack.pop();
-      let patterns = current.config.getPworkspaces();
+      let patterns = current.config.getWorkspaces();
 
       if (patterns) {
         let filePaths = matches.map(match => {
@@ -128,7 +132,7 @@ export default class Config {
       config === null ||
       Array.isArray(config)
     ) {
-      throw new PError(
+      throw new BoltError(
         `package.json must be an object. See: "${this.filePath}"`
       );
     }
@@ -148,7 +152,7 @@ export default class Config {
     let config = this.getConfig();
     let name = config.name;
     if (typeof name !== 'string') {
-      throw new PError(
+      throw new BoltError(
         `package.json#name must be a string. See "${this.filePath}"`
       );
     }
@@ -159,7 +163,7 @@ export default class Config {
     let config = this.getConfig();
     let version = config.version;
     if (typeof version !== 'string') {
-      throw new PError(
+      throw new BoltError(
         `package.json#version must be a string. See "${this.filePath}"`
       );
     }
@@ -170,20 +174,31 @@ export default class Config {
     let config = this.getConfig();
     let priv = config.private;
     if (typeof priv !== 'undefined' && typeof priv !== 'boolean') {
-      throw new PError(
+      throw new BoltError(
         `package.json#private must be a boolean. See "${this.filePath}"`
       );
     }
     return priv;
   }
 
-  getPworkspaces(): Array<string> | void {
+  getBoltConfig(): { [key: string]: JSONValue } | void {
     let config = this.getConfig();
-    let pworkspaces = config.pworkspaces;
-    if (typeof pworkspaces === 'undefined') return;
+    let boltConfig = config.bolt;
+    if (typeof boltConfig === 'undefined') return;
+    return toObject(
+      boltConfig,
+      `package.json#bolt must be an object. See "${this.filePath}"`
+    );
+  }
+
+  getWorkspaces(): Array<string> | void {
+    let boltConfig = this.getBoltConfig();
+    if (typeof boltConfig === 'undefined') return;
+    let workspaces = boltConfig.workspaces;
+    if (typeof workspaces === 'undefined') return;
     return toArrayOfStrings(
-      pworkspaces,
-      `package.json#pworkspaces must be an array of globs. See "${this
+      workspaces,
+      `package.json#bolt.workspaces must be an array of globs. See "${this
         .filePath}"`
     );
   }

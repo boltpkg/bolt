@@ -1,6 +1,6 @@
 // @flow
 import * as options from '../utils/options';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type GenerateOptions = {};
 
@@ -12,5 +12,5 @@ export function toGenerateOptions(
 }
 
 export async function generate(opts: GenerateOptions) {
-  throw new PError('Unimplemented command "generate"');
+  throw new BoltError('Unimplemented command "generate"');
 }

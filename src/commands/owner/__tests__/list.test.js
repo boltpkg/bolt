@@ -1,4 +1,4 @@
 // @flow
-import {ownerList, toOwnerListOptions} from '../list';
+import { ownerList, toOwnerListOptions } from '../list';
 
-test('pyarn owner list');
+test('bolt owner list');

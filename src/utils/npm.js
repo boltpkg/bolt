@@ -1,5 +1,5 @@
 // @flow
-import { PError } from './errors';
+import { BoltError } from './errors';
 import * as logger from './logger';
 import * as processes from './processes';
 import pLimit from 'p-limit';
@@ -59,7 +59,7 @@ export function addTag(pkgName: string, pkgVersion: string, tag: string) {
     ]);
     // An existing tag will return a warning to stderr, but a 0 status code
     if (result.stderr) {
-      throw new PError(
+      throw new BoltError(
         `Could not add tag ${tag} to ${pkgStr} as one already exists`
       );
     }

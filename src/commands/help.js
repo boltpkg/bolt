@@ -1,6 +1,6 @@
 // @flow
 import * as options from '../utils/options';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type HelpOptions = {};
 
@@ -12,5 +12,5 @@ export function toHelpOptions(
 }
 
 export async function help(opts: HelpOptions) {
-  throw new PError('Unimplemented command "help"');
+  throw new BoltError('Unimplemented command "help"');
 }

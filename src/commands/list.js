@@ -1,6 +1,6 @@
 // @flow
 import * as options from '../utils/options';
-import { PError } from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type ListOptions = {};
 
@@ -12,5 +12,5 @@ export function toListOptions(
 }
 
 export async function list(opts: ListOptions) {
-  throw new PError('Unimplemented command "list"');
+  throw new BoltError('Unimplemented command "list"');
 }

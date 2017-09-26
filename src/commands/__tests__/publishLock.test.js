@@ -1,4 +1,4 @@
 // @flow
-import {publishLock, toPublishLockOptions} from '../publishLock';
+import { publishLock, toPublishLockOptions } from '../publishLock';
 
-test('pyarn publish-lock');
+test('bolt publish-lock');
