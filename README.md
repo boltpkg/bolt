@@ -15,6 +15,9 @@ command:
 yarn global add bolt
 ```
 
+> Thanks to Cam Pedersen ([@ecto](https://github.com/ecto)) for the "bolt"
+> package name on npm
+
 ## Commands
 
 > **Note:** Bolt is under active development and some of these commands have
