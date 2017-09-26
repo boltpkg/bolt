@@ -5,7 +5,7 @@ import parseJson from 'parse-json';
 import type { JSONValue, DependencySet } from './types';
 import * as fs from './utils/fs';
 import * as path from 'path';
-import multimatch from 'multimatch';
+import * as globs from './utils/globs';
 import { BoltError } from './utils/errors';
 
 async function getPackageStack(cwd: string) {
@@ -112,7 +112,7 @@ export default class Config {
           );
         });
 
-        let found = multimatch(filePaths, patterns);
+        let found = globs.matchWorkspaces(filePaths, patterns);
 
         if (found.length) {
           matches.push(current);

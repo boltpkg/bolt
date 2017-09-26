@@ -1,7 +1,5 @@
 // @flow
 import * as path from 'path';
-import globby from 'globby';
-import multimatch from 'multimatch';
 import includes from 'array-includes';
 import Package from './Package';
 import Workspace from './Workspace';
@@ -11,6 +9,7 @@ import * as fs from './utils/fs';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import { BoltError } from './utils/errors';
+import * as globs from './utils/globs';
 
 export type Task = (workspace: Workspace) => Promise<mixed>;
 
@@ -35,8 +34,8 @@ export default class Project {
 
     for (let pkg of queue) {
       let cwd = path.dirname(pkg.filePath);
-      let patterns = this.pkg.getWorkspacesConfig();
-      let matchedPaths: Array<string> = await globby(patterns, { cwd });
+      let patterns = pkg.getWorkspacesConfig();
+      let matchedPaths = await globs.findWorkspaces(cwd, patterns);
 
       for (let matchedPath of matchedPaths) {
         let dir = path.join(cwd, matchedPath);
@@ -157,26 +156,25 @@ export default class Project {
   }
 
   filterWorkspaces(workspaces: Array<Workspace>, opts: FilterOpts) {
-    const onlyPattern = opts.only || '**';
-    const ignorePattern = opts.ignore ? `!${opts.ignore}` : '';
-    const onlyFsPattern = opts.onlyFs || '**';
-    const ignoreFsPattern = opts.ignoreFs ? `!${opts.ignoreFs}` : '';
-    const relativeDir = (workspace: Workspace) =>
+    let relativeDir = (workspace: Workspace) =>
       path.relative(this.pkg.dir, workspace.pkg.dir);
 
-    const workspaceNames = workspaces.map(ws => ws.pkg.config.getName());
-    const workspaceDirs = workspaces.map(ws => relativeDir(ws));
+    let workspaceNames = workspaces.map(ws => ws.pkg.config.getName());
+    let workspaceDirs = workspaces.map(ws => relativeDir(ws));
 
-    const filteredByName = multimatch(workspaceNames, [
-      onlyPattern,
-      ignorePattern
-    ]);
-    const filteredByDir = multimatch(workspaceDirs, [
-      onlyFsPattern,
-      ignoreFsPattern
-    ]);
+    let filteredByName = globs.matchOnlyAndIgnore(
+      workspaceNames,
+      opts.only,
+      opts.ignore
+    );
 
-    const filteredWorkspaces = workspaces.filter(
+    let filteredByDir = globs.matchOnlyAndIgnore(
+      workspaceDirs,
+      opts.onlyFs,
+      opts.ignoreFs
+    );
+
+    let filteredWorkspaces = workspaces.filter(
       workspace =>
         includes(filteredByName, workspace.pkg.config.getName()) &&
         includes(filteredByDir, relativeDir(workspace))
