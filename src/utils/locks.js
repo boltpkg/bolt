@@ -1,6 +1,7 @@
 // @flow
 import Package from '../Package';
 import * as logger from './logger';
+import * as messages from './messages';
 import * as npm from './npm';
 import { settleAll } from './promises';
 import { BoltError } from './errors';
@@ -11,7 +12,7 @@ export async function lock(packages: Array<Package>) {
   let locks = [];
   let promises = [];
 
-  logger.info('Attempting to get locks for all packages');
+  logger.info(messages.lockingAllPackages());
 
   for (let pkg of packages) {
     let name = pkg.config.getName();

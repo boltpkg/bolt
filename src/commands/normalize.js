@@ -195,6 +195,8 @@ export async function normalize(opts: NormalizeOptions) {
     }
   }
 
-  logger.error('The following packages could not be normalized:');
-  logger.log(outputItems.join('\n\n'));
+  logger.error(messages.couldNotBeNormalized());
+  logger.error(messages.toMessage(outputItems.join('\n\n')), {
+    prefix: false
+  });
 }

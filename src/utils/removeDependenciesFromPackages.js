@@ -157,5 +157,5 @@ export default async function removeDependenciesFromPackages(
     await removeDependenciesFromPackage(project, workspace.pkg, dependencies);
   }
 
-  logger.success('Removed dependencies');
+  logger.success(messages.removedDependencies());
 }
