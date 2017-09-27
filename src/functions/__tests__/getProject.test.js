@@ -9,7 +9,7 @@ describe('function/getProject', () => {
     it('should return path to a project root folder from a workspace', async () => {
       const projectRoot = await getFixturePath(__dirname, 'simple-project');
       const workspacePath = path.join(projectRoot, 'packages', 'bar');
-      return getProject(workspacePath).then(pr =>
+      return getProject({ cwd: workspacePath }).then(pr =>
         expect(pr.dir).toBe(projectRoot)
       );
     });
@@ -19,7 +19,7 @@ describe('function/getProject', () => {
     it('should return path to a project root folder from a workspace', async () => {
       const projectRoot = await getFixturePath(__dirname, 'nested-workspaces');
       const workspacePath = path.join(projectRoot, 'packages', 'foo');
-      return getProject(workspacePath).then(pr =>
+      return getProject({ cwd: workspacePath }).then(pr =>
         expect(pr.dir).toBe(projectRoot)
       );
     });
@@ -33,7 +33,7 @@ describe('function/getProject', () => {
         'packages',
         'baz'
       );
-      return getProject(workspacePath).then(pr =>
+      return getProject({ cwd: workspacePath }).then(pr =>
         expect(pr.dir).toBe(projectRoot)
       );
     });
