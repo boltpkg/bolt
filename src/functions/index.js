@@ -1,4 +1,5 @@
 // @flow
+export { default as getProject } from './getProject';
 export { default as getWorkspaces } from './getWorkspaces';
 export { default as getDependencyGraph } from './getDependencyGraph';
 export { default as getDependentsGraph } from './getDependentsGraph';
