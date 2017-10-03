@@ -224,4 +224,16 @@ export default class Config {
         .filePath}"`
     );
   }
+
+  getBin() {
+    let config = this.getConfig();
+    let bin = config.bin;
+    if (typeof bin === 'undefined') return;
+    if (typeof bin === 'string') return bin;
+    return toObjectOfStrings(
+      bin,
+      `package.json#bin must be an object of strings or a string. See "${this
+        .filePath}"`
+    );
+  }
 }

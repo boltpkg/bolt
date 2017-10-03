@@ -6,7 +6,7 @@ import includes from 'array-includes';
 import Project from '../Project';
 import type Workspace from '../Workspace';
 import type Package from '../Package';
-import { PError } from './errors';
+import { BoltError } from './errors';
 import * as fs from './fs';
 import * as logger from './logger';
 import * as messages from './messages';
@@ -24,8 +24,9 @@ export default async function symlinkPackageDependencies(
     graph: dependencyGraph,
     valid: dependencyGraphValid
   } = await project.getDependencyGraph(workspaces);
-  const internalDeps =
-    (dependencyGraph.get(pkg.config.name) || {}).dependencies || [];
+  const pkgName = pkg.config.getName();
+  // get all the dependencies that are internal workspaces in this project
+  const internalDeps = (dependencyGraph.get(pkgName) || {}).dependencies || [];
 
   const directoriesToCreate = [];
   const symlinksToCreate = [];
@@ -49,14 +50,19 @@ export default async function symlinkPackageDependencies(
 
     if (!versionInProject) {
       valid = false;
-      logger.error(messages.depMustBeAddedToProject(pkg.config.name, depName));
+      logger.error(
+        messages.depMustBeAddedToProject(pkg.config.getName(), depName)
+      );
       continue;
     }
 
     if (!versionInPkg) {
       valid = false;
       logger.error(
-        messages.couldntSymlinkDependencyNotExists(pkg.config.name, depName)
+        messages.couldntSymlinkDependencyNotExists(
+          pkg.config.getName(),
+          depName
+        )
       );
       continue;
     }
@@ -65,7 +71,7 @@ export default async function symlinkPackageDependencies(
       valid = false;
       logger.error(
         messages.depMustMatchProject(
-          pkg.config.name,
+          pkg.config.getName(),
           depName,
           versionInProject,
           versionInPkg
@@ -93,7 +99,7 @@ export default async function symlinkPackageDependencies(
   }
 
   if (!dependencyGraphValid || !valid) {
-    throw new PError('Cannot symlink invalid set of dependencies.');
+    throw new BoltError('Cannot symlink invalid set of dependencies.');
   }
 
   /********************************************************
@@ -114,7 +120,7 @@ export default async function symlinkPackageDependencies(
     const actualBinFileRelative = await fs.readlink(binPath);
 
     if (!actualBinFileRelative) {
-      throw new PError(`${binName} is not a symlink`);
+      throw new BoltError(`${binName} is not a symlink`);
     }
 
     const actualBinFile = path.join(
@@ -123,7 +129,7 @@ export default async function symlinkPackageDependencies(
     );
 
     if (!pathIsInside(actualBinFile, project.pkg.nodeModules)) {
-      throw new PError(
+      throw new BoltError(
         `${binName} is linked to a location outside of project node_modules: ${actualBinFileRelative}`
       );
     }
@@ -161,7 +167,7 @@ export default async function symlinkPackageDependencies(
     const depBinFiles =
       depWorkspace.pkg &&
       depWorkspace.pkg.config &&
-      depWorkspace.pkg.config.bin;
+      depWorkspace.pkg.config.getBin();
 
     if (!depBinFiles) {
       continue;

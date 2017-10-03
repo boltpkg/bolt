@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "name": "fixture-project-nested-workspaces",
+  "bolt": {
+    "workspaces": ["packages/*"]
+  },
+  "dependencies": {
+    "react": "^15.6.1",
+    "left-pad": "^1.1.3"
+  }
+}

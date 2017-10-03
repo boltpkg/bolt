@@ -40,10 +40,10 @@ export default async function addDependenciesToPackage(
     if (dep.version && dep.version !== installed) {
       logger.warn(
         messages.depMustMatchProject(
-          pkg.config.name,
+          pkg.config.getName(),
           dep.name,
           installed,
-          dep.version
+          String(dep.version)
         )
       );
       throw new Error();
@@ -53,14 +53,14 @@ export default async function addDependenciesToPackage(
 
   for (let dep of internalDeps) {
     const dependencyPkg = (depGraph.get(dep.name) || {}).pkg;
-    const curVersion = dependencyPkg.config.version;
+    const curVersion = dependencyPkg.config.getVersion();
     if (dep.version) {
       logger.warn(
         messages.packageMustDependOnCurrentVersion(
-          pkg.config.name,
+          pkg.config.getName(),
           dep.name,
           curVersion,
-          dep.version
+          String(dep.version)
         )
       );
       throw new Error();
@@ -69,7 +69,7 @@ export default async function addDependenciesToPackage(
   }
 
   for (let [depName, depVersion] of Object.entries(installedVersions)) {
-    await pkg.setDependencyVersionRange(depName, type, depVersion);
+    await pkg.setDependencyVersionRange(depName, type, String(depVersion));
   }
 
   await symlinkPackageDependencies(project, pkg, dependencyNames);

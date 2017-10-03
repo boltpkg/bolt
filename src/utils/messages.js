@@ -145,7 +145,7 @@ export function couldntRemoveDependencies(deps: Array<string>): Message {
 export function couldntSymlinkDependencyNotExists(
   pkgName: string,
   depName: string
-) {
+): Message {
   return `Could not symlink ${depName} in ${pkgName} as no dependency exists`;
 }
 

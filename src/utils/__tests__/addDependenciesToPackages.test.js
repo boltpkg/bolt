@@ -8,6 +8,7 @@ import * as symlinkPackageDependencies from '../symlinkPackageDependencies';
 import * as yarn from '../yarn';
 import Project from '../../Project';
 import Package from '../../Package';
+import Config from '../../Config';
 
 jest.mock('../yarn');
 jest.mock('../logger');
@@ -16,10 +17,10 @@ const unsafeYarn: any & typeof yarn = yarn;
 
 // Mock yarn.add to make it update the packages config when called
 function fakeYarnAdd(pkg, dependencies, type = 'dependencies') {
-  pkg.config[type] = pkg.config[type] || {};
+  pkg.config.json[type] = pkg.config.json[type] || {};
 
   dependencies.forEach(dep => {
-    pkg.config[type][dep.name] = dep.version || '^1.0.0';
+    pkg.config.json[type][dep.name] = dep.version || '^1.0.0';
   });
 }
 

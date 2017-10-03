@@ -33,7 +33,6 @@ async function symlinkExists(dir: string, symlink: string) {
 describe('utils/symlinkPackageDependencies()', () => {
   let project;
   let workspaces;
-  let mkdir;
   let pkgToSymlink;
   let nodeModules;
   let nodeModulesBin;

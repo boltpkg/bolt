@@ -6,5 +6,7 @@
     "external-dep": "^1.0.0",
     "external-dep-with-bin": "^1.0.0"
   },
-  "pworkspaces": ["packages/*"]
+  "bolt": {
+    "workspaces": ["packages/*"]
+  }
 }

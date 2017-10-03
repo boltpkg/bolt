@@ -1,0 +1,8 @@
+{
+  "name": "baz",
+  "version": "1.0.1",
+  "dependencies": {
+    "react": "^15.6.1",
+    "bar": "^1.0.0"
+  }
+}
