@@ -1,13 +1,16 @@
 // @flow
 import * as options from '../utils/options';
-import {PError} from '../utils/errors';
+import { BoltError } from '../utils/errors';
 
 export type WhyOptions = {};
 
-export function toWhyOptions(args: options.Args, flags: options.Flags): WhyOptions {
+export function toWhyOptions(
+  args: options.Args,
+  flags: options.Flags
+): WhyOptions {
   return {};
 }
 
 export async function why(opts: WhyOptions) {
-  throw new PError('Unimplemented command "why"');
+  throw new BoltError('Unimplemented command "why"');
 }

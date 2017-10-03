@@ -1,13 +1,16 @@
 // @flow
 import * as options from '../../utils/options';
-import {PError} from '../../utils/errors';
+import { BoltError } from '../../utils/errors';
 
 export type GlobalRemoveOptions = {};
 
-export function toGlobalRemoveOptions(args: options.Args, flags: options.Flags): GlobalRemoveOptions {
+export function toGlobalRemoveOptions(
+  args: options.Args,
+  flags: options.Flags
+): GlobalRemoveOptions {
   return {};
 }
 
 export async function globalRemove(opts: GlobalRemoveOptions) {
-  throw new PError('Unimplemented command "global remove"');
+  throw new BoltError('Unimplemented command "global remove"');
 }

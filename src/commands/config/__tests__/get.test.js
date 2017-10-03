@@ -1,4 +1,4 @@
 // @flow
-import {configGet, toConfigGetOptions} from '../get';
+import { configGet, toConfigGetOptions } from '../get';
 
-test('pyarn config get');
+test('bolt config get');

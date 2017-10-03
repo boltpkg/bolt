@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "name": "project-with-bins",
+  "version": "1.0.0",
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  },
+  "dependencies": {
+    "dep-with-bin": "^1.0.0"
+  }
+}

@@ -8,7 +8,7 @@ import * as yarn from '../../../utils/yarn';
 jest.mock('../../../utils/logger');
 jest.mock('../../../utils/yarn');
 
-describe('pyarn project remove', () => {
+describe('bolt project remove', () => {
   test('removing a project dependency only used by the project', async () => {
     let tempDir = await copyFixtureIntoTempDir(
       __dirname,

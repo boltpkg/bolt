@@ -1,4 +1,4 @@
 // @flow
-import {teamDestroy, toTeamDestroyOptions} from '../destroy';
+import { teamDestroy, toTeamDestroyOptions } from '../destroy';
 
-test('pyarn team destroy');
+test('bolt team destroy');

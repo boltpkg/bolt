@@ -1,4 +1,4 @@
 // @flow
-import {licensesList, toLicensesListOptions} from '../list';
+import { licensesList, toLicensesListOptions } from '../list';
 
-test('pyarn licenses list');
+test('bolt licenses list');

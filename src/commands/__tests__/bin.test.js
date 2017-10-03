@@ -1,4 +1,4 @@
 // @flow
-import {bin, toBinOptions} from '../bin';
+import { bin, toBinOptions } from '../bin';
 
-test('pyarn bin');
+test('bolt bin');

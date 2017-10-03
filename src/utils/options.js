@@ -3,6 +3,7 @@
 export type Args = Array<string>;
 
 export type Flags = {
+  '--'?: Array<string>,
   [key: string]: boolean | string
 };
 

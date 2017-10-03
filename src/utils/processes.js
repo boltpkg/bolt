@@ -38,61 +38,69 @@ type SpawnOptions = {
   pkg?: Package,
   silent?: boolean,
   tty?: boolean,
+  env?: { [key: string]: ?string }
 };
 
-export function spawn(cmd: string, args: Array<string>, opts: SpawnOptions = {}) {
-  return limit(() => new Promise((resolve, reject) => {
-    let stdoutBuf = Buffer.from('');
-    let stderrBuf = Buffer.from('');
+export function spawn(
+  cmd: string,
+  args: Array<string>,
+  opts: SpawnOptions = {}
+) {
+  return limit(
+    () =>
+      new Promise((resolve, reject) => {
+        let stdoutBuf = Buffer.from('');
+        let stderrBuf = Buffer.from('');
 
-    let cmdStr = cmd + ' ' + args.join(' ');
+        let cmdStr = cmd + ' ' + args.join(' ');
 
-    let spawnOpts: child_process$spawnOpts = {
-      cwd: opts.cwd,
-      env: process.env,
-    };
+        let spawnOpts: child_process$spawnOpts = {
+          cwd: opts.cwd,
+          env: opts.env || process.env
+        };
 
-    if (opts.tty) {
-      spawnOpts.shell = true;
-      spawnOpts.stdio = 'inherit';
-    }
-
-    let child = crossSpawn(cmd, args, spawnOpts);
-
-    processes.add(child);
-
-    if (child.stdout) {
-      child.stdout.on('data', data => {
-        if (!opts.silent) {
-          logger.stdout(cmdStr, data, opts.pkg);
+        if (opts.tty) {
+          spawnOpts.shell = true;
+          spawnOpts.stdio = 'inherit';
         }
 
-        stdoutBuf = Buffer.concat([stdoutBuf, data]);
-      });
-    }
+        let child = crossSpawn(cmd, args, spawnOpts);
 
-    if (child.stderr) {
-      child.stderr.on('data', data => {
-        if (!opts.silent) {
-          logger.stderr(cmdStr, data, opts.pkg);
+        processes.add(child);
+
+        if (child.stdout) {
+          child.stdout.on('data', data => {
+            if (!opts.silent) {
+              logger.stdout(cmdStr, data, opts.pkg);
+            }
+
+            stdoutBuf = Buffer.concat([stdoutBuf, data]);
+          });
         }
-        stderrBuf = Buffer.concat([stderrBuf, data]);
-      });
-    }
 
-    child.on('error', reject);
+        if (child.stderr) {
+          child.stderr.on('data', data => {
+            if (!opts.silent) {
+              logger.stderr(cmdStr, data, opts.pkg);
+            }
+            stderrBuf = Buffer.concat([stderrBuf, data]);
+          });
+        }
 
-    child.on('close', code => {
-      let stdout = stdoutBuf.toString();
-      let stderr = stderrBuf.toString();
+        child.on('error', reject);
 
-      processes.delete(child);
+        child.on('close', code => {
+          let stdout = stdoutBuf.toString();
+          let stderr = stderrBuf.toString();
 
-      if (code === 0) {
-        resolve({code, stdout, stderr});
-      } else {
-        reject(new ChildProcessError(code, stdout, stderr));
-      }
-    });
-  }));
+          processes.delete(child);
+
+          if (code === 0) {
+            resolve({ code, stdout, stderr });
+          } else {
+            reject(new ChildProcessError(code, stdout, stderr));
+          }
+        });
+      })
+  );
 }

@@ -1,4 +1,4 @@
 // @flow
-import {teamCreate, toTeamCreateOptions} from '../create';
+import { teamCreate, toTeamCreateOptions } from '../create';
 
-test('pyarn team create');
+test('bolt team create');

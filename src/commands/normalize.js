@@ -27,7 +27,7 @@ function getWorkspaceMap(workspaces) {
   let workspaceMap = new Map();
 
   for (let workspace of workspaces) {
-    workspaceMap.set(workspace.pkg.config.name, workspace);
+    workspaceMap.set(workspace.pkg.config.getName(), workspace);
   }
 
   return workspaceMap;
@@ -183,7 +183,7 @@ export async function normalize(opts: NormalizeOptions) {
 
       for (let [version, packages] of versionMap) {
         let pkgs = Array.from(packages).map(pkg => {
-          return chalk.cyan(pkg.config.name);
+          return chalk.cyan(pkg.config.getDescriptor());
         });
 
         outputItem += '\n';
@@ -195,6 +195,8 @@ export async function normalize(opts: NormalizeOptions) {
     }
   }
 
-  logger.error('The following packages could not be normalized:');
-  logger.log(outputItems.join('\n\n'));
+  logger.error(messages.couldNotBeNormalized());
+  logger.error(messages.toMessage(outputItems.join('\n\n')), {
+    prefix: false
+  });
 }

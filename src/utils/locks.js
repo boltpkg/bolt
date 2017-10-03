@@ -1,25 +1,27 @@
 // @flow
 import Package from '../Package';
 import * as logger from './logger';
+import * as messages from './messages';
 import * as npm from './npm';
 import { settleAll } from './promises';
-import { PError } from './errors';
+import { BoltError } from './errors';
 
-const LOCK_DIST_TAG = 'pyarn-lock';
+const LOCK_DIST_TAG = 'bolt-lock';
 
 export async function lock(packages: Array<Package>) {
   let locks = [];
   let promises = [];
 
-  logger.info('Attempting to get locks for all packages');
+  logger.info(messages.lockingAllPackages());
 
   for (let pkg of packages) {
-    let { name, version } = pkg.config;
+    let name = pkg.config.getName();
+    let version = pkg.config.getVersion();
     let promise = npm.infoAllow404(name).then(response => {
       if (response.published) {
         const pkgInfo = response.pkgInfo || {};
         if (pkgInfo['dist-tags'].LOCK_DIST_TAG) {
-          throw new PError(
+          throw new BoltError(
             `Unable to get lock as a lock already exists for '${name}'`
           );
         }
@@ -38,7 +40,7 @@ export async function lock(packages: Array<Package>) {
     logger.error(err.message);
     // Note: We only unlock the locks *we* just locked, as the other ones are currently being used
     await unlock(locks);
-    throw new PError(
+    throw new BoltError(
       'Unable to lock all packages, someone else may be releasing'
     );
   }
@@ -48,7 +50,7 @@ export async function unlock(packages: Array<Package>) {
   let promises = [];
 
   for (let pkg of packages) {
-    promises.push(npm.removeTag(pkg.config.name, LOCK_DIST_TAG));
+    promises.push(npm.removeTag(pkg.config.getName(), LOCK_DIST_TAG));
   }
 
   await Promise.all(promises);

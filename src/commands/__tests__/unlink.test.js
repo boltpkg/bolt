@@ -1,4 +1,4 @@
 // @flow
-import {unlink, toUnlinkOptions} from '../unlink';
+import { unlink, toUnlinkOptions } from '../unlink';
 
-test('pyarn unlink');
+test('bolt unlink');

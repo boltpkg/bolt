@@ -1,17 +1,20 @@
 // @flow
 import * as options from '../../utils/options';
-import {PError} from '../../utils/errors';
+import { BoltError } from '../../utils/errors';
 
 export type WorkspaceUpgradeOptions = {
-  cwd?: string,
+  cwd?: string
 };
 
-export function toWorkspaceUpgradeOptions(args: options.Args, flags: options.Flags): WorkspaceUpgradeOptions {
+export function toWorkspaceUpgradeOptions(
+  args: options.Args,
+  flags: options.Flags
+): WorkspaceUpgradeOptions {
   return {
-    cwd: options.string(flags.cwd, 'cwd'),
+    cwd: options.string(flags.cwd, 'cwd')
   };
 }
 
 export async function workspaceUpgrade(opts: WorkspaceUpgradeOptions) {
-  throw new PError('Unimplemented command "workspace upgrade"');
+  throw new BoltError('Unimplemented command "workspace upgrade"');
 }

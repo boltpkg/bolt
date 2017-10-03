@@ -1,4 +1,4 @@
 // @flow
-import {outdated, toOutdatedOptions} from '../outdated';
+import { outdated, toOutdatedOptions } from '../outdated';
 
-test('pyarn outdated');
+test('bolt outdated');

@@ -21,7 +21,7 @@ const assertWorkspaces = (workspaces, expectedNames) => {
   expect(workspaces.length).toEqual(expectedNames.length);
   expectedNames.forEach(expected => {
     expect(
-      workspaces.some(workspace => workspace.pkg.config.name === expected)
+      workspaces.some(workspace => workspace.pkg.config.getName() === expected)
     );
   });
 };

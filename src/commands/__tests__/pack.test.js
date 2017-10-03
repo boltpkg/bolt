@@ -1,4 +1,4 @@
 // @flow
-import {pack, toPackOptions} from '../pack';
+import { pack, toPackOptions } from '../pack';
 
-test('pyarn pack');
+test('bolt pack');

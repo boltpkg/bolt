@@ -1,4 +1,4 @@
 // @flow
-import {globalList, toGlobalListOptions} from '../list';
+import { globalList, toGlobalListOptions } from '../list';
 
-test('pyarn global list');
+test('bolt global list');

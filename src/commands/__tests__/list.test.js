@@ -1,4 +1,4 @@
 // @flow
-import {list, toListOptions} from '../list';
+import { list, toListOptions } from '../list';
 
-test('pyarn list');
+test('bolt list');

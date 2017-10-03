@@ -1,4 +1,4 @@
 // @flow
-import {ownerRemove, toOwnerRemoveOptions} from '../remove';
+import { ownerRemove, toOwnerRemoveOptions } from '../remove';
 
-test('pyarn owner remove');
+test('bolt owner remove');

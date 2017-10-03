@@ -1,4 +1,4 @@
 // @flow
-import {lint, toLintOptions} from '../lint';
+import { lint, toLintOptions } from '../lint';
 
-test('pyarn lint');
+test('bolt lint');

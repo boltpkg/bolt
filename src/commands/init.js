@@ -3,12 +3,15 @@ import * as options from '../utils/options';
 import * as yarn from '../utils/yarn';
 
 export type InitOptions = {|
-  cwd?: string,
+  cwd?: string
 |};
 
-export function toInitOptions(args: options.Args, flags: options.Flags): InitOptions {
+export function toInitOptions(
+  args: options.Args,
+  flags: options.Flags
+): InitOptions {
   return {
-    cwd: options.string(flags.cwd, 'cwd'),
+    cwd: options.string(flags.cwd, 'cwd')
   };
 }
 

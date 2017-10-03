@@ -1,4 +1,4 @@
 // @flow
-import {configSet, toConfigSetOptions} from '../set';
+import { configSet, toConfigSetOptions } from '../set';
 
-test('pyarn config set');
+test('bolt config set');

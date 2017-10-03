@@ -1,4 +1,4 @@
 // @flow
-import {add, toAddOptions} from '../add';
+import { add, toAddOptions } from '../add';
 
-test('pyarn add');
+test('bolt add');

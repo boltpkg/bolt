@@ -1,4 +1,7 @@
 // @flow
-import {upgradeInteractive, toUpgradeInteractiveOptions} from '../upgradeInteractive';
+import {
+  upgradeInteractive,
+  toUpgradeInteractiveOptions
+} from '../upgradeInteractive';
 
-test('pyarn upgrade-interactive');
+test('bolt upgrade-interactive');

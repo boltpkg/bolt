@@ -1,4 +1,4 @@
 // @flow
-import {globalRemove, toGlobalRemoveOptions} from '../remove';
+import { globalRemove, toGlobalRemoveOptions } from '../remove';
 
-test('pyarn global remove');
+test('bolt global remove');

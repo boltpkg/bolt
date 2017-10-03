@@ -1,4 +1,4 @@
 // @flow
-import {run, toRunOptions} from '../run';
+import { run, toRunOptions } from '../run';
 
-test('pyarn run');
+test('bolt run');

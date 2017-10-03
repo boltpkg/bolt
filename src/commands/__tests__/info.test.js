@@ -1,4 +1,4 @@
 // @flow
-import {info, toInfoOptions} from '../info';
+import { info, toInfoOptions } from '../info';
 
-test('pyarn info');
+test('bolt info');

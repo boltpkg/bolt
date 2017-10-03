@@ -1,6 +1,6 @@
 // @flow
-import {getFixturePath} from 'jest-fixtures';
-import {publish, toPublishOptions} from '../publish';
+import { getFixturePath } from 'jest-fixtures';
+import { publish, toPublishOptions } from '../publish';
 import * as locks from '../../utils/locks';
 import * as npm from '../../utils/npm';
 
@@ -10,7 +10,7 @@ jest.mock('../../utils/npm');
 
 const untypedNpm: any = npm;
 
-describe('pyarn publish', () => {
+describe('bolt publish', () => {
   let lockSpy;
   let unlockSpy;
   let npmPublishSpy;
@@ -19,14 +19,13 @@ describe('pyarn publish', () => {
     lockSpy = jest.spyOn(locks, 'lock');
     unlockSpy = jest.spyOn(locks, 'unlock');
     npmPublishSpy = jest.spyOn(npm, 'publish');
-  })
+  });
 
   afterEach(() => {
     lockSpy.mockClear();
     unlockSpy.mockClear();
     npmPublishSpy.mockClear();
-  })
-
+  });
 
   test('should lock all workspaces', async () => {
     const cwd = await getFixturePath(__dirname, 'simple-project');
@@ -47,7 +46,7 @@ describe('pyarn publish', () => {
   });
 
   test('should run publish on all unpublished packages', async () => {
-    untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {}});
+    untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
     const cwd = await getFixturePath(__dirname, 'simple-project');
 
     await publish({ cwd });

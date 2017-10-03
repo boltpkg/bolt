@@ -4,7 +4,7 @@ import Package from '../../Package';
 import * as options from '../../utils/options';
 import * as logger from '../../utils/logger';
 import removeDependenciesFromPackages from '../../utils/removeDependenciesFromPackages';
-import { PError } from '../../utils/errors';
+import { BoltError } from '../../utils/errors';
 
 export type WorkspaceRemoveOptions = {
   cwd?: string,
@@ -34,7 +34,7 @@ export async function workspaceRemove(opts: WorkspaceRemoveOptions) {
   );
 
   if (!workspace) {
-    throw new PError(
+    throw new BoltError(
       `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
     );
   }

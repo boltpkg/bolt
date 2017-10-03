@@ -1,3 +1,3 @@
 // @flow
 
-export class PError extends Error {}
+export class BoltError extends Error {}

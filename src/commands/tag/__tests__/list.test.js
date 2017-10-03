@@ -1,4 +1,4 @@
 // @flow
-import {tagList, toTagListOptions} from '../list';
+import { tagList, toTagListOptions } from '../list';
 
-test('pyarn tag list');
+test('bolt tag list');

@@ -5,6 +5,7 @@ import type { Dependency, configDependencyType } from '../types';
 import type Package from '../Package';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
+import * as logger from '../utils/fs';
 
 export async function add(
   pkg: Package,
@@ -51,29 +52,30 @@ export async function run(
     spawnArgs = spawnArgs.concat('--', args);
   }
 
-  let validScript = false;
+  await processes.spawn('yarn', spawnArgs, {
+    cwd: pkg.dir,
+    pkg: pkg,
+    tty: true
+  });
+}
 
-  if (pkg.config.scripts && pkg.config.scripts[script]) {
-    validScript = true;
+export async function getScript(pkg: Package, script: string) {
+  let result = null;
+  let scripts = pkg.config.getScripts();
+
+  if (scripts && scripts[script]) {
+    result = scripts[script];
   }
 
-  if (!validScript) {
+  if (!result) {
     let bins = await fs.readdirSafe(pkg.nodeModulesBin);
 
     if (includes(bins, script)) {
-      validScript = true;
+      result = script;
     }
   }
 
-  if (validScript) {
-    await processes.spawn('yarn', spawnArgs, {
-      cwd: pkg.dir,
-      pkg: pkg,
-      tty: true
-    });
-  }
-
-  return validScript;
+  return result;
 }
 
 export async function init(cwd: string) {

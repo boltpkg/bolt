@@ -1,4 +1,4 @@
 // @flow
-import {help, toHelpOptions} from '../help';
+import { help, toHelpOptions } from '../help';
 
-test('pyarn help');
+test('bolt help');

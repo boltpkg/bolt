@@ -2,8 +2,9 @@
 import meow from 'meow';
 import chalk from 'chalk';
 import * as logger from './utils/logger';
+import * as messages from './utils/messages';
 import * as processes from './utils/processes';
-import { PError } from './utils/errors';
+import { BoltError } from './utils/errors';
 import cleanStack from 'clean-stack';
 import * as commands from './commands';
 import * as options from './utils/options';
@@ -23,6 +24,7 @@ const commandMap = {
   CONFIG_SET: { set: true },
   CREATE: { create: true },
   DOC: { doc: true },
+  EXEC: { exec: true },
   FORMAT: { format: true, fmt: true },
   GENERATE: { generate: true },
   GLOBAL: { global: true },
@@ -53,6 +55,7 @@ const commandMap = {
   PACK: { pack: true },
   PROJECT: { project: true, p: true },
   PROJECT_ADD: { add: true },
+  PROJECT_EXEC: { exec: true },
   PROJECT_REMOVE: { remove: true, rm: true },
   PROJECT_RUN: { run: true },
   PROJECT_UPGRADE: { upgrade: true },
@@ -80,11 +83,13 @@ const commandMap = {
   WHY: { why: true },
   WORKSPACE: { workspace: true, w: true },
   WORKSPACE_ADD: { add: true },
+  WORKSPACE_EXEC: { exec: true },
   WORKSPACE_REMOVE: { remove: true, rm: true },
   WORKSPACE_RUN: { run: true },
   WORKSPACE_UPGRADE: { upgrade: true },
   WORKSPACES: { workspaces: true, ws: true },
   WORKSPACES_ADD: { add: true },
+  WORKSPACES_EXEC: { exec: true },
   WORKSPACES_REMOVE: { remove: true, rm: true },
   WORKSPACES_RUN: { run: true },
   WORKSPACES_UPGRADE: { upgrade: true }
@@ -144,6 +149,8 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.create(commands.toCreateOptions(commandArgs, flags));
   } else if (commandMap.DOC[command]) {
     return commands.doc(commands.toDocOptions(commandArgs, flags));
+  } else if (commandMap.EXEC[command]) {
+    return commands.exec(commands.toExecOptions(commandArgs, flags));
   } else if (commandMap.FORMAT[command]) {
     return commands.format(commands.toFormatOptions(commandArgs, flags));
   } else if (commandMap.GENERATE[command]) {
@@ -233,6 +240,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     if (commandMap.PROJECT_ADD[subCommand]) {
       return commands.projectAdd(
         commands.toProjectAddOptions(subCommandArgs, flags)
+      );
+    } else if (commandMap.PROJECT_EXEC[subCommand]) {
+      return commands.projectExec(
+        commands.toProjectExecOptions(subCommandArgs, flags)
       );
     } else if (commandMap.PROJECT_REMOVE[subCommand]) {
       return commands.projectRemove(
@@ -324,6 +335,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
       return commands.workspaceAdd(
         commands.toWorkspaceAddOptions(workspaceArgs, flags)
       );
+    } else if (commandMap.WORKSPACE_EXEC[workspaceCommand]) {
+      return commands.workspaceExec(
+        commands.toWorkspaceExecOptions(workspaceArgs, flags)
+      );
     } else if (commandMap.WORKSPACE_REMOVE[workspaceCommand]) {
       return commands.workspaceRemove(
         commands.toWorkspaceRemoveOptions(workspaceArgs, flags)
@@ -349,6 +364,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
       return commands.workspacesAdd(
         commands.toWorkspacesAddOptions(subCommandArgs, flags)
       );
+    } else if (commandMap.WORKSPACES_EXEC[subCommand]) {
+      return commands.workspacesExec(
+        commands.toWorkspacesExecOptions(subCommandArgs, flags)
+      );
     } else if (commandMap.WORKSPACES_REMOVE[subCommand]) {
       return commands.workspacesRemove(
         commands.toWorkspacesRemoveOptions(subCommandArgs, flags)
@@ -370,40 +389,32 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.run(commands.toRunOptions(args, flags));
   }
 
-  throw new PError(`You must specify a valid command`);
+  throw new BoltError(`You must specify a valid command`);
 }
 
 export default async function cli(argv: Array<string>, exit: boolean = false) {
   const start = Date.now();
+
   const { pkg, input, flags } = meow({
     argv,
-    help: `
-      usage
-        $ pyarn [command] <...args> <...opts>
-
-      commands
-        init         init a pyarn project
-        install      install a pyarn project
-        add          add a dependency to a pyarn project
-        upgrade      upgrade a dependency in a pyarn project
-        remove       remove a dependency from a pyarn project
-        exec         execute a command in a pyarn project
-        run          run a script in a pyarn project
-        publish      publish all the packages in a pyarn project
-        workspaces   run a pyarn command inside all workspaces
-        workspace    run a pyarn command inside a specific workspace
-        help         get help with pyarn commands
-    `
+    help: messages.helpContent(),
+    flags: {
+      '--': true
+    }
   });
 
-  logger.title(`pyarn v${pkg.version}`);
+  logger.title(
+    messages.boltVersion(pkg.version),
+    messages.nodeVersion(process.versions.node),
+    { emoji: '⚡️' }
+  );
 
   processes.handleSignals();
 
   try {
     await runCommandFromCli(input, flags);
   } catch (err) {
-    if (err instanceof PError) {
+    if (err instanceof BoltError) {
       logger.error(err.message);
     } else {
       logger.error(cleanStack(err.stack));
@@ -419,5 +430,8 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
   const timing = (Date.now() - start) / 1000;
   const rounded = Math.round(timing * 100) / 100;
 
-  logger.log(`Done in ${rounded}s.`);
+  logger.info(messages.doneInSeconds(rounded), {
+    emoji: '🏁',
+    prefix: false
+  });
 }

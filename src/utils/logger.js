@@ -1,45 +1,104 @@
 // @flow
 import chalk from 'chalk';
 import type Package from '../Package';
+import { toString, type Message } from './messages';
 
-export function prefix(prefix: string, message: string | Buffer) {
-  return message.toString().trimRight().split('\n').map(line => {
-    return prefix + ' ' + line;
-  }).join('\n');
-}
+type LoggerOpts = {
+  prefix?: string | false,
+  emoji?: string
+};
 
-export function log(message: string) {
-  console.log(message);
-}
+function fmt(str: Message | Buffer | string, opts: LoggerOpts = {}) {
+  let result = toString(str);
 
-export function title(message: string) {
-  console.log(chalk.bold(message));
-}
+  if (opts.prefix) {
+    let prefix = opts.prefix;
+    result = result
+      .trimRight()
+      .split('\n')
+      .map(line => `${prefix} ${line}`)
+      .join('\n');
+  }
 
-export function info(message: string) {
-  console.error(prefix(chalk.cyan('info'), message));
-}
+  if (opts.emoji) {
+    result = `${opts.emoji}  ${result}`;
+  }
 
-export function warn(message: string) {
-  console.error(prefix(chalk.yellow('warn'), message));
-}
-
-export function error(message: string) {
-  console.error(prefix(chalk.red('error'), message));
-}
-
-export function success(message: string) {
-  console.log(prefix(chalk.green('success'), message));
+  return result;
 }
 
 function prompt(pkg) {
-  return (pkg ? '(' + pkg.config.name + ') ' : '') + '$ ';
+  return (pkg ? '(' + pkg.config.getName() + ') ' : '') + '$ ';
 }
 
-export function stdout(cmd: string, data: Buffer, pkg?: Package) {
-  console.log(prefix(chalk.cyan(prompt(pkg) + cmd), data));
+function write(
+  message: Message | Buffer | string,
+  opts: LoggerOpts = {},
+  err: boolean = false
+) {
+  if (err) {
+    console.error(fmt(message, opts));
+  } else {
+    console.log(fmt(message, opts));
+  }
 }
 
-export function stderr(cmd: string, data: Buffer, pkg?: Package) {
-  console.error(prefix(chalk.red(prompt(pkg) + cmd), data));
+export function title(
+  title: Message,
+  subtitle: Message,
+  opts: LoggerOpts = {}
+) {
+  let str = chalk.bold(title);
+  if (subtitle) str += ' ' + chalk.dim(subtitle);
+  write(str, opts);
+}
+
+const INFO_PREFIX = chalk.cyan('info');
+const WARN_PREFIX = chalk.yellow('warn');
+const ERROR_PREFIX = chalk.red('error');
+const SUCCESS_PREFIX = chalk.green('success');
+
+export function info(message: Message, opts: LoggerOpts = {}) {
+  write(message, { prefix: INFO_PREFIX, ...opts }, true);
+}
+
+export function warn(message: Message, opts: LoggerOpts = {}) {
+  write(message, { prefix: WARN_PREFIX, ...opts }, true);
+}
+
+export function error(message: Message, opts: LoggerOpts = {}) {
+  write(message, { prefix: ERROR_PREFIX, ...opts }, true);
+}
+
+export function success(message: Message, opts: LoggerOpts = {}) {
+  write(message, { prefix: SUCCESS_PREFIX, ...opts }, true);
+}
+
+export function stdout(
+  cmd: string,
+  data: Buffer,
+  pkg?: Package,
+  opts: LoggerOpts = {}
+) {
+  let prefix = chalk.cyan(prompt(pkg) + cmd);
+  write(data, { prefix, ...opts }, false);
+}
+
+export function stderr(
+  cmd: string,
+  data: Buffer,
+  pkg?: Package,
+  opts: LoggerOpts = {}
+) {
+  let prefix = chalk.red(prompt(pkg) + cmd);
+  write(data, { prefix, ...opts }, true);
+}
+
+export function cmd(cmd: string, args: Array<string>, opts: LoggerOpts = {}) {
+  let msg = chalk.dim(prompt() + cmd);
+  if (args.length) {
+    msg += ' ';
+    msg += chalk.magenta(args.join(' '));
+  }
+  write(msg, {}, true);
 }

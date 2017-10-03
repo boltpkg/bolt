@@ -1,4 +1,4 @@
 // @flow
-import {logout, toLogoutOptions} from '../logout';
+import { logout, toLogoutOptions } from '../logout';
 
-test('pyarn logout');
+test('bolt logout');

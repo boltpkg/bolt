@@ -9,6 +9,7 @@ module.exports = {
   ...require('./config'),
   ...require('./create'),
   ...require('./doc'),
+  ...require('./exec'),
   ...require('./format'),
   ...require('./generate'),
   ...require('./global'),
@@ -43,5 +44,5 @@ module.exports = {
   ...require('./versions'),
   ...require('./why'),
   ...require('./workspace'),
-  ...require('./workspaces'),
+  ...require('./workspaces')
 };

@@ -1,4 +1,4 @@
 // @flow
-import {globalAdd, toGlobalAddOptions} from '../add';
+import { globalAdd, toGlobalAddOptions } from '../add';
 
-test('pyarn global add');
+test('bolt global add');

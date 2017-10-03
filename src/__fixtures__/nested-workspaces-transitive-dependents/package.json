@@ -4,7 +4,9 @@
   "name": "nested-workspaces-transitive-dependents",
   "description": "pkg-a is a leaf node, pkg-b and pkg-c exist under a nested workspace",
   "description2": "pkg-b depends on pkg-a directly, and pkg-c depends on pkg-b, thus transitively depends on pkg-a",
-  "pworkspaces": ["packages/*"],
+  "bolt": {
+    "workspaces": ["packages/*"]
+  },
   "dependencies": {
     "react": "^15.6.1"
   }
