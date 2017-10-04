@@ -142,7 +142,9 @@ export default async function removeDependenciesFromPackages(
   await Promise.all(
     UNINSTALL_SCRIPTS.map(async script => {
       await Project.runWorkspaceTasks(includedWorkspaces, async workspace => {
-        await yarn.run(workspace.pkg, script);
+        if (await yarn.getScript(workspace.pkg, script)) {
+          await yarn.run(workspace.pkg, script);
+        }
       });
     })
   );
