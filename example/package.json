@@ -1,9 +1,9 @@
 {
   "private": true,
   "name": "fixture-project",
-  "pworkspaces": [
-    "packages/*"
-  ],
+  "bolt": {
+    "workspaces": ["packages/*"]
+   },
   "dependencies": {
     "react": "^15.6.1"
   }

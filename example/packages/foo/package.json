@@ -7,9 +7,9 @@
     "postinstall": "echo postinstall",
     "prepublish": "echo prepublish"
   },
-  "pworkspaces": [
-    "packages/*"
-  ],
+  "bolt": {
+    "workspaces": ["packages/*"]
+  },
   "dependencies": {
     "react": "^15.6.1",
     "bar-workspace-package": "^1.0.0"
