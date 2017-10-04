@@ -1,6 +1,9 @@
 {
   "name": "foo",
   "version": "1.0.0",
+  "scripts": {
+    "test": "echo 'running test script it foo package'"
+  },
   "bolt": {
     "workspaces": ["packages/*"]
   },
