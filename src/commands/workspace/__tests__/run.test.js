@@ -73,5 +73,3 @@ describe('bolt workspace run', () => {
     ).rejects.toBeInstanceOf(Error);
   });
 });
-
-describe('bolt workspace run', () => {});
