@@ -39,7 +39,7 @@ export async function workspaceRun(opts: WorkspaceRunOptions) {
     );
   }
 
-  let validScript = await yarn.run(workspace.pkg, opts.script, opts.scriptArgs);
+  let validScript = await yarn.getScript(workspace.pkg, opts.script);
 
   if (!validScript) {
     throw new BoltError(
@@ -47,4 +47,5 @@ export async function workspaceRun(opts: WorkspaceRunOptions) {
         .dir}" does not have a script named "${opts.script}"`
     );
   }
+  await yarn.run(workspace.pkg, opts.script, opts.scriptArgs);
 }
