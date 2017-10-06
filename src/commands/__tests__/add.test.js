@@ -49,7 +49,7 @@ describe('bolt add', () => {
     );
     fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
-    yarn.add.mockImplementation(fakeYarnAdd);
+    unsafeYarn.add.mockImplementation(fakeYarnAdd);
   });
 
   describe('from the project pkg', () => {
