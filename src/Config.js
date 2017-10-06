@@ -69,6 +69,7 @@ export default class Config {
   fileContents: string;
   json: JSONValue;
   indent: string;
+  invalid: boolean;
 
   constructor(filePath: string, fileContents: string) {
     this.filePath = filePath;
@@ -125,6 +126,11 @@ export default class Config {
   }
 
   getConfig(): { [key: string]: JSONValue } {
+    if (this.invalid) {
+      throw new BoltError(
+        `You need to refresh the Config object for ${this.filePath}`
+      );
+    }
     let config = this.json;
 
     if (
@@ -138,6 +144,10 @@ export default class Config {
     }
 
     return config;
+  }
+
+  invalidate() {
+    this.invalid = true;
   }
 
   getDescriptor(): string {

@@ -27,7 +27,11 @@ export default async function addDependenciesToPackage(
   const externalDepsToInstallForProject = externalDeps.filter(
     dep => !projectDependencies.has(dep.name)
   );
-  await yarn.add(project.pkg, externalDepsToInstallForProject, type);
+  if (externalDepsToInstallForProject.length !== 0) {
+    await yarn.add(project.pkg, externalDepsToInstallForProject, type);
+    // we reinitialise the project config because it will be modified externally by yarn
+    project = await Project.init(project.pkg.dir);
+  }
 
   if (pkg.isSamePackage(project.pkg)) {
     return true;

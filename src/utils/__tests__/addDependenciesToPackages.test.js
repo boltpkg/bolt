@@ -79,11 +79,7 @@ describe('utils/addDependenciesToPackages', () => {
 
     await addDependenciesToPackage(project, project.pkg, [{ name: 'react' }]);
 
-    expect(unsafeYarn.add).toHaveBeenCalledWith(
-      project.pkg,
-      [],
-      'dependencies'
-    );
+    expect(unsafeYarn.add).toHaveBeenCalledTimes(0);
   });
 
   test('it should throw if version does not match version in project config', async () => {
@@ -100,27 +96,45 @@ describe('utils/addDependenciesToPackages', () => {
   });
 
   test('should call symlinkPackageDependencies to symlink dependencies in workspace', async () => {
-    const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
+    const cwd = await copyFixtureIntoTempDir(
+      __dirname,
+      'package-with-external-deps-installed'
+    );
     const project = await Project.init(cwd);
     const workspaces = await project.getWorkspaces();
     const wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
 
-    await addDependenciesToPackage(project, wsToAddTo.pkg, [{ name: 'chalk' }]);
+    await addDependenciesToPackage(project, wsToAddTo.pkg, [
+      { name: 'project-only-dep' }
+    ]);
 
-    expect(symlinkSpy).toHaveBeenCalledWith(project, wsToAddTo.pkg, ['chalk']);
+    expect(symlinkSpy).toHaveBeenCalledWith(project, wsToAddTo.pkg, [
+      'project-only-dep'
+    ]);
   });
 
   test('should update packages dependencies in package config', async () => {
-    const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
+    const cwd = await copyFixtureIntoTempDir(
+      __dirname,
+      'package-with-external-deps-installed'
+    );
     const project = await Project.init(cwd);
     const workspaces = await project.getWorkspaces();
     const wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
 
-    expect(wsToAddTo.pkg.getDependencyVersionRange('chalk')).toEqual(null);
-    await addDependenciesToPackage(project, wsToAddTo.pkg, [{ name: 'chalk' }]);
+    expect(wsToAddTo.pkg.getDependencyVersionRange('project-only-dep')).toEqual(
+      null
+    );
+    await addDependenciesToPackage(project, wsToAddTo.pkg, [
+      { name: 'project-only-dep' }
+    ]);
 
-    expect(symlinkSpy).toHaveBeenCalledWith(project, wsToAddTo.pkg, ['chalk']);
-    expect(wsToAddTo.pkg.getDependencyVersionRange('chalk')).toEqual('^1.0.0');
+    expect(symlinkSpy).toHaveBeenCalledWith(project, wsToAddTo.pkg, [
+      'project-only-dep'
+    ]);
+    expect(wsToAddTo.pkg.getDependencyVersionRange('project-only-dep')).toEqual(
+      '^1.0.0'
+    );
   });
 
   describe('when adding internal package', () => {
@@ -160,11 +174,7 @@ describe('utils/addDependenciesToPackages', () => {
       expect(project.pkg.getDependencyVersionRange('baz')).toEqual(null);
       await addDependenciesToPackage(project, wsToAddTo.pkg, [{ name: 'baz' }]);
       expect(project.pkg.getDependencyVersionRange('baz')).toEqual(null);
-      expect(unsafeYarn.add).toHaveBeenCalledWith(
-        project.pkg,
-        [],
-        'dependencies'
-      );
+      expect(unsafeYarn.add).toHaveBeenCalledTimes(0);
     });
   });
 });
