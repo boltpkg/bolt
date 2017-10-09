@@ -1,0 +1,12 @@
+{
+  "name": "foo",
+  "version": "1.0.0",
+  "dependencies": {
+    "bar": "^1.0.0",
+    "external-dep": "^1.0.0",
+    "external-dep-with-bin": "^1.0.0"
+  },
+  "bolt": {
+    "workspaces": ["packages/*"]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "name": "fixture-project-nested-workspaces-with-root-dependencies-installed",
+  "description": "A project with only the root node_modules and symlinks already set up",
+  "description2": "Packages: foo, bar, baz, zee",
+  "description3": "bar has a single bin file, baz has two",
+  "description4": "foo and baz depend on bar, zee depends on baz",
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  },
+  "dependencies": {
+    "external-dep": "^1.0.0",
+    "external-dep-with-bin": "^1.0.0",
+    "external-dep-with-two-bins": "^1.0.0"
+  }
+}

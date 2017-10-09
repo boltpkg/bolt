@@ -113,17 +113,14 @@ describe('getProjectConfig()', () => {
     expect(found).toBe(null);
   });
 
-  it.only(
-    'should get the root if in nested package not included in a parent project',
-    async () => {
-      let fixturePath = await getFixturePath(
-        __dirname,
-        'simple-project-with-excluded-package',
-        'packages',
-        'bar'
-      );
-      let found = await Config.getProjectConfig(fixturePath);
-      expect(found).toBe(path.join(fixturePath, 'package.json'));
-    }
-  );
+  it('should get the root if in nested package not included in a parent project', async () => {
+    let fixturePath = await getFixturePath(
+      __dirname,
+      'simple-project-with-excluded-package',
+      'packages',
+      'bar'
+    );
+    let found = await Config.getProjectConfig(fixturePath);
+    expect(found).toBe(path.join(fixturePath, 'package.json'));
+  });
 });

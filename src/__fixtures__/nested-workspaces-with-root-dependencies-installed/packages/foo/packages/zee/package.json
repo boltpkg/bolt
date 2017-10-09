@@ -1,0 +1,13 @@
+{
+  "name": "zee",
+  "version": "1.0.0",
+  "description": "We use the zee package to test all bin symlinking",
+  "description2": "bar and external-dep-with-bin both have one bin",
+  "description3": "baz and external-dep... both have two",
+  "dependencies": {
+    "bar": "^1.0.0",
+    "baz": "^1.0.0",
+    "external-dep-with-bin": "^1.0.0",
+    "external-dep-with-two-bins": "^1.0.0"
+  }
+}

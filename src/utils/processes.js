@@ -38,13 +38,13 @@ type SpawnOptions = {
   pkg?: Package,
   silent?: boolean,
   tty?: boolean,
-  env?: {[key: string]: ?string},
+  env?: { [key: string]: ?string }
 };
 
 export function spawn(
   cmd: string,
   args: Array<string>,
-  opts: SpawnOptions = {},
+  opts: SpawnOptions = {}
 ) {
   return limit(
     () =>
@@ -56,7 +56,7 @@ export function spawn(
 
         let spawnOpts: child_process$spawnOpts = {
           cwd: opts.cwd,
-          env: opts.env || process.env,
+          env: opts.env || process.env
         };
 
         if (opts.tty) {
@@ -96,11 +96,11 @@ export function spawn(
           processes.delete(child);
 
           if (code === 0) {
-            resolve({code, stdout, stderr});
+            resolve({ code, stdout, stderr });
           } else {
             reject(new ChildProcessError(code, stdout, stderr));
           }
         });
-      }),
+      })
   );
 }
