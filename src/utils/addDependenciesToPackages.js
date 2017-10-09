@@ -5,6 +5,7 @@ import type Workspace from '../Workspace';
 import type Package from '../Package';
 import type { Dependency, configDependencyType } from '../types';
 import * as messages from './messages';
+import { BoltError } from './errors';
 import * as logger from './logger';
 import * as yarn from './yarn';
 import symlinkPackageDependencies from './symlinkPackageDependencies';
@@ -34,6 +35,11 @@ export default async function addDependenciesToPackage(
   }
 
   if (pkg.isSamePackage(project.pkg)) {
+    if (internalDeps.length > 0) {
+      throw new BoltError(
+        messages.cannotInstallWorkspaceInProject(internalDeps[0].name)
+      );
+    }
     return true;
   }
 
@@ -41,35 +47,35 @@ export default async function addDependenciesToPackage(
 
   for (let dep of externalDeps) {
     const installed = project.pkg.getDependencyVersionRange(dep.name);
-    if (dep.version && dep.version !== installed) {
-      logger.warn(
+    const depVersion = dep.version;
+    if (depVersion && depVersion !== installed) {
+      throw new BoltError(
         messages.depMustMatchProject(
           pkg.config.getName(),
           dep.name,
           installed,
-          String(dep.version)
+          depVersion
         )
       );
-      throw new Error();
     }
     installedVersions[dep.name] = String(installed);
   }
 
   for (let dep of internalDeps) {
     const dependencyPkg = (depGraph.get(dep.name) || {}).pkg;
-    const curVersion = dependencyPkg.config.getVersion();
-    if (dep.version) {
-      logger.warn(
+    const requestedVersion = dep.version;
+    const internalVersion = dependencyPkg.config.getVersion();
+    if (requestedVersion && requestedVersion !== internalVersion) {
+      throw new BoltError(
         messages.packageMustDependOnCurrentVersion(
           pkg.config.getName(),
           dep.name,
-          curVersion,
-          String(dep.version)
+          internalVersion,
+          requestedVersion
         )
       );
-      throw new Error();
     }
-    installedVersions[dep.name] = `^${curVersion}`;
+    installedVersions[dep.name] = `^${internalVersion}`;
   }
 
   for (let [depName, depVersion] of Object.entries(installedVersions)) {

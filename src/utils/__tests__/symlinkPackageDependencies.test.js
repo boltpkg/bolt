@@ -91,14 +91,15 @@ describe('utils/symlinkPackageDependencies()', () => {
       expect(await symlinkExists(nodeModules, 'bar')).toEqual(true);
     });
 
-    it('should run preinstall, postinstall and prepublish scripts', async () => {
+    it('should run correct lifecycle scripts', async () => {
       await symlinkPackageDependencies(project, pkgToSymlink, ['bar']);
 
-      expect(yarn.run).toHaveBeenCalledTimes(3);
+      expect(yarn.run).toHaveBeenCalledTimes(4);
       const yarnCalls = unsafeYarn.run.mock.calls;
       expect(yarnCalls[0][1]).toEqual('preinstall');
       expect(yarnCalls[1][1]).toEqual('postinstall');
       expect(yarnCalls[2][1]).toEqual('prepublish');
+      expect(yarnCalls[3][1]).toEqual('prepare');
     });
   });
 

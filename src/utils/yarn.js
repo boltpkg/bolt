@@ -6,6 +6,15 @@ import type Package from '../Package';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
 import * as logger from '../utils/fs';
+import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
+
+function depTypeToFlag(depType) {
+  const flag = Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).find(
+    key => DEPENDENCY_TYPE_FLAGS_MAP[key] === depType
+  );
+
+  return flag ? `--${flag}` : flag;
+}
 
 export async function add(
   pkg: Package,
@@ -24,13 +33,7 @@ export async function add(
   });
 
   if (type) {
-    const typeToFlagMap = {
-      dependencies: '',
-      devDependencies: '--dev',
-      peerDependencies: '--peer',
-      optionalDependencies: '--optional'
-    };
-    const flag = typeToFlagMap[type];
+    const flag = depTypeToFlag(type);
     if (flag) spawnArgs.push(flag);
   }
 

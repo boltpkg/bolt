@@ -5,20 +5,12 @@ import * as options from '../utils/options';
 import * as logger from '../utils/logger';
 import addDependenciesToPackage from '../utils/addDependenciesToPackages';
 import type { Dependency, configDependencyType } from '../types';
+import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
 
 export type AddOptions = {
   cwd?: string,
   deps: Array<Dependency>,
   type: configDependencyType
-};
-
-const depTypeFlags = {
-  dev: 'devDependencies',
-  D: 'devDependencies',
-  peer: 'peerDependencies',
-  P: 'peerDependencies',
-  optional: 'optionalDependencies',
-  O: '--optional'
 };
 
 export function toAddOptions(
@@ -34,9 +26,9 @@ export function toAddOptions(
     depsArgs.push(version ? { name, version } : { name });
   });
 
-  Object.keys(depTypeFlags).forEach(depTypeFlag => {
+  Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).forEach(depTypeFlag => {
     if (flags[depTypeFlag]) {
-      type = depTypeFlags[depTypeFlag];
+      type = DEPENDENCY_TYPE_FLAGS_MAP[depTypeFlag];
     }
   });
 

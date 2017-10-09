@@ -216,4 +216,5 @@ export default async function symlinkPackageDependencies(
 
   await yarn.run(pkg, 'postinstall');
   await yarn.run(pkg, 'prepublish');
+  await yarn.run(pkg, 'prepare');
 }

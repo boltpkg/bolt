@@ -255,3 +255,7 @@ export function couldNotBeNormalized(): Message {
 export function installedAndLinkedWorkspaces(): Message {
   return 'Installed and linked workspaces.';
 }
+
+export function cannotInstallWorkspaceInProject(pkgName: string): Message {
+  return `Cannot install workspace "${pkgName}" as a dependency of a project`;
+}

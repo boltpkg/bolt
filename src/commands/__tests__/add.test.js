@@ -15,14 +15,20 @@ const unsafeProcessses: any & typeof processes = processes;
 const unsafeYarn: any & typeof yarn = yarn;
 
 // Helper method to check if a dependency is installed, both in the package.json and on the fs
-async function depIsInstalled(workspaceDir: string, depName: string) {
+async function depIsInstalled(
+  workspaceDir: string,
+  depName: string,
+  version?: string
+) {
   const pkg = await Package.init(path.join(workspaceDir, 'package.json'));
   const dirExists = await pathExists(
     path.join(workspaceDir, 'node_modules', depName)
   );
   const depInPkgJson = pkg.getDependencyType(depName) !== null;
+  const correctVersion =
+    !version || pkg.getDependencyVersionRange(depName) === version;
 
-  return dirExists && depInPkgJson;
+  return dirExists && depInPkgJson && correctVersion;
 }
 
 // a mock yarn add function to update the pakcages's config and also node_modules dir
@@ -76,7 +82,7 @@ describe('bolt add', () => {
       expect(yarn.add).toHaveBeenCalledTimes(0);
     });
 
-    test('adding new dev dependency', async () => {
+    test('adding new dependency with --dev flag', async () => {
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(false);
       await add(
         toAddOptions(['new-dep'], {
@@ -110,6 +116,32 @@ describe('bolt add', () => {
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(true);
       expect(await depIsInstalled(projectDir, 'new-dep-2')).toEqual(true);
     });
+
+    test('adding internal dep (should error)', async () => {
+      await expect(
+        add(
+          toAddOptions(['bar'], {
+            cwd: projectDir
+          })
+        )
+      ).rejects.toBeInstanceOf(Error);
+
+      expect(yarn.add).toHaveBeenCalledTimes(0);
+      expect(await depIsInstalled(projectDir, 'bar')).toEqual(false);
+    });
+
+    test('adding new package at version', async () => {
+      expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(false);
+      await add(
+        toAddOptions(['new-dep@^2.0.0'], {
+          cwd: projectDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(await depIsInstalled(projectDir, 'new-dep', '^2.0.0')).toEqual(
+        true
+      );
+    });
   });
 
   describe('from a workspace', () => {
@@ -141,7 +173,7 @@ describe('bolt add', () => {
       );
     });
 
-    test('adding new dev dependency', async () => {
+    test('adding new dependency with --dev flag', async () => {
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
       await add(
         toAddOptions(['new-dep'], {
@@ -174,6 +206,32 @@ describe('bolt add', () => {
       );
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(true);
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep-2')).toEqual(true);
+    });
+
+    test('adding internal dep', async () => {
+      expect(await depIsInstalled(fooWorkspaceDir, 'bar')).toEqual(false);
+
+      await add(
+        toAddOptions(['bar'], {
+          cwd: fooWorkspaceDir
+        })
+      );
+
+      expect(yarn.add).toHaveBeenCalledTimes(0);
+      expect(await depIsInstalled(fooWorkspaceDir, 'bar')).toEqual(true);
+    });
+
+    test('adding new package at version', async () => {
+      expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
+      await add(
+        toAddOptions(['new-dep@^2.0.0'], {
+          cwd: fooWorkspaceDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(
+        await depIsInstalled(fooWorkspaceDir, 'new-dep', '^2.0.0')
+      ).toEqual(true);
     });
   });
 });
