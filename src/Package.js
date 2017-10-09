@@ -108,8 +108,7 @@ export default class Package {
         cleaned[depName] = versionRange;
       }
     }
-
-    this.config.write({
+    await this.config.write({
       ...this.config.getConfig(),
       [depType]: sortObject(cleaned)
     });
@@ -120,6 +119,16 @@ export default class Package {
       let deps = this.config.getDeps(depType);
       if (deps && deps[depName]) {
         return depType;
+      }
+    }
+    return null;
+  }
+
+  getDependencyVersionRange(depName: string) {
+    for (let depType of DEPENDENCY_TYPES) {
+      const deps = this.config.getDeps(depType);
+      if (deps && deps[depName]) {
+        return deps[depName];
       }
     }
     return null;

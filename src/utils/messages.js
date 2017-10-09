@@ -1,6 +1,7 @@
 // @flow
 import chalk from 'chalk';
 import type Workspace from '../Workspace';
+import type Package from '../Package';
 
 /*::
 export opaque type Message = string;
@@ -141,6 +142,13 @@ export function couldntRemoveDependencies(deps: Array<string>): Message {
     .join('\n')}`;
 }
 
+export function couldntSymlinkDependencyNotExists(
+  pkgName: string,
+  depName: string
+): Message {
+  return `Could not symlink ${depName} in ${pkgName} as no dependency exists`;
+}
+
 export function doneInSeconds(rounded: number): Message {
   return `Done in ${rounded}s.`;
 }
@@ -246,4 +254,8 @@ export function couldNotBeNormalized(): Message {
 
 export function installedAndLinkedWorkspaces(): Message {
   return 'Installed and linked workspaces.';
+}
+
+export function cannotInstallWorkspaceInProject(pkgName: string): Message {
+  return `Cannot install workspace "${pkgName}" as a dependency of a project`;
 }
