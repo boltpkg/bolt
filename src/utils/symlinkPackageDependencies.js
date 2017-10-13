@@ -200,7 +200,7 @@ export default async function symlinkPackageDependencies(
    * Create directories and symlinks *
   ***********************************/
 
-  await yarn.run(pkg, 'preinstall');
+  await yarn.runIfExists(pkg, 'preinstall');
 
   await Promise.all(
     directoriesToCreate.map(dirName => {
@@ -214,7 +214,7 @@ export default async function symlinkPackageDependencies(
     })
   );
 
-  await yarn.run(pkg, 'postinstall');
-  await yarn.run(pkg, 'prepublish');
-  await yarn.run(pkg, 'prepare');
+  await yarn.runIfExists(pkg, 'postinstall');
+  await yarn.runIfExists(pkg, 'prepublish');
+  await yarn.runIfExists(pkg, 'prepare');
 }

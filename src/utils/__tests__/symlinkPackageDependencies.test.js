@@ -94,8 +94,8 @@ describe('utils/symlinkPackageDependencies()', () => {
     it('should run correct lifecycle scripts', async () => {
       await symlinkPackageDependencies(project, pkgToSymlink, ['bar']);
 
-      expect(yarn.run).toHaveBeenCalledTimes(4);
-      const yarnCalls = unsafeYarn.run.mock.calls;
+      expect(yarn.runIfExists).toHaveBeenCalledTimes(4);
+      const yarnCalls = unsafeYarn.runIfExists.mock.calls;
       expect(yarnCalls[0][1]).toEqual('preinstall');
       expect(yarnCalls[1][1]).toEqual('postinstall');
       expect(yarnCalls[2][1]).toEqual('prepublish');

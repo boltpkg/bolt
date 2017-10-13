@@ -80,9 +80,10 @@ describe('install', () => {
     await install(toInstallOptions([], { cwd }));
 
     for (let workspace of workspaces) {
-      expect(unsafeYarn.run).toHaveBeenCalledWith(workspace.pkg, 'preinstall');
-      expect(unsafeYarn.run).toHaveBeenCalledWith(workspace.pkg, 'postinstall');
-      expect(unsafeYarn.run).toHaveBeenCalledWith(workspace.pkg, 'prepublish');
+      const runFn = unsafeYarn.runIfExists;
+      expect(runFn).toHaveBeenCalledWith(workspace.pkg, 'preinstall');
+      expect(runFn).toHaveBeenCalledWith(workspace.pkg, 'postinstall');
+      expect(runFn).toHaveBeenCalledWith(workspace.pkg, 'prepublish');
     }
   });
 
