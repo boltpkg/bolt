@@ -62,6 +62,17 @@ export async function run(
   });
 }
 
+export async function runIfExists(
+  pkg: Package,
+  script: string,
+  args: Array<string> = []
+) {
+  const scriptExists = await getScript(pkg, script);
+  if (scriptExists) {
+    await run(pkg, script, args);
+  }
+}
+
 export async function getScript(pkg: Package, script: string) {
   let result = null;
   let scripts = pkg.config.getScripts();
