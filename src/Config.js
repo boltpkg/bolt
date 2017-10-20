@@ -6,6 +6,8 @@ import type { JSONValue, DependencySet } from './types';
 import * as fs from './utils/fs';
 import * as path from 'path';
 import * as globs from './utils/globs';
+import * as logger from './utils/logger';
+import * as messages from './utils/messages';
 import { BoltError } from './utils/errors';
 
 async function getPackageStack(cwd: string) {
@@ -74,8 +76,18 @@ export default class Config {
   constructor(filePath: string, fileContents: string) {
     this.filePath = filePath;
     this.fileContents = fileContents;
-    this.indent = detectIndent(fileContents).indent || '  ';
-    this.json = parseJson(fileContents);
+    try {
+      this.indent = detectIndent(fileContents).indent || '  ';
+      this.json = parseJson(fileContents);
+    } catch (e) {
+      if (e.name === 'JSONError') {
+        logger.error(messages.errorParsingJSON(filePath), {
+          emoji: '💥',
+          prefix: false
+        });
+      }
+      throw e;
+    }
   }
 
   static async findConfigFile(filePath: string): Promise<?string> {

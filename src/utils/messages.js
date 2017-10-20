@@ -259,3 +259,7 @@ export function installedAndLinkedWorkspaces(): Message {
 export function cannotInstallWorkspaceInProject(pkgName: string): Message {
   return `Cannot install workspace "${pkgName}" as a dependency of a project`;
 }
+
+export function errorParsingJSON(filePath: string): Message {
+  return `Error parsing JSON in file:\n${filePath}`;
+}
