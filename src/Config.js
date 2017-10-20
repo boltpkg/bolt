@@ -85,7 +85,6 @@ export default class Config {
           emoji: '💥',
           prefix: false
         });
-        // logger.error(filePath, { emoji: '💥', prefix: false });
       }
       throw e;
     }
