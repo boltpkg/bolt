@@ -11,17 +11,18 @@ type LoggerOpts = {
 function fmt(str: Message | Buffer | string, opts: LoggerOpts = {}) {
   let result = toString(str);
 
-  if (opts.prefix) {
-    let prefix = opts.prefix;
+  let prefix = opts.prefix || '';
+
+  if (opts.emoji) {
+    prefix = `${opts.emoji}  ${prefix}`;
+  }
+
+  if (prefix) {
     result = result
       .trimRight()
       .split('\n')
       .map(line => `${prefix} ${line}`)
       .join('\n');
-  }
-
-  if (opts.emoji) {
-    result = `${opts.emoji}  ${result}`;
   }
 
   return result;
