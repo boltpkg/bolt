@@ -2,8 +2,12 @@
   "env": {
     "test": {
       "presets": [
-        "flow",
-        ["env", { "loose": true, "targets": { "node": "current" } }]
+        "flow", ["env", {
+          "loose": true,
+          "targets": {
+            "node": "current"
+          }
+        }]
       ],
       "plugins": [
         "transform-class-properties",
@@ -13,8 +17,12 @@
     },
     "legacy": {
       "presets": [
-        "flow",
-        ["env", { "loose": true, "targets": { "node": 4 } }]
+        "flow", ["env", {
+          "loose": true,
+          "targets": {
+            "node": 4
+          }
+        }]
       ],
       "plugins": [
         "transform-class-properties",
@@ -24,13 +32,18 @@
       "ignore": [
         "__mocks__",
         "__tests__",
+        "__fixtures__",
         "node_modules"
       ]
     },
     "modern": {
       "presets": [
-        "flow",
-        ["env", { "loose": true, "targets": { "node": 8 } }]
+        "flow", ["env", {
+          "loose": true,
+          "targets": {
+            "node": 8
+          }
+        }]
       ],
       "plugins": [
         "transform-class-properties",
@@ -40,6 +53,7 @@
       "ignore": [
         "__mocks__",
         "__tests__",
+        "__fixtures__",
         "node_modules"
       ]
     }

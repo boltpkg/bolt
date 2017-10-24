@@ -14,14 +14,34 @@ jest.mock('../../../utils/logger');
 const unsafeProcessses: any & typeof processes = processes;
 const unsafeYarn: any & typeof yarn = yarn;
 
-async function depIsInstalled(workspaceDir: string, depName: string) {
+// Helper method to check if a dependency is installed, both in the package.json and on the fs
+async function depIsInstalled(
+  workspaceDir: string,
+  depName: string,
+  version?: string
+) {
   const pkg = await Package.init(path.join(workspaceDir, 'package.json'));
   const dirExists = await pathExists(
     path.join(workspaceDir, 'node_modules', depName)
   );
   const depInPkgJson = pkg.getDependencyType(depName) !== null;
+  const correctVersion =
+    !version || pkg.getDependencyVersionRange(depName) === version;
 
-  return dirExists && depInPkgJson;
+  return dirExists && depInPkgJson && correctVersion;
+}
+
+// a mock yarn add function to update the pakcages's config and also node_modules dir
+async function fakeYarnAdd(pkg: Package, dependencies, type = 'dependencies') {
+  for (let dep of dependencies) {
+    await pkg.setDependencyVersionRange(
+      dep.name,
+      type,
+      dep.version || '^1.0.0'
+    );
+
+    await fs.mkdirp(path.join(pkg.nodeModules, dep.name));
+  }
 }
 
 describe('bolt workspace add', () => {
@@ -36,69 +56,122 @@ describe('bolt workspace add', () => {
     );
     fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
+    unsafeYarn.add.mockImplementation(fakeYarnAdd);
   });
 
-  test('running from project, installing dependency that is in project', async () => {
-    expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
-      false
-    );
-    await workspaceAdd(
-      toWorkspaceAddOptions(['foo', 'project-only-dep'], {
-        cwd: projectDir
-      })
-    );
-    expect(yarn.add).toHaveBeenCalledTimes(0);
-    expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
-      true
-    );
-  });
-
-  test('running from a different workspace, installing dependency that is in project', async () => {
-    expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
-      false
-    );
-    await workspaceAdd(
-      toWorkspaceAddOptions(['foo', 'project-only-dep'], {
-        cwd: barWorkspaceDir
-      })
-    );
-    expect(yarn.add).toHaveBeenCalledTimes(0);
-    expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
-      true
-    );
-  });
-
-  test('running from project, installing dep not in project', async () => {
-    // yarn add is mocked, so we need to update the package json and create a dir in node_modules
-    // ourselves (the tasks `yarn add` would normally do)
-    unsafeYarn.add.mockImplementationOnce(async (pkg: Package) => {
-      await pkg.setDependencyVersionRange('new-dep', 'dependencies', '^1.0.0');
-      await fs.mkdirp(path.join(pkg.nodeModules, 'new-dep'));
+  describe('running from a project', () => {
+    test('installing dependency that is in project', async () => {
+      expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
+        false
+      );
+      await workspaceAdd(
+        toWorkspaceAddOptions(['foo', 'project-only-dep'], {
+          cwd: projectDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(0);
+      expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
+        true
+      );
     });
-    expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
-    await workspaceAdd(
-      toWorkspaceAddOptions(['foo', 'new-dep'], {
-        cwd: projectDir
-      })
-    );
-    expect(yarn.add).toHaveBeenCalledTimes(1);
-    expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(true);
+
+    test('installing a dependency not in project', async () => {
+      expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
+      await workspaceAdd(
+        toWorkspaceAddOptions(['foo', 'new-dep'], {
+          cwd: projectDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(true);
+    });
+
+    test('installing a scoped dependency', async () => {
+      expect(await depIsInstalled(fooWorkspaceDir, '@scope/pkgName')).toEqual(
+        false
+      );
+      await workspaceAdd(
+        toWorkspaceAddOptions(['foo', '@scope/pkgName'], {
+          cwd: projectDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(await depIsInstalled(fooWorkspaceDir, '@scope/pkgName')).toEqual(
+        true
+      );
+    });
+
+    test('installing a scoped dependency at a version', async () => {
+      expect(
+        await depIsInstalled(fooWorkspaceDir, '@scope/pkgName@^2.0.0')
+      ).toEqual(false);
+      await workspaceAdd(
+        toWorkspaceAddOptions(['foo', '@scope/pkgName@^2.0.0'], {
+          cwd: projectDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(
+        await depIsInstalled(fooWorkspaceDir, '@scope/pkgName', '^2.0.0')
+      ).toEqual(true);
+    });
   });
 
-  test('running from a different workspace, installing dep not in project', async () => {
-    // yarn add is mocked, so we need to update the package json and create a dir in node_modules
-    // ourselves (the tasks `yarn add` would normally do)
-    unsafeYarn.add.mockImplementationOnce(async (pkg: Package) => {
-      await pkg.setDependencyVersionRange('new-dep', 'dependencies', '^1.0.0');
-      await fs.mkdirp(path.join(pkg.nodeModules, 'new-dep'));
+  describe('running from a workspace', () => {
+    test('running from a different workspace, installing dependency that is in project', async () => {
+      expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
+        false
+      );
+      await workspaceAdd(
+        toWorkspaceAddOptions(['foo', 'project-only-dep'], {
+          cwd: barWorkspaceDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(0);
+      expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
+        true
+      );
     });
-    expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
-    await workspaceAdd(
-      toWorkspaceAddOptions(['foo', 'new-dep'], {
-        cwd: barWorkspaceDir
-      })
-    );
-    expect(yarn.add).toHaveBeenCalledTimes(1);
-    expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(true);
+
+    test('running from a different workspace, installing dep not in project', async () => {
+      expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
+      await workspaceAdd(
+        toWorkspaceAddOptions(['foo', 'new-dep'], {
+          cwd: barWorkspaceDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(true);
+    });
+
+    test('installing a scoped dependency', async () => {
+      expect(await depIsInstalled(fooWorkspaceDir, '@scope/pkgName')).toEqual(
+        false
+      );
+      await workspaceAdd(
+        toWorkspaceAddOptions(['foo', '@scope/pkgName'], {
+          cwd: barWorkspaceDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(await depIsInstalled(fooWorkspaceDir, '@scope/pkgName')).toEqual(
+        true
+      );
+    });
+
+    test('installing a scoped dependency at a version', async () => {
+      expect(
+        await depIsInstalled(fooWorkspaceDir, '@scope/pkgName@^2.0.0')
+      ).toEqual(false);
+      await workspaceAdd(
+        toWorkspaceAddOptions(['foo', '@scope/pkgName@^2.0.0'], {
+          cwd: barWorkspaceDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(
+        await depIsInstalled(fooWorkspaceDir, '@scope/pkgName', '^2.0.0')
+      ).toEqual(true);
+    });
   });
 });
