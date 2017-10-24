@@ -71,10 +71,10 @@ export default async function symlinkPackageDependencies(
       valid = false;
       logger.error(
         messages.depMustMatchProject(
-          '111',
-          depName + '222',
-          versionInProject + '333',
-          versionInPkg + '444'
+          pkg.config.getName(),
+          depName,
+          versionInProject,
+          versionInPkg
         )
       );
       continue;
