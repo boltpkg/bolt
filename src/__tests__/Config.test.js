@@ -5,6 +5,8 @@ import { mkdtempSync } from 'fs';
 import * as path from 'path';
 import { getFixturePath } from 'jest-fixtures';
 
+jest.spyOn(console, 'error').mockImplementation(() => {});
+
 describe('Config.init', () => {
   it('should read a valid package.json file', async () => {
     let filePath = await getFixturePath(
