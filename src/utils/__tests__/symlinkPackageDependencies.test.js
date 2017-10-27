@@ -82,6 +82,20 @@ describe('utils/symlinkPackageDependencies()', () => {
       );
     });
 
+    it('should symlink external dependencies with different version', async () => {
+      expect(
+        await dirExists(path.join(nodeModules, 'external-dep-alt-version'))
+      ).toEqual(false);
+
+      await symlinkPackageDependencies(project, pkgToSymlink, [
+        'external-dep-alt-version'
+      ]);
+
+      expect(
+        await dirExists(path.join(nodeModules, 'external-dep-alt-version'))
+      ).toEqual(true);
+    });
+
     it('should symlink internal dependencies', async () => {
       expect(await dirExists(path.join(nodeModules, 'bar'))).toEqual(false);
 

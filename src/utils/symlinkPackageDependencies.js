@@ -2,6 +2,7 @@
 import path from 'path';
 import pathIsInside from 'path-is-inside';
 import includes from 'array-includes';
+import semver from 'semver';
 
 import Project from '../Project';
 import type Workspace from '../Workspace';
@@ -67,7 +68,7 @@ export default async function symlinkPackageDependencies(
       continue;
     }
 
-    if (versionInProject !== versionInPkg) {
+    if (!semver.intersects(versionInProject, versionInPkg)) {
       valid = false;
       logger.error(
         messages.depMustMatchProject(
