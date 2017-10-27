@@ -95,6 +95,22 @@ describe('utils/addDependenciesToPackages', () => {
     ).rejects.toBeInstanceOf(Error);
   });
 
+  test('it should accept a semver range that satisfies the project config ', async () => {
+    const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
+    const project = await Project.init(cwd);
+    const workspaces = await project.getWorkspaces();
+    const wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
+
+    await addDependenciesToPackage(project, wsToAddTo.pkg, [
+      { name: 'left-pad', version: '^1.1.4' }
+    ]);
+
+    expect(unsafeYarn.add).toHaveBeenCalledTimes(0);
+    expect(wsToAddTo.pkg.getDependencyVersionRange('left-pad')).toEqual(
+      '^1.1.4'
+    );
+  });
+
   test('should call symlinkPackageDependencies to symlink dependencies in workspace', async () => {
     const cwd = await copyFixtureIntoTempDir(
       __dirname,
