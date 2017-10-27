@@ -13,6 +13,19 @@ export type AddOptions = {
   type: configDependencyType
 };
 
+/**
+ * Takes a string in one of the following forms:
+ *  "pkgName", "pkgName@version", "@scope/pkgName", "@scope/pkgName@version"
+ * and returns an object with the package name and version (if passed)
+ */
+function asDependency(dependencyString: string): Dependency {
+  let [name, version] = dependencyString.split('@').filter(part => part !== '');
+  if (name.includes('/')) {
+    name = '@' + name;
+  }
+  return version ? { name, version } : { name };
+}
+
 export function toAddOptions(
   args: options.Args,
   flags: options.Flags
@@ -20,10 +33,9 @@ export function toAddOptions(
   const depsArgs = [];
   let type = 'dependencies';
 
-  // args is each of our dependencies we are adding
+  // args is each of our dependencies we are adding which may have "@version" parts to them
   args.forEach(dep => {
-    const [name, version] = dep.split('@');
-    depsArgs.push(version ? { name, version } : { name });
+    depsArgs.push(options.toDependency(dep));
   });
 
   Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).forEach(depTypeFlag => {

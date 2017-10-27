@@ -24,8 +24,7 @@ export function toWorkspaceAddOptions(
   let type = 'dependencies';
 
   deps.forEach(dep => {
-    const [name, version] = dep.split('@');
-    depsArgs.push(version ? { name, version } : { name });
+    depsArgs.push(options.toDependency(dep));
   });
 
   Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).forEach(depTypeFlag => {

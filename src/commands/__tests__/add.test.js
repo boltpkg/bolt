@@ -39,6 +39,7 @@ async function fakeYarnAdd(pkg: Package, dependencies, type = 'dependencies') {
       type,
       dep.version || '^1.0.0'
     );
+
     await fs.mkdirp(path.join(pkg.nodeModules, dep.name));
   }
 }
@@ -142,6 +143,32 @@ describe('bolt add', () => {
         true
       );
     });
+
+    test('adding scoped package', async () => {
+      expect(await depIsInstalled(projectDir, '@scope/pkgName')).toEqual(false);
+      await add(
+        toAddOptions(['@scope/pkgName'], {
+          cwd: projectDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(await depIsInstalled(projectDir, '@scope/pkgName')).toEqual(true);
+    });
+
+    test('adding scoped package at a version', async () => {
+      expect(await depIsInstalled(projectDir, '@scope/pkgName@^2.0.0')).toEqual(
+        false
+      );
+      await add(
+        toAddOptions(['@scope/pkgName@^2.0.0'], {
+          cwd: projectDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(
+        await depIsInstalled(projectDir, '@scope/pkgName', '^2.0.0')
+      ).toEqual(true);
+    });
   });
 
   describe('from a workspace', () => {
@@ -231,6 +258,36 @@ describe('bolt add', () => {
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(
         await depIsInstalled(fooWorkspaceDir, 'new-dep', '^2.0.0')
+      ).toEqual(true);
+    });
+
+    test('adding scoped package', async () => {
+      expect(await depIsInstalled(fooWorkspaceDir, '@scope/pkgName')).toEqual(
+        false
+      );
+      await add(
+        toAddOptions(['@scope/pkgName'], {
+          cwd: fooWorkspaceDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(await depIsInstalled(fooWorkspaceDir, '@scope/pkgName')).toEqual(
+        true
+      );
+    });
+
+    test('adding scoped package at a version', async () => {
+      expect(
+        await depIsInstalled(fooWorkspaceDir, '@scope/pkgName@^2.0.0')
+      ).toEqual(false);
+      await add(
+        toAddOptions(['@scope/pkgName@^2.0.0'], {
+          cwd: fooWorkspaceDir
+        })
+      );
+      expect(yarn.add).toHaveBeenCalledTimes(1);
+      expect(
+        await depIsInstalled(fooWorkspaceDir, '@scope/pkgName', '^2.0.0')
       ).toEqual(true);
     });
   });

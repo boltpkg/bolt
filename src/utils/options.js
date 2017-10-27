@@ -1,4 +1,5 @@
 // @flow
+import type { Dependency } from '../types';
 
 export type Args = Array<string>;
 
@@ -32,4 +33,17 @@ export function toFilterOpts(flags: Flags) {
   if (flags.ignoreFs) filterOpts.ignoreFs = string(flags.ignoreFs, 'ignoreFs');
 
   return filterOpts;
+}
+
+/**
+ * Takes a string in one of the following forms:
+ *  "pkgName", "pkgName@version", "@scope/pkgName", "@scope/pkgName@version"
+ * and returns an object with the package name and version (if passed)
+ */
+export function toDependency(dependencyString: string): Dependency {
+  let [name, version] = dependencyString.split('@').filter(part => part !== '');
+  if (name.includes('/')) {
+    name = '@' + name;
+  }
+  return version ? { name, version } : { name };
 }
