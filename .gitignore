@@ -1,5 +1,5 @@
 node_modules
 *.log
 dist
-coverage
+coverage/
 !**/__fixtures__/**/node_modules/

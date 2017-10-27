@@ -26,13 +26,13 @@ export default async function updatePackageVersions(
     for (let depName of Object.keys(versions)) {
       let depType = pkg.getDependencyType(depName);
       if (!depType) continue;
-      promises.push(
-        pkg.setDependencyVersionRange(depName, depType, '^' + versions[depName])
+      await pkg.setDependencyVersionRange(
+        depName,
+        depType,
+        '^' + versions[depName]
       );
       updatedPackages.add(pkg.filePath);
     }
-
-    await Promise.all(promises);
   }
 
   return Array.from(updatedPackages);

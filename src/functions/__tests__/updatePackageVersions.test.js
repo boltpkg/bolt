@@ -2,37 +2,41 @@
 import path from 'path';
 import updatePackageVersions from '../updatePackageVersions';
 import * as fs from '../../utils/fs';
-import { getFixturePath } from 'jest-fixtures';
+import Config from '../../Config';
+import { copyFixtureIntoTempDir } from 'jest-fixtures';
 
 jest.mock('../../utils/logger');
 
+async function getDepVersion(pathToPkg: string, depName: string) {
+  const config = await Config.init(path.join(pathToPkg, 'package.json'));
+  const deps = config.getDeps('dependencies');
+  return deps ? deps[depName] : undefined;
+}
+
 describe('function/updatePackageVersions', () => {
-  let fsWriteSpy;
+  let cwd, fooPath, barPath, bazPath;
 
-  beforeEach(() => {
-    fsWriteSpy = jest
-      .spyOn(fs, 'writeFile')
-      .mockImplementation(() => Promise.resolve());
-  });
-
-  afterEach(() => {
-    fsWriteSpy.mockClear();
+  beforeEach(async () => {
+    cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
+    fooPath = path.join(cwd, 'packages', 'foo');
+    barPath = path.join(cwd, 'packages', 'bar');
+    bazPath = path.join(cwd, 'packages', 'foo', 'packages', 'baz');
   });
 
   describe('A simple project', async () => {
     it('should update dependencies for all packages', async () => {
-      const cwd = await getFixturePath(__dirname, 'nested-workspaces');
+      expect(await getDepVersion(fooPath, 'react')).toBe('^15.6.1');
+      expect(await getDepVersion(barPath, 'react')).toBe('^15.6.1');
+      expect(await getDepVersion(bazPath, 'react')).toBe('^15.6.1');
+
       await updatePackageVersions({ react: '15.6.0' }, { cwd });
 
-      const fsSpyCalls = fsWriteSpy.mock.calls;
-      expect(fsWriteSpy).toHaveBeenCalledTimes(3);
-      expect(fsWriteSpy.mock.calls[0][1]).toContain(`"react": "^15.6.0"`);
-      expect(fsWriteSpy.mock.calls[1][1]).toContain(`"react": "^15.6.0"`);
-      expect(fsWriteSpy.mock.calls[2][1]).toContain(`"react": "^15.6.0"`);
+      expect(await getDepVersion(fooPath, 'react')).toBe('^15.6.0');
+      expect(await getDepVersion(barPath, 'react')).toBe('^15.6.0');
+      expect(await getDepVersion(bazPath, 'react')).toBe('^15.6.0');
     });
 
     it('should return list of updated packages', async () => {
-      const cwd = await getFixturePath(__dirname, 'nested-workspaces');
       const updated = await updatePackageVersions({ react: '15.6.0' }, { cwd });
       const expectedUpdated = [
         'packages/foo/package.json',
@@ -45,6 +49,16 @@ describe('function/updatePackageVersions', () => {
         const found = updated.find(p => path.relative(cwd, p) === expected);
         expect(found).toBeDefined();
       });
+    });
+
+    it('should be able to update more than one package at a time', async () => {
+      expect(await getDepVersion(fooPath, 'react')).toBe('^15.6.1');
+      expect(await getDepVersion(fooPath, 'bar')).toBe('^1.0.0');
+
+      await updatePackageVersions({ react: '15.6.0', bar: '1.0.1' }, { cwd });
+
+      expect(await getDepVersion(fooPath, 'react')).toBe('^15.6.0');
+      expect(await getDepVersion(fooPath, 'bar')).toBe('^1.0.1');
     });
   });
 });
