@@ -29,7 +29,7 @@ export default class Package {
   static async init(filePath: string) {
     let config = await Config.init(filePath);
     if (!config) {
-      throw new BoltError(`Could not find package.json in ${filePath}`);
+      throw new BoltError(`Could not init config for "${filePath}"`);
     }
     return new Package(filePath, config);
   }
