@@ -21,7 +21,8 @@ export async function publishUnlock(opts: PublishUnlockOptions) {
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
 
-  let packages = workspaces.map(workspace => workspace.pkg);
-
+  let packages = workspaces
+    .map(workspace => workspace.pkg)
+    .filter(pkg => !pkg.config.getPrivate());
   await locks.unlock(packages);
 }

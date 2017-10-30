@@ -20,7 +20,7 @@ export async function lock(packages: Array<Package>) {
     let promise = npm.infoAllow404(name).then(response => {
       if (response.published) {
         const pkgInfo = response.pkgInfo || {};
-        if (pkgInfo['dist-tags'].LOCK_DIST_TAG) {
+        if (pkgInfo['dist-tags'][LOCK_DIST_TAG]) {
           throw new BoltError(
             `Unable to get lock as a lock already exists for '${name}'`
           );
@@ -30,7 +30,6 @@ export async function lock(packages: Array<Package>) {
         });
       }
     });
-
     promises.push(promise);
   }
 
@@ -39,18 +38,39 @@ export async function lock(packages: Array<Package>) {
   } catch (err) {
     logger.error(err.message);
     // Note: We only unlock the locks *we* just locked, as the other ones are currently being used
-    await unlock(locks);
+    await _unlock(locks);
     throw new BoltError(
       'Unable to lock all packages, someone else may be releasing'
     );
   }
 }
 
-export async function unlock(packages: Array<Package>) {
+async function _unlock(packages: Array<Package>) {
   let promises = [];
 
   for (let pkg of packages) {
     promises.push(npm.removeTag(pkg.config.getName(), LOCK_DIST_TAG));
+  }
+
+  await Promise.all(promises);
+}
+
+export async function unlock(packages: Array<Package>) {
+  let promises = [];
+
+  for (let pkg of packages) {
+    let name = pkg.config.getName();
+    let promise = npm.infoAllow404(name).then(response => {
+      if (response.published) {
+        const pkgInfo = response.pkgInfo || {};
+        if (!pkgInfo['dist-tags'][LOCK_DIST_TAG]) {
+          return;
+        }
+        return npm.removeTag(pkg.config.getName(), LOCK_DIST_TAG);
+      }
+    });
+
+    promises.push(promise);
   }
 
   await Promise.all(promises);
