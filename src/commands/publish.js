@@ -56,7 +56,8 @@ export async function publish(opts: PublishOptions) {
     .filter(pkg => !pkg.config.getPrivate());
 
   try {
-    await locks.lock(packages);
+    // TODO: Re-enable once locking issues are sorted out
+    // await locks.lock(packages);
     const unpublishedPackages = await getUnpublishedPackages(packages);
     const isUnpublished = workspace =>
       unpublishedPackages.some(
@@ -76,7 +77,8 @@ export async function publish(opts: PublishOptions) {
       await npm.publish(name, { cwd: workspace.pkg.dir, access: opts.access });
     });
 
-    await locks.unlock(packages);
+    // TODO: Re-enable once locking issues are sorted out
+    // await locks.unlock(packages);
   } catch (err) {
     logger.error(err.message);
     throw new BoltError('Failed to publish');
