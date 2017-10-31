@@ -95,7 +95,15 @@ export default class Config {
   }
 
   static async init(filePath: string): Promise<Config> {
-    let fileContents = await fs.readFile(filePath);
+    let fileContents;
+    try {
+      fileContents = await fs.readFile(filePath);
+    } catch (e) {
+      if (e.code === 'ENOENT') {
+        logger.error(messages.cannotInitConfigMissingPkgJSON(filePath));
+      }
+      throw e;
+    }
     return new Config(filePath, fileContents.toString());
   }
 
