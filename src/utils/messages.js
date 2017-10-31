@@ -66,6 +66,10 @@ export function depMustMatchProject(
   )} vs ${badVer(actual)}`;
 }
 
+export function projectCannotDependOnWorkspace(depName: string): Message {
+  return `Project cannot depend on workspace Package ${normalPkg(depName)}`;
+}
+
 export function unableToUpdateDepVersion(
   pkgName: string,
   depName: string,
@@ -229,12 +233,15 @@ export function lockingAllPackages(): Message {
   return 'Attempting to get locks for all packages';
 }
 
+export function validatingProject(): Message {
+  return '[1/3] Validating project...';
+}
 export function installingProjectDependencies(): Message {
-  return '[1/2] Installing project dependencies...';
+  return '[2/3] Installing project dependencies...';
 }
 
 export function linkingWorkspaceDependencies(): Message {
-  return '[2/2] Linking workspace dependencies...';
+  return '[3/3] Linking workspace dependencies...';
 }
 
 export function publishingPackage(

@@ -6,6 +6,7 @@ import * as fs from '../utils/fs';
 import * as path from 'path';
 import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
+import validateProject from '../utils/validateProject';
 import symlinkPackageDependencies from '../utils/symlinkPackageDependencies';
 import * as yarn from '../utils/yarn';
 import pathIsInside from 'path-is-inside';
@@ -28,6 +29,11 @@ export async function install(opts: InstallOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
+
+  logger.info(messages.validatingProject(), { emoji: '🔎', prefix: false });
+
+  let projectIsValid = await validateProject(project);
+  if (!projectIsValid) return;
 
   logger.info(messages.installingProjectDependencies(), {
     emoji: '📦',
