@@ -24,13 +24,15 @@ export default async function updatePackageVersions(
     let promises = [];
 
     for (let depName of Object.keys(versions)) {
-      let depType = pkg.getDependencyType(depName);
-      if (!depType) continue;
-      await pkg.setDependencyVersionRange(
-        depName,
-        depType,
-        '^' + versions[depName]
-      );
+      let depTypes = pkg.getDependencyTypes(depName);
+      if (depTypes.length === 0) continue;
+      for (let depType of depTypes) {
+        await pkg.setDependencyVersionRange(
+          depName,
+          depType,
+          '^' + versions[depName]
+        );
+      }
       updatedPackages.add(pkg.filePath);
     }
   }
