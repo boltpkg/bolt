@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "simple-project-with-multiple-dep-types",
+  "version": "1.0.0",
+  "devDependencies": {
+    "react": "^16.0.0"
+  },
+  "peerDependencies": {
+    "react": "^16.0.0"
+  },
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  }
+}

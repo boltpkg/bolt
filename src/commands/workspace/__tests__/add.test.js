@@ -24,7 +24,7 @@ async function depIsInstalled(
   const dirExists = await pathExists(
     path.join(workspaceDir, 'node_modules', depName)
   );
-  const depInPkgJson = pkg.getDependencyType(depName) !== null;
+  const depInPkgJson = pkg.getDependencyTypes(depName).length > 0;
   const correctVersion =
     !version || pkg.getDependencyVersionRange(depName) === version;
 

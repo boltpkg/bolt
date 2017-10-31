@@ -114,14 +114,15 @@ export default class Package {
     });
   }
 
-  getDependencyType(depName: string) {
+  getDependencyTypes(depName: string) {
+    let matchedTypes = [];
     for (let depType of DEPENDENCY_TYPES) {
       let deps = this.config.getDeps(depType);
       if (deps && deps[depName]) {
-        return depType;
+        matchedTypes.push(depType);
       }
     }
-    return null;
+    return matchedTypes;
   }
 
   getDependencyVersionRange(depName: string) {
