@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "name": "invalid-project-root-dependency-on-ws",
+  "version": "1.0.0",
+  "dependencies": {
+    "foo": "^1.0.0"
+  },
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  }
+}
