@@ -158,17 +158,19 @@ export async function normalize(opts: NormalizeOptions) {
   for (let [depName] of allDependencies) {
     let finalVersion = finalVersions.get(depName);
     let depTypes = project.pkg.getDependencyTypes(depName);
-    let depTypeToSet = depTypes.length > 0 ? depTypes[0] : 'dependencies';
+    depTypes = depTypes.length > 0 ? depTypes : ['dependencies'];
 
     let isWorkspace = workspaceMap.has(depName);
     let isUpdating = projectDependencies.has(depName);
 
     if (finalVersion && (isWorkspace ? isUpdating : true)) {
-      await project.pkg.setDependencyVersionRange(
-        depName,
-        depTypeToSet,
-        finalVersion
-      );
+      for (let depType of depTypes) {
+        await project.pkg.setDependencyVersionRange(
+          depName,
+          depType,
+          finalVersion
+        );
+      }
     }
   }
 
