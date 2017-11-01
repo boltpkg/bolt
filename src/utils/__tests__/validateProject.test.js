@@ -38,12 +38,12 @@ describe('utils/validateProject', () => {
     expect(valid).toBe(false);
   });
 
-  describe('engines.bolt field', () => {
-    test('should return true if bolt version matches engines field', async () => {
+  describe('bolt.version field', () => {
+    test('should return true if bolt version matches specified range', async () => {
       // expected version range is "0.14.x"
       const cwd = await getFixturePath(
         __dirname,
-        'simple-project-with-engines-field'
+        'simple-project-with-bolt-version-check'
       );
       const project = await Project.init(cwd);
       // $FlowFixMe
@@ -57,7 +57,7 @@ describe('utils/validateProject', () => {
       // expected version range is "0.14.x"
       const cwd = await getFixturePath(
         __dirname,
-        'simple-project-with-engines-field'
+        'simple-project-with-bolt-version-check'
       );
       const project = await Project.init(cwd);
       // $FlowFixMe
