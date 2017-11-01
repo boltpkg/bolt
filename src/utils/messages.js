@@ -70,6 +70,14 @@ export function projectCannotDependOnWorkspace(depName: string): Message {
   return `Project cannot depend on workspace Package ${normalPkg(depName)}`;
 }
 
+export function invalidBoltVersion(
+  actualVersion: string,
+  expectedVersion: string
+): Message {
+  return `Project expects a bolt version of ${expectedVersion} but found ${actualVersion}
+run \`yarn global add "bolt@${expectedVersion}"\` to resolve`;
+}
+
 export function unableToUpdateDepVersion(
   pkgName: string,
   depName: string,

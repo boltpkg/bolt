@@ -1,4 +1,9 @@
 // @flow
+import pkgUp from 'pkg-up';
+const boltPkgPath = pkgUp.sync(__dirname);
+
+// $FlowFixMe
+const boltPkg = require(boltPkgPath);
 
 export const DEPENDENCY_TYPES = [
   'dependencies',
@@ -16,3 +21,5 @@ export const DEPENDENCY_TYPE_FLAGS_MAP = {
   P: 'peerDependencies',
   O: 'optionalDependencies'
 };
+
+export const BOLT_VERSION = boltPkg.version;
