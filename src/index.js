@@ -1,5 +1,5 @@
 // @flow
 module.exports = {
   ...require('./commands'),
-  ...require('./functions'),
+  ...require('./functions')
 };

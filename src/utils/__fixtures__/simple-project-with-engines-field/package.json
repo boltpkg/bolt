@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "name": "simple-project-with-engines-field",
+  "version": "1.0.0",
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  },
+  "engines": {
+    "bolt": "0.14.x"
+  }
+}
