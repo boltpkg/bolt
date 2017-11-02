@@ -1,5 +1,7 @@
 // @flow
 
+import semver from 'semver';
+
 import Project from '../Project';
 import type Workspace from '../Workspace';
 import type Package from '../Package';
@@ -48,7 +50,7 @@ export default async function addDependenciesToPackage(
   for (let dep of externalDeps) {
     const installed = project.pkg.getDependencyVersionRange(dep.name);
     const depVersion = dep.version;
-    if (depVersion && depVersion !== installed) {
+    if (depVersion && installed && !semver.intersects(installed, depVersion)) {
       throw new BoltError(
         messages.depMustMatchProject(
           pkg.config.getName(),
@@ -58,14 +60,17 @@ export default async function addDependenciesToPackage(
         )
       );
     }
-    installedVersions[dep.name] = String(installed);
+    installedVersions[dep.name] = String(depVersion || installed);
   }
 
   for (let dep of internalDeps) {
     const dependencyPkg = (depGraph.get(dep.name) || {}).pkg;
     const requestedVersion = dep.version;
     const internalVersion = dependencyPkg.config.getVersion();
-    if (requestedVersion && requestedVersion !== internalVersion) {
+    if (
+      requestedVersion &&
+      semver.satisfies(internalVersion, requestedVersion)
+    ) {
       throw new BoltError(
         messages.packageMustDependOnCurrentVersion(
           pkg.config.getName(),

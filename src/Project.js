@@ -1,6 +1,7 @@
 // @flow
 import * as path from 'path';
 import includes from 'array-includes';
+import semver from 'semver';
 import Package from './Package';
 import Workspace from './Workspace';
 import Config from './Config';
@@ -77,10 +78,10 @@ export default class Project {
         let match = packagesByName[depName];
         if (!match) continue;
 
-        let actual = depVersion.replace(/^\^/, '');
+        let actual = depVersion;
         let expected = match.config.getVersion();
 
-        if (actual !== expected) {
+        if (!semver.satisfies(expected, depVersion)) {
           valid = false;
           logger.error(
             messages.packageMustDependOnCurrentVersion(
