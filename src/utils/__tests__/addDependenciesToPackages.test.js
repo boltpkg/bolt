@@ -95,22 +95,6 @@ describe('utils/addDependenciesToPackages', () => {
     ).rejects.toBeInstanceOf(Error);
   });
 
-  test('it should accept a semver range that satisfies the project config ', async () => {
-    const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
-    const project = await Project.init(cwd);
-    const workspaces = await project.getWorkspaces();
-    const wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
-
-    await addDependenciesToPackage(project, wsToAddTo.pkg, [
-      { name: 'left-pad', version: '^1.1.4' }
-    ]);
-
-    expect(unsafeYarn.add).toHaveBeenCalledTimes(0);
-    expect(wsToAddTo.pkg.getDependencyVersionRange('left-pad')).toEqual(
-      '^1.1.4'
-    );
-  });
-
   test('should call symlinkPackageDependencies to symlink dependencies in workspace', async () => {
     const cwd = await copyFixtureIntoTempDir(
       __dirname,
@@ -153,9 +137,27 @@ describe('utils/addDependenciesToPackages', () => {
     );
   });
 
+  test('should be able to add packages with tagged versions (without specifying)', async () => {
+    const cwd = await copyFixtureIntoTempDir(
+      __dirname,
+      'package-with-external-deps-installed'
+    );
+    const project = await Project.init(cwd);
+    const workspaces = await project.getWorkspaces();
+    const wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
+
+    await addDependenciesToPackage(project, wsToAddTo.pkg, [
+      { name: 'project-only-dep-with-beta-tag' }
+    ]);
+
+    expect(
+      wsToAddTo.pkg.getDependencyVersionRange('project-only-dep-with-beta-tag')
+    ).toEqual('1.0.0-beta');
+  });
+
   describe('when adding internal package', () => {
-    test('should set version as current version of internal package', async () => {
-      // i.e if we have bar 1.0.0 installed locally addDependenciesToPackages should add ^1.0.0
+    test('should set version as current version of internal package if no version passed', async () => {
+      // i.e if we have bar 1.0.1 installed locally addDependenciesToPackages should add ^1.0.1
       const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
       const project = await Project.init(cwd);
       const workspaces = await project.getWorkspaces();
@@ -168,15 +170,32 @@ describe('utils/addDependenciesToPackages', () => {
       expect(wsToAddTo.pkg.getDependencyVersionRange('baz')).toEqual('^1.0.1');
     });
 
-    test('should throw if attempting to set to version that doesnt match local', async () => {
+    test('should allow any version range that satisfies local dep', async () => {
+      // i.e if we have bar 1.0.1 installed locally ^1.0.0 should still install
       const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
       const project = await Project.init(cwd);
       const workspaces = await project.getWorkspaces();
       const wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
 
+      expect(wsToAddTo.pkg.getDependencyVersionRange('baz')).toEqual(null);
+      await addDependenciesToPackage(project, wsToAddTo.pkg, [
+        { name: 'baz', version: '^1.0.0' }
+      ]);
+
+      expect(symlinkSpy).toHaveBeenCalledWith(project, wsToAddTo.pkg, ['baz']);
+      expect(wsToAddTo.pkg.getDependencyVersionRange('baz')).toEqual('^1.0.0');
+    });
+
+    test('should throw if attempting to set to version that doesnt satisfy local', async () => {
+      const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
+      const project = await Project.init(cwd);
+      const workspaces = await project.getWorkspaces();
+      const wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
+
+      // local baz version is 1.0.0, so we'll install ^2.0.0
       await expect(
         addDependenciesToPackage(project, wsToAddTo.pkg, [
-          { name: 'baz', version: '^1.0.0' }
+          { name: 'baz', version: '^2.0.0' }
         ])
       ).rejects.toBeInstanceOf(Error);
     });

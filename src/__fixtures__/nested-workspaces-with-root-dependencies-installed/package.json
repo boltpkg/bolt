@@ -14,7 +14,6 @@
   "dependencies": {
     "external-dep": "^1.0.0",
     "external-dep-with-bin": "^1.0.0",
-    "external-dep-alt-version": "^1.0.0",
     "external-dep-with-two-bins": "^1.0.0"
   }
 }

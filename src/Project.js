@@ -81,6 +81,7 @@ export default class Project {
         let actual = depVersion;
         let expected = match.config.getVersion();
 
+        // Workspace dependencies only need to semver satisfy, not '==='
         if (!semver.satisfies(expected, depVersion)) {
           valid = false;
           logger.error(

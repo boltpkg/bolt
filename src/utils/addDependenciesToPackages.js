@@ -49,8 +49,9 @@ export default async function addDependenciesToPackage(
 
   for (let dep of externalDeps) {
     const installed = project.pkg.getDependencyVersionRange(dep.name);
-    const depVersion = dep.version;
-    if (depVersion && installed && !semver.intersects(installed, depVersion)) {
+    // If we aren't specified a version, use the same one from the project
+    const depVersion = dep.version || installed;
+    if (depVersion !== installed) {
       throw new BoltError(
         messages.depMustMatchProject(
           pkg.config.getName(),
@@ -60,17 +61,15 @@ export default async function addDependenciesToPackage(
         )
       );
     }
-    installedVersions[dep.name] = String(depVersion || installed);
+    installedVersions[dep.name] = depVersion;
   }
 
   for (let dep of internalDeps) {
     const dependencyPkg = (depGraph.get(dep.name) || {}).pkg;
-    const requestedVersion = dep.version;
     const internalVersion = dependencyPkg.config.getVersion();
-    if (
-      requestedVersion &&
-      semver.satisfies(internalVersion, requestedVersion)
-    ) {
+    // If no version is requested, default to caret at the current version
+    const requestedVersion = dep.version || `^${internalVersion}`;
+    if (!semver.satisfies(internalVersion, requestedVersion)) {
       throw new BoltError(
         messages.packageMustDependOnCurrentVersion(
           pkg.config.getName(),
@@ -80,7 +79,7 @@ export default async function addDependenciesToPackage(
         )
       );
     }
-    installedVersions[dep.name] = `^${internalVersion}`;
+    installedVersions[dep.name] = requestedVersion;
   }
 
   for (let [depName, depVersion] of Object.entries(installedVersions)) {
