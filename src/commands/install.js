@@ -33,7 +33,9 @@ export async function install(opts: InstallOptions) {
   logger.info(messages.validatingProject(), { emoji: '🔎', prefix: false });
 
   let projectIsValid = await validateProject(project);
-  if (!projectIsValid) return;
+  if (!projectIsValid) {
+    throw new BoltError(messages.unableToInstall());
+  }
 
   logger.info(messages.installingProjectDependencies(), {
     emoji: '📦',

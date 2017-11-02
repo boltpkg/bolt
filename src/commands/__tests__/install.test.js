@@ -105,16 +105,15 @@ describe('install', () => {
     }
   });
 
-  test('should exit early if project is not valid', async () => {
+  test('should throw if project is not valid', async () => {
     const cwd = await copyFixtureIntoTempDir(
       __dirname,
       'invalid-project-root-dependency-on-ws'
     );
     const project = await Project.init(cwd);
 
-    await install(toInstallOptions([], { cwd }));
-
-    // check that yarn install didnt get called
-    expect(unsafeProcesses.spawn).not.toHaveBeenCalled();
+    await expect(install(toInstallOptions([], { cwd }))).rejects.toBeInstanceOf(
+      Error
+    );
   });
 });
