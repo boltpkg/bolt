@@ -18,12 +18,11 @@ export default async function validateProject(project: Project) {
   let projectIsValid = true;
 
   // If the project has an engines.bolt field we must respect it
-  const enginesConfig = projectConfig.getEngines();
-  if (enginesConfig && enginesConfig.bolt) {
-    const expectedBoltVersion = enginesConfig.bolt;
-    if (!semver.satisfies(BOLT_VERSION, expectedBoltVersion)) {
+  const boltConfigVersion = projectConfig.getBoltConfigVersion();
+  if (boltConfigVersion) {
+    if (!semver.satisfies(BOLT_VERSION, boltConfigVersion)) {
       logger.error(
-        messages.invalidBoltVersion(BOLT_VERSION, expectedBoltVersion)
+        messages.invalidBoltVersion(BOLT_VERSION, boltConfigVersion)
       );
       projectIsValid = false;
     }

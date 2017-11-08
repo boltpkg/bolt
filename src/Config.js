@@ -221,14 +221,13 @@ export default class Config {
     );
   }
 
-  getEngines(): { [key: string]: string } | void {
-    let config = this.getConfig();
-    let enginesConfig = config.engines;
-    if (typeof enginesConfig === 'undefined') return;
-    return toObjectOfStrings(
-      enginesConfig,
-      `package.json#engines must be an object. See "${this.filePath}"`
-    );
+  getBoltConfigVersion(): string | void {
+    let config = this.getBoltConfig();
+    let boltVersion = config && config.version;
+    if (typeof boltVersion === 'string') {
+      return boltVersion;
+    }
+    return;
   }
 
   getWorkspaces(): Array<string> | void {

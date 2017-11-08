@@ -74,7 +74,9 @@ export function invalidBoltVersion(
   actualVersion: string,
   expectedVersion: string
 ): Message {
-  return `Project expects a bolt version of ${expectedVersion} but found ${actualVersion}
+  return `Project expects a bolt version of ${goodVer(
+    expectedVersion
+  )} but found ${badVer(actualVersion)}
 run \`yarn global add "bolt@${expectedVersion}"\` to resolve`;
 }
 
