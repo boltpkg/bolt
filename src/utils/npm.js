@@ -24,7 +24,8 @@ export async function infoAllow404(pkgName: string) {
     const pkgInfo = await info(pkgName);
     return { published: true, pkgInfo };
   } catch (error) {
-    if (error.stderr && error.stderr.startsWith('npm ERR! code E404')) {
+    const output = JSON.parse(error.stdout);
+    if (output.error && output.error.code === 'E404') {
       logger.warn(messages.npmInfo404(pkgName));
       return { published: false, pkgInfo: {} };
     }
