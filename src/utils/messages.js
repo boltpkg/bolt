@@ -265,6 +265,14 @@ export function noUnpublishedPackagesToPublish(): Message {
   return 'No unpublished packages to publish';
 }
 
+export function notPublishingPackage(
+  pkgLocalVersion: string | number,
+  pkgPublishedVersion: string | number,
+  pkgName: string
+): Message {
+  return `${pkgName} is not being published because version ${pkgPublishedVersion} is already published on npm and we are trying to publish version ${pkgLocalVersion}`;
+}
+
 export function couldNotBeNormalized(): Message {
   return 'The following packages could not be normalized:';
 }

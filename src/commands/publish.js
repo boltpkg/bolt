@@ -24,6 +24,20 @@ export function toPublishOptions(
 }
 
 async function getUnpublishedPackages(packages) {
+  const semverGtCheckFailWithWarning = (
+    pkgLocalVersion: string | number,
+    pkgPublishedVersion: string | number,
+    pkgName: string
+  ): boolean =>
+    semver.gt(pkgLocalVersion, pkgPublishedVersion) ||
+    !!logger.warn(
+      messages.notPublishingPackage(
+        pkgLocalVersion,
+        pkgPublishedVersion,
+        pkgName
+      )
+    );
+
   const results = await Promise.all(
     packages.map(async pkg => {
       let config = pkg.config;
@@ -42,7 +56,11 @@ async function getUnpublishedPackages(packages) {
     // only publish if our version is higher than the one on npm
     return (
       !result.isPublished ||
-      semver.gt(result.localVersion, result.publishedVersion)
+      semverGtCheckFailWithWarning(
+        result.localVersion,
+        result.publishedVersion,
+        result.name
+      )
     );
   });
 }
