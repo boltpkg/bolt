@@ -10,6 +10,9 @@ type Options = {
   cwd?: string
 };
 
+/**
+ * Updates all dependency versions
+ */
 export default async function updatePackageVersions(
   versions: VersionMap,
   opts: Options = {}
@@ -30,7 +33,7 @@ export default async function updatePackageVersions(
         await pkg.setDependencyVersionRange(
           depName,
           depType,
-          '^' + versions[depName]
+          versions[depName]
         );
       }
       updatedPackages.add(pkg.filePath);

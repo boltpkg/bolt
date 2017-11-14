@@ -33,7 +33,7 @@ describe('function/updatePackageVersions', () => {
       expect(await getDepVersion(barPath, 'react')).toBe('^15.6.1');
       expect(await getDepVersion(bazPath, 'react')).toBe('^15.6.1');
 
-      await updatePackageVersions({ react: '15.6.0' }, { cwd });
+      await updatePackageVersions({ react: '^15.6.0' }, { cwd });
 
       expect(await getDepVersion(fooPath, 'react')).toBe('^15.6.0');
       expect(await getDepVersion(barPath, 'react')).toBe('^15.6.0');
@@ -59,7 +59,7 @@ describe('function/updatePackageVersions', () => {
       expect(await getDepVersion(fooPath, 'react')).toBe('^15.6.1');
       expect(await getDepVersion(fooPath, 'bar')).toBe('^1.0.0');
 
-      await updatePackageVersions({ react: '15.6.0', bar: '1.0.1' }, { cwd });
+      await updatePackageVersions({ react: '^15.6.0', bar: '^1.0.1' }, { cwd });
 
       expect(await getDepVersion(fooPath, 'react')).toBe('^15.6.0');
       expect(await getDepVersion(fooPath, 'bar')).toBe('^1.0.1');
@@ -79,7 +79,7 @@ describe('function/updatePackageVersions', () => {
       '^16.0.0'
     );
 
-    await updatePackageVersions({ react: '15.6.0' }, { cwd });
+    await updatePackageVersions({ react: '^15.6.0' }, { cwd });
 
     expect(await getDepVersion(fooPath, 'react', 'devDependencies')).toBe(
       '^15.6.0'
