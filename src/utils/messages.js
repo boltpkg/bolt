@@ -270,8 +270,8 @@ export function noUnpublishedPackagesToPublish(): Message {
 }
 
 export function notPublishingPackage(
-  pkgLocalVersion: string | number,
-  pkgPublishedVersion: string | number,
+  pkgLocalVersion: string,
+  pkgPublishedVersion: string,
   pkgName: string
 ): Message {
   return `${pkgName} is not being published because version ${pkgPublishedVersion} is already published on npm and we are trying to publish version ${pkgLocalVersion}`;

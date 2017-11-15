@@ -42,14 +42,14 @@ export function publish(
     const publishFlags = opts.access ? ['--access', opts.access] : [];
 
     try {
-      const publishedPkgInfo = await processes.spawn(
+      const result = await processes.spawn(
         'npm',
         ['publish', ...publishFlags],
         {
           cwd: opts.cwd
         }
       );
-      return { published: true, publishedPkgInfo };
+      return { published: true, publishedPkgInfo: JSON.parse(result.stdout) };
     } catch (error) {
       //Publish failed
       if (error.code == 0) {
