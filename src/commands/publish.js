@@ -25,18 +25,25 @@ export function toPublishOptions(
 
 async function getUnpublishedPackages(packages) {
   const semverGtCheckFailWithWarning = (
-    pkgLocalVersion: string | number,
-    pkgPublishedVersion: string | number,
+    pkgLocalVersion: string,
+    pkgPublishedVersion: string,
     pkgName: string
-  ): boolean =>
-    semver.gt(pkgLocalVersion, pkgPublishedVersion) ||
-    !!logger.warn(
-      messages.notPublishingPackage(
-        pkgLocalVersion,
-        pkgPublishedVersion,
-        pkgName
-      )
-    );
+  ): boolean => {
+    const shouldPublish = semver.gt(pkgLocalVersion, pkgPublishedVersion);
+
+    //show a warning message if package is not published since pkgPublishedVersion > pkgLocalVersion
+    if (!shouldPublish) {
+      logger.warn(
+        messages.notPublishingPackage(
+          pkgLocalVersion,
+          pkgPublishedVersion,
+          pkgName
+        )
+      );
+    }
+
+    return shouldPublish;
+  };
 
   const results = await Promise.all(
     packages.map(async pkg => {
