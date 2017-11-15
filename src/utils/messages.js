@@ -143,6 +143,13 @@ export function cannotRemoveDependencyDependendOnByWorkspaces(
     .map(workspace => ` - ${normalPkg(workspace.pkg.config.getName())}`)
     .join('\n')}`;
 }
+export function externalDepsPassedToUpdatePackageVersions(
+  externalDeps: Array<string>
+): Message {
+  return `Attempted to pass external dependencies to updatePackageVersions:\n${externalDeps.join(
+    ', '
+  )}`;
+}
 
 export function runWorkspacesRemoveDependency(depName: string): Message {
   return `Run ${cmd(
