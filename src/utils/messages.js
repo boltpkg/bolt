@@ -288,6 +288,15 @@ export function errorParsingJSON(filePath: string): Message {
   return `Error parsing JSON in file:\n${filePath}`;
 }
 
+export function invalidBoltWorkspacesFromUpdate(
+  name: string,
+  depName: string,
+  depRange: string,
+  newVersion: string
+): Message {
+  return `${name} has a dependency on ${depName} at ${depRange}, however the new version of ${newVersion} leaves this range. You will need to make a new changeset that includes an update to ${name}`;
+}
+
 export function unableToInstall(): Message {
   return `Project is invalid, bolt is unable to install`;
 }

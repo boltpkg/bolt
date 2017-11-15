@@ -1,4 +1,6 @@
 // @flow
+import semver from 'semver';
+
 import Project from '../Project';
 import Workspace from '../Workspace';
 import * as logger from '../utils/logger';
@@ -59,13 +61,9 @@ export default async function updatePackageVersions(
   }
 
   for (let workspace of workspaces) {
-    // This check determines whether the package will be released. If the
-    // package will not be released, we skip it.
-    // NOTE: This does not handle the error state, as it is easiest for users to
-    // resolve this error when re-bolting to create correct dependencies.
-    if (!internalDeps.includes(workspace.pkg.config.getName())) continue;
     let pkg = workspace.pkg;
     let promises = [];
+    let name = workspace.pkg.config.getName();
 
     for (let depName of internalDeps) {
       const depRange = String(pkg.getDependencyVersionRange(depName));
@@ -73,6 +71,26 @@ export default async function updatePackageVersions(
       const rangeType = versionRangeToRangeType(depRange);
       const newDepRange = rangeType + updatedPackages[depName];
       if (depTypes.length === 0) continue;
+
+      const inUpdatedPackages = internalDeps.includes(name);
+      const willLeaveSemverRange = !semver.satisfies(
+        updatedPackages[depName],
+        depRange
+      );
+      // This check determines whether the package will be released. If the
+      // package will not be released, we throw.
+      if (!inUpdatedPackages && willLeaveSemverRange) {
+        throw new Error(
+          messages.invalidBoltWorkspacesFromUpdate(
+            name,
+            depName,
+            depRange,
+            updatedPackages[depName]
+          )
+        );
+      }
+      if (!inUpdatedPackages) continue;
+
       for (let depType of depTypes) {
         await pkg.setDependencyVersionRange(depName, depType, newDepRange);
       }

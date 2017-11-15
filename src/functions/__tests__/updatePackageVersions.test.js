@@ -1,11 +1,12 @@
 // @flow
 import path from 'path';
+import { copyFixtureIntoTempDir } from 'jest-fixtures';
+
 import updatePackageVersions from '../updatePackageVersions';
 import * as fs from '../../utils/fs';
 import * as logger from '../../utils/logger';
 import Config from '../../Config';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
-
+import * as messages from '../../utils/messages';
 jest.mock('../../utils/logger');
 
 /*
@@ -38,12 +39,12 @@ describe('function/updatePackageVersions', () => {
     });
 
     it('should update internal deps with caret deps', async () => {
-      const updatedPackages = { 'caret-dep': '2.0.0', 'has-all-deps': '1.1.2' };
+      const updatedPackages = { 'caret-dep': '1.2.0', 'has-all-deps': '1.1.2' };
       expect(await getDepVersion(pkgWithDepsPath, 'caret-dep')).toBe('^1.1.1');
       // pretend we've just updated 'caret-dep' to 2.0.0
       await updatePackageVersions(updatedPackages, { cwd });
 
-      expect(await getDepVersion(pkgWithDepsPath, 'caret-dep')).toBe('^2.0.0');
+      expect(await getDepVersion(pkgWithDepsPath, 'caret-dep')).toBe('^1.2.0');
     });
 
     it('should update internal deps with tilde deps', async () => {
@@ -66,7 +67,7 @@ describe('function/updatePackageVersions', () => {
 
     it('should return list of updated packages', async () => {
       const updatePackages = {
-        'caret-dep': '2.0.0',
+        'caret-dep': '1.2.0',
         'has-all-deps': '1.1.2',
         'pinned-dep': '1.2.2'
       };
@@ -119,19 +120,19 @@ describe('function/updatePackageVersions', () => {
       ).toBe('^1.1.1');
 
       await updatePackageVersions(
-        { 'caret-dep': '2.0.0', 'has-all-deps-with-peers': '1.1.2' },
+        { 'caret-dep': '1.2.0', 'has-all-deps-with-peers': '1.1.2' },
         { cwd }
       );
 
       expect(
         await getDepVersion(pkgPeerDepsPath, 'caret-dep', 'devDependencies')
-      ).toBe('^2.0.0');
+      ).toBe('^1.2.0');
       expect(
         await getDepVersion(pkgPeerDepsPath, 'caret-dep', 'peerDependencies')
-      ).toBe('^2.0.0');
+      ).toBe('^1.2.0');
     });
     it('should skip updating dependencies for packages not in the udpatedPackages', async () => {
-      const updatePackages = { 'caret-dep': '2.0.0' };
+      const updatePackages = { 'caret-dep': '1.2.0' };
       expect(
         await getDepVersion(pkgPeerDepsPath, 'caret-dep', 'peerDependencies')
       ).toBe('^1.1.1');
@@ -139,11 +140,23 @@ describe('function/updatePackageVersions', () => {
 
       // This tests that peer deps not to be updated even though it has a dependency
       // as our passed updatePackages is not requesting its release.
-      // This means that the passed updatePackages is explicitly wrong and will
-      // create an invalid bolt project.
       expect(
         await getDepVersion(pkgPeerDepsPath, 'caret-dep', 'peerDependencies')
       ).toBe('^1.1.1');
+    });
+    it('should throw when you will leave a version range without it being included', async () => {
+      const updatePackages = { 'tilde-dep': '2.0.0' };
+      const message = messages.invalidBoltWorkspacesFromUpdate(
+        'has-all-deps',
+        'tilde-dep',
+        '~1.1.1',
+        '2.0.0'
+      );
+      return updatePackageVersions(updatePackages, {
+        cwd
+      }).catch(returnedMessage => {
+        expect(returnedMessage.message).toEqual(message);
+      });
     });
   });
 });
