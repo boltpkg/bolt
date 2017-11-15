@@ -26,6 +26,7 @@ export default async function execCommand(
   let PATH = PATH_PARTS.join(':');
 
   return await processes.spawn(command, commandArgs, {
+    pkg,
     cwd: pkg.dir,
     tty: false,
     env: { ...process.env, PATH }
