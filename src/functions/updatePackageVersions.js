@@ -36,8 +36,6 @@ function versionRangeToRangeType(versionRange: string) {
  *
  */
 
-function checkStillValid() {}
-
 export default async function updatePackageVersions(
   updatedPackages: VersionMap,
   opts: Options = {}
