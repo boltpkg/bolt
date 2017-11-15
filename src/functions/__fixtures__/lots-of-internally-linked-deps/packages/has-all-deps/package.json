@@ -1,0 +1,10 @@
+{
+  "name": "has-all-deps",
+  "version": "1.1.1",
+  "dependencies": {
+    "react": "^15.6.1",
+    "pinned-dep": "1.1.1",
+    "caret-dep": "^1.1.1",
+    "tilde-dep": "~1.1.1"
+  }
+}

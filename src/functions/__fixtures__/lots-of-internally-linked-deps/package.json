@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "name": "lots-of-internally-linked-deps",
+  "description": "all packages are at 1.1.1, each named package is depended on according to that name",
+  "description-2": "i.e caret-dep will always dep depended on with a caret range",
+  "bolt": {
+    "workspaces": ["packages/*"]
+  },
+  "dependencies": {
+    "react": "^15.6.1",
+    "left-pad": "^1.1.3"
+  }
+}
