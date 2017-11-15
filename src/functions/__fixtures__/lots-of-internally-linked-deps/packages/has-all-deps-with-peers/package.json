@@ -2,13 +2,9 @@
   "name": "has-all-deps-with-peers",
   "version": "1.1.1",
   "peerDependencies": {
-    "pinned-dep": "1.1.1",
-    "tilde-dep": "~1.1.1",
     "caret-dep": "^1.1.1"
   },
   "devDependencies": {
-    "pinned-dep": "1.1.1",
-    "tilde-dep": "~1.1.1",
     "caret-dep": "^1.1.1"
   }
 }
