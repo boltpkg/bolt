@@ -5,6 +5,7 @@ import Project from '../Project';
 import Workspace from '../Workspace';
 import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
+import includes from 'array-includes';
 
 type VersionMap = {
   [name: string]: string
@@ -72,7 +73,7 @@ export default async function updatePackageVersions(
       const newDepRange = rangeType + updatedPackages[depName];
       if (depTypes.length === 0) continue;
 
-      const inUpdatedPackages = internalDeps.includes(name);
+      const inUpdatedPackages = includes(internalDeps, name);
       const willLeaveSemverRange = !semver.satisfies(
         updatedPackages[depName],
         depRange
