@@ -79,6 +79,7 @@ export async function publish(opts: PublishOptions) {
   const packages = workspaces
     .map(workspace => workspace.pkg)
     .filter(pkg => !pkg.config.getPrivate());
+  let publishedPackages = [];
 
   try {
     // TODO: Re-enable once locking issues are sorted out
@@ -99,8 +100,17 @@ export async function publish(opts: PublishOptions) {
       const version = workspace.pkg.config.getVersion();
       logger.info(messages.publishingPackage(name, version));
 
-      await npm.publish(name, { cwd: workspace.pkg.dir, access: opts.access });
+      const publishConfirmation = await npm.publish(name, {
+        cwd: workspace.pkg.dir,
+        access: opts.access
+      });
+
+      if (publishConfirmation && publishConfirmation.published) {
+        publishedPackages.push({ name, version });
+      }
     });
+
+    return publishedPackages;
 
     // TODO: Re-enable once locking issues are sorted out
     // await locks.unlock(packages);

@@ -39,10 +39,24 @@ export function publish(
 ) {
   return npmRequestLimit(async () => {
     logger.info(messages.npmPublish(pkgName));
-    let publishFlags = opts.access ? ['--access', opts.access] : [];
-    return await processes.spawn('npm', ['publish', ...publishFlags], {
-      cwd: opts.cwd
-    });
+    const publishFlags = opts.access ? ['--access', opts.access] : [];
+
+    try {
+      const publishedPkgInfo = await processes.spawn(
+        'npm',
+        ['publish', ...publishFlags],
+        {
+          cwd: opts.cwd
+        }
+      );
+      return { published: true, publishedPkgInfo };
+    } catch (error) {
+      //Publish failed
+      if (error.code == 0) {
+        logger.warn(messages.publishingPackageFailed(pkgName));
+      }
+      return { published: false };
+    }
   });
 }
 
