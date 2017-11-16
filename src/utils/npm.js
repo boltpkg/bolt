@@ -42,19 +42,12 @@ export function publish(
     const publishFlags = opts.access ? ['--access', opts.access] : [];
 
     try {
-      const result = await processes.spawn(
-        'npm',
-        ['publish', ...publishFlags],
-        {
-          cwd: opts.cwd
-        }
-      );
-      return { published: true, publishedPkgInfo: JSON.parse(result.stdout) };
+      await processes.spawn('npm', ['publish', ...publishFlags], {
+        cwd: opts.cwd
+      });
+      return { published: true };
     } catch (error) {
-      //Publish failed
-      if (error.code == 0) {
-        logger.warn(messages.publishingPackageFailed(pkgName));
-      }
+      // Publish failed
       return { published: false };
     }
   });

@@ -31,7 +31,7 @@ async function getUnpublishedPackages(packages) {
   ): boolean => {
     const shouldPublish = semver.gt(pkgLocalVersion, pkgPublishedVersion);
 
-    //show a warning message if package is not published since pkgPublishedVersion > pkgLocalVersion
+    // show a warning message if package is not published since pkgPublishedVersion > pkgLocalVersion
     if (!shouldPublish) {
       logger.warn(
         messages.notPublishingPackage(

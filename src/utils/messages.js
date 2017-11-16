@@ -261,10 +261,6 @@ export function publishingPackage(
   return `Publishing ${normalPkg(pkgName)} at ${goodVer(pkgVersion)}`;
 }
 
-export function publishingPackageFailed(pkgName: string): Message {
-  return `Failed to publish ${pkgName}`;
-}
-
 export function noUnpublishedPackagesToPublish(): Message {
   return 'No unpublished packages to publish';
 }
