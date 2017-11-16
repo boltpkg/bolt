@@ -1,16 +1,27 @@
 // @flow
+import * as yarn from '../utils/yarn';
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 
-export type BinOptions = {};
+export type BinOptions = {
+  cwd?: string
+};
 
 export function toBinOptions(
   args: options.Args,
   flags: options.Flags
 ): BinOptions {
-  return {};
+  return {
+    cwd: options.string(flags.cwd, 'cwd')
+  };
 }
 
 export async function bin(opts: BinOptions) {
-  throw new BoltError('Unimplemented command "bin"');
+  let cwd = opts.cwd || process.cwd();
+
+  try {
+    await yarn.bin(cwd);
+  } catch (err) {
+    throw new BoltError(err);
+  }
 }

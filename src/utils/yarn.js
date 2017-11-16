@@ -105,3 +105,10 @@ export async function remove(dependencies: Array<string>, cwd: string) {
     tty: true
   });
 }
+
+export async function bin(cwd: string) {
+  await processes.spawn('yarn', ['bin'], {
+    cwd,
+    tty: true
+  });
+}
