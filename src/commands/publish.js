@@ -24,6 +24,27 @@ export function toPublishOptions(
 }
 
 async function getUnpublishedPackages(packages) {
+  const semverGtCheckFailWithWarning = (
+    pkgLocalVersion: string,
+    pkgPublishedVersion: string,
+    pkgName: string
+  ): boolean => {
+    const shouldPublish = semver.gt(pkgLocalVersion, pkgPublishedVersion);
+
+    // show a warning message if package is not published since pkgPublishedVersion > pkgLocalVersion
+    if (!shouldPublish) {
+      logger.warn(
+        messages.notPublishingPackage(
+          pkgLocalVersion,
+          pkgPublishedVersion,
+          pkgName
+        )
+      );
+    }
+
+    return shouldPublish;
+  };
+
   const results = await Promise.all(
     packages.map(async pkg => {
       let config = pkg.config;
@@ -42,7 +63,11 @@ async function getUnpublishedPackages(packages) {
     // only publish if our version is higher than the one on npm
     return (
       !result.isPublished ||
-      semver.gt(result.localVersion, result.publishedVersion)
+      semverGtCheckFailWithWarning(
+        result.localVersion,
+        result.publishedVersion,
+        result.name
+      )
     );
   });
 }
@@ -54,6 +79,7 @@ export async function publish(opts: PublishOptions) {
   const packages = workspaces
     .map(workspace => workspace.pkg)
     .filter(pkg => !pkg.config.getPrivate());
+  let publishedPackages = [];
 
   try {
     // TODO: Re-enable once locking issues are sorted out
@@ -74,8 +100,17 @@ export async function publish(opts: PublishOptions) {
       const version = workspace.pkg.config.getVersion();
       logger.info(messages.publishingPackage(name, version));
 
-      await npm.publish(name, { cwd: workspace.pkg.dir, access: opts.access });
+      const publishConfirmation = await npm.publish(name, {
+        cwd: workspace.pkg.dir,
+        access: opts.access
+      });
+
+      if (publishConfirmation && publishConfirmation.published) {
+        publishedPackages.push({ name, version });
+      }
     });
+
+    return publishedPackages;
 
     // TODO: Re-enable once locking issues are sorted out
     // await locks.unlock(packages);

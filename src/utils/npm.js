@@ -39,10 +39,17 @@ export function publish(
 ) {
   return npmRequestLimit(async () => {
     logger.info(messages.npmPublish(pkgName));
-    let publishFlags = opts.access ? ['--access', opts.access] : [];
-    return await processes.spawn('npm', ['publish', ...publishFlags], {
-      cwd: opts.cwd
-    });
+    const publishFlags = opts.access ? ['--access', opts.access] : [];
+
+    try {
+      await processes.spawn('npm', ['publish', ...publishFlags], {
+        cwd: opts.cwd
+      });
+      return { published: true };
+    } catch (error) {
+      // Publish failed
+      return { published: false };
+    }
   });
 }
 
