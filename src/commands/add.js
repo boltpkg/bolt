@@ -41,6 +41,10 @@ export function toAddOptions(
   Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).forEach(depTypeFlag => {
     if (flags[depTypeFlag]) {
       type = DEPENDENCY_TYPE_FLAGS_MAP[depTypeFlag];
+      // check if value of dependency flag is a package name and then push to dependency arguments
+      if (typeof flags[depTypeFlag] === 'string') {
+        depsArgs.push(options.toDependency(flags[depTypeFlag]));
+      }
     }
   });
 
