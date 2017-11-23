@@ -37,11 +37,10 @@ describe('install', () => {
     let cwd = await getFixturePath(__dirname, 'simple-package');
     await install(toInstallOptions([], { cwd }));
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
-    expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
-      'yarn',
-      ['install', '--non-interactive', '-s'],
-      { cwd }
-    );
+    expect(unsafeProcesses.spawn).toHaveBeenCalledWith('yarn', ['install'], {
+      cwd,
+      tty: true
+    });
   });
 
   test('should still run yarn install at the root when called from ws', async () => {
@@ -49,10 +48,24 @@ describe('install', () => {
     let cwd = path.join(path.join(rootDir, 'packages', 'foo'));
     await install(toInstallOptions([], { cwd }));
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
+    expect(unsafeProcesses.spawn).toHaveBeenCalledWith('yarn', ['install'], {
+      cwd: rootDir,
+      tty: true
+    });
+  });
+
+  test('should pass the --pure-lockfile flag correctly', async () => {
+    let rootDir = await getFixturePath(__dirname, 'simple-project');
+    let cwd = path.join(path.join(rootDir, 'packages', 'foo'));
+    await install(toInstallOptions([], { cwd, pureLockfile: true }));
+    expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
       'yarn',
-      ['install', '--non-interactive', '-s'],
-      { cwd: rootDir }
+      ['install', '--pure-lockfile'],
+      {
+        cwd: rootDir,
+        tty: true
+      }
     );
   });
 
