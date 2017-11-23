@@ -14,7 +14,7 @@ function assertSpawnCalls(expectedArgs, expectedCwd) {
   const spawnCalls = unsafeProcesses.spawn.mock.calls;
 
   expect(spawnCalls.length).toEqual(1);
-  expect(spawnCalls[0][0]).toEqual('yarn');
+  expect(spawnCalls[0][0]).toEqual(`${expectedCwd}/node_modules/.bin/yarn`);
   expect(spawnCalls[0][1]).toEqual(expectedArgs);
   expect(spawnCalls[0][2].cwd).toEqual(expectedCwd);
 }

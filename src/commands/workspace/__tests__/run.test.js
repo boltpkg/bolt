@@ -28,7 +28,7 @@ describe('bolt workspace run', () => {
     );
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      'yarn',
+      `${projectDir}/node_modules/.bin/yarn`,
       ['run', '-s', 'test'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
@@ -43,7 +43,7 @@ describe('bolt workspace run', () => {
 
     // Ensure the extra '--' gets passed in
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      'yarn',
+      `${projectDir}/node_modules/.bin/yarn`,
       ['run', '-s', 'test', '--', '--first-arg', '--second-arg'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
@@ -57,7 +57,7 @@ describe('bolt workspace run', () => {
     );
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      'yarn',
+      `${projectDir}/node_modules/.bin/yarn`,
       ['run', '-s', 'test'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
