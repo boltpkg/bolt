@@ -63,7 +63,8 @@
     "rimraf": "^2.6.1",
     "semver": "^5.4.1",
     "sort-object": "^3.0.2",
-    "typeable-promisify": "^2.0.1"
+    "typeable-promisify": "^2.0.1",
+    "yarn": "^1.3.2"
   },
   "jest": {
     "resetMocks": true,
