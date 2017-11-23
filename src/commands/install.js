@@ -13,7 +13,8 @@ import pathIsInside from 'path-is-inside';
 import { BoltError } from '../utils/errors';
 
 export type InstallOptions = {|
-  cwd?: string
+  cwd?: string,
+  pureLockfile: boolean
 |};
 
 export function toInstallOptions(
@@ -21,7 +22,8 @@ export function toInstallOptions(
   flags: options.Flags
 ): InstallOptions {
   return {
-    cwd: options.string(flags.cwd, 'cwd')
+    cwd: options.string(flags.cwd, 'cwd'),
+    pureLockfile: options.boolean(flags.pureLockfile, 'pure-lockfile') || false
   };
 }
 
@@ -29,6 +31,9 @@ export async function install(opts: InstallOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
+  let installFlags = [];
+
+  if (opts.pureLockfile) installFlags.push('--pure-lockfile');
 
   logger.info(messages.validatingProject(), { emoji: '🔎', prefix: false });
 
@@ -42,8 +47,9 @@ export async function install(opts: InstallOptions) {
     prefix: false
   });
 
-  await processes.spawn('yarn', ['install', '--non-interactive', '-s'], {
-    cwd: project.pkg.dir
+  await processes.spawn('yarn', ['install', ...installFlags], {
+    cwd: project.pkg.dir,
+    tty: true
   });
 
   logger.info(messages.linkingWorkspaceDependencies(), {
