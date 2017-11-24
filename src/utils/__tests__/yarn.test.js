@@ -5,16 +5,18 @@ import { getFixturePath } from 'jest-fixtures';
 import * as yarn from '../yarn';
 import * as processes from '../processes';
 import Project from '../../Project';
+import * as path from 'path';
 
 jest.mock('../processes');
 
 const unsafeProcesses: any & typeof processes = processes;
+const boltBinPath: string = path.join(process.cwd(), 'node_modules', '.bin');
 
 function assertSpawnCalls(expectedArgs, expectedCwd) {
   const spawnCalls = unsafeProcesses.spawn.mock.calls;
 
   expect(spawnCalls.length).toEqual(1);
-  expect(spawnCalls[0][0]).toEqual('yarn');
+  expect(spawnCalls[0][0]).toEqual(`${boltBinPath}/yarn`);
   expect(spawnCalls[0][1]).toEqual(expectedArgs);
   expect(spawnCalls[0][2].cwd).toEqual(expectedCwd);
 }

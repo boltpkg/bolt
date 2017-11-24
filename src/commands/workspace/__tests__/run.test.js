@@ -8,6 +8,7 @@ jest.mock('../../../utils/processes');
 jest.mock('../../../utils/logger');
 
 const unsafeProcessses: any & typeof processes = processes;
+const boltBinPath: string = path.join(process.cwd(), 'node_modules', '.bin');
 
 describe('bolt workspace run', () => {
   let projectDir;
@@ -28,7 +29,7 @@ describe('bolt workspace run', () => {
     );
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      'yarn',
+      `${boltBinPath}/yarn`,
       ['run', '-s', 'test'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
@@ -43,7 +44,7 @@ describe('bolt workspace run', () => {
 
     // Ensure the extra '--' gets passed in
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      'yarn',
+      `${boltBinPath}/yarn`,
       ['run', '-s', 'test', '--', '--first-arg', '--second-arg'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
@@ -57,7 +58,7 @@ describe('bolt workspace run', () => {
     );
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      'yarn',
+      `${boltBinPath}/yarn`,
       ['run', '-s', 'test'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
