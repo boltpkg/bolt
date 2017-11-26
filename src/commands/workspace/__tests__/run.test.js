@@ -1,23 +1,29 @@
 // @flow
 import { workspaceRun, toWorkspaceRunOptions } from '../run';
 import { copyFixtureIntoTempDir } from 'jest-fixtures';
+import projectBinPath from 'project-bin-path';
 import * as path from 'path';
 import * as processes from '../../../utils/processes';
 
 jest.mock('../../../utils/processes');
 jest.mock('../../../utils/logger');
 
+async function getLocalBinPath(): Promise<string> {
+  return await projectBinPath();
+}
 const unsafeProcessses: any & typeof processes = processes;
 
 describe('bolt workspace run', () => {
   let projectDir;
   let fooWorkspaceDir;
   let barWorkspaceDir;
+  let localYarn;
 
   beforeEach(async () => {
     projectDir = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
     fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
+    localYarn = path.join(await getLocalBinPath(), 'yarn');
   });
 
   test('running script that exists', async () => {
@@ -28,7 +34,7 @@ describe('bolt workspace run', () => {
     );
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      'yarn',
+      localYarn,
       ['run', '-s', 'test'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
@@ -43,7 +49,7 @@ describe('bolt workspace run', () => {
 
     // Ensure the extra '--' gets passed in
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      'yarn',
+      localYarn,
       ['run', '-s', 'test', '--', '--first-arg', '--second-arg'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
@@ -57,7 +63,7 @@ describe('bolt workspace run', () => {
     );
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      'yarn',
+      localYarn,
       ['run', '-s', 'test'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );

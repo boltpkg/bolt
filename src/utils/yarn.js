@@ -1,12 +1,17 @@
 // @flow
 import includes from 'array-includes';
-
+import projectBinPath from 'project-bin-path';
+import * as path from 'path';
 import type { Dependency, configDependencyType } from '../types';
 import type Package from '../Package';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
 import * as logger from '../utils/fs';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
+
+async function getLocalBinPath() {
+  return await projectBinPath(__dirname);
+}
 
 function depTypeToFlag(depType) {
   const flag = Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).find(
@@ -21,6 +26,7 @@ export async function add(
   dependencies: Array<Dependency>,
   type?: configDependencyType
 ) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
   const spawnArgs = ['add'];
   if (!dependencies.length) return;
 
@@ -37,7 +43,7 @@ export async function add(
     if (flag) spawnArgs.push(flag);
   }
 
-  await processes.spawn('yarn', spawnArgs, {
+  await processes.spawn(localYarn, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true
@@ -49,13 +55,14 @@ export async function run(
   script: string,
   args: Array<string> = []
 ) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
   let spawnArgs = ['run', '-s', script];
 
   if (args.length) {
     spawnArgs = spawnArgs.concat('--', args);
   }
 
-  await processes.spawn('yarn', spawnArgs, {
+  await processes.spawn(localYarn, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true
@@ -93,21 +100,24 @@ export async function getScript(pkg: Package, script: string) {
 }
 
 export async function init(cwd: string) {
-  await processes.spawn('yarn', ['init', '-s'], {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  await processes.spawn(localYarn, ['init', '-s'], {
     cwd: cwd,
     tty: true
   });
 }
 
 export async function remove(dependencies: Array<string>, cwd: string) {
-  await processes.spawn('yarn', ['remove', ...dependencies], {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  await processes.spawn(localYarn, ['remove', ...dependencies], {
     cwd,
     tty: true
   });
 }
 
 export async function bin(cwd: string) {
-  await processes.spawn('yarn', ['bin'], {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  await processes.spawn(localYarn, ['bin'], {
     cwd,
     tty: true
   });
