@@ -9,7 +9,7 @@ import * as fs from '../utils/fs';
 import * as logger from '../utils/fs';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
 
-async function getLocalBinPath() {
+async function getLocalBinPath(): Promise<string> {
   return await projectBinPath(__dirname);
 }
 
