@@ -58,7 +58,7 @@
     "parse-json": "^2.2.0",
     "path-is-inside": "^1.0.2",
     "pkg-up": "^2.0.0",
-    "project-bin-path": "^0.0.2",
+    "project-bin-path": "^1.0.0",
     "read-cmd-shim": "^1.0.1",
     "read-pkg": "^2.0.0",
     "rimraf": "^2.6.1",
