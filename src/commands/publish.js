@@ -54,7 +54,7 @@ async function getUnpublishedPackages(packages) {
         name: config.getName(),
         localVersion: config.getVersion(),
         isPublished: response.published,
-        publishedVersion: response.pkgInfo.version || ''
+        newVersion: response.pkgInfo.version || ''
       };
     })
   );
@@ -65,7 +65,7 @@ async function getUnpublishedPackages(packages) {
       !result.isPublished ||
       semverGtCheckFailWithWarning(
         result.localVersion,
-        result.publishedVersion,
+        result.newVersion,
         result.name
       )
     );
@@ -90,7 +90,6 @@ export async function publish(opts: PublishOptions) {
         pkg => workspace.pkg.config.getName() === pkg.name
       );
     const unpublishedWorkspaces = workspaces.filter(isUnpublished);
-
     if (unpublishedPackages.length === 0) {
       logger.warn(messages.noUnpublishedPackagesToPublish());
     }
@@ -105,9 +104,11 @@ export async function publish(opts: PublishOptions) {
         access: opts.access
       });
 
-      if (publishConfirmation && publishConfirmation.published) {
-        publishedPackages.push({ name, version });
-      }
+      publishedPackages.push({
+        name,
+        newVersion: version,
+        published: publishConfirmation && publishConfirmation.published
+      });
     });
 
     return publishedPackages;

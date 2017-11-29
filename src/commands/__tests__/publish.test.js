@@ -22,9 +22,7 @@ describe('bolt publish', () => {
   });
 
   afterEach(() => {
-    lockSpy.mockClear();
-    unlockSpy.mockClear();
-    npmPublishSpy.mockClear();
+    jest.clearAllMocks();
   });
 
   // test('should lock all workspaces', async () => {
@@ -51,5 +49,27 @@ describe('bolt publish', () => {
 
     await publish({ cwd });
     expect(npmPublishSpy).toHaveBeenCalledTimes(1);
+  });
+  test('should return publishedPackages', async () => {
+    untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
+    const cwd = await getFixturePath(__dirname, 'simple-project');
+    untypedNpm.publish.mockReturnValueOnce({ published: true });
+    const published = await publish({ cwd });
+    expect(untypedNpm.publish).toHaveBeenCalledTimes(1);
+
+    expect(published).toEqual([
+      { name: 'foo', newVersion: '1.0.0', published: true }
+    ]);
+  });
+  test('should return published false if it fails', async () => {
+    untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
+    const cwd = await getFixturePath(__dirname, 'simple-project');
+    untypedNpm.publish.mockReturnValueOnce({ published: false });
+    const published = await publish({ cwd });
+    expect(untypedNpm.publish).toHaveBeenCalledTimes(1);
+
+    expect(published).toEqual([
+      { name: 'foo', newVersion: '1.0.0', published: false }
+    ]);
   });
 });
