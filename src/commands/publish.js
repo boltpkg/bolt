@@ -104,19 +104,11 @@ export async function publish(opts: PublishOptions) {
         access: opts.access
       });
 
-      if (publishConfirmation && publishConfirmation.published) {
-        publishedPackages.push({
-          name,
-          newVersion: version,
-          published: true
-        });
-      } else {
-        publishedPackages.push({
-          name,
-          newVersion: version,
-          published: false
-        });
-      }
+      publishedPackages.push({
+        name,
+        newVersion: version,
+        published: publishConfirmation && publishConfirmation.published
+      });
     });
 
     return publishedPackages;
