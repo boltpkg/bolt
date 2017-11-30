@@ -343,10 +343,7 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
       return commands.workspaceRemove(
         commands.toWorkspaceRemoveOptions(workspaceArgs, flags)
       );
-    } else if (
-      commandMap.WORKSPACE_RUN[workspaceCommand] ||
-      typeof subCommand !== 'undefined'
-    ) {
+    } else if (commandMap.WORKSPACE_RUN[workspaceCommand]) {
       return commands.workspaceRun(
         commands.toWorkspaceRunOptions(workspaceArgs, flags)
       );
