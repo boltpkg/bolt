@@ -18,12 +18,11 @@ export function toWorkspaceLinkOptions(
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     workspaceName,
-    packageToLink: packageToLink || ''
+    packageToLink
   };
 }
 
 export async function workspaceLink(opts: LinkOptions) {
-  console.log(opts);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

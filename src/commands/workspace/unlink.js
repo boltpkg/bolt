@@ -18,12 +18,11 @@ export function toWorkspaceUnlinkOptions(
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     workspaceName,
-    packageToUnlink: packageToUnlink || ''
+    packageToUnlink
   };
 }
 
 export async function workspaceUnlink(opts: UnlinkOptions) {
-  console.log(opts);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

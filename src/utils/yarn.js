@@ -114,14 +114,22 @@ export async function bin(cwd: string) {
 }
 
 export async function link(cwd: string, packageToLink?: string) {
-  await processes.spawn('yarn', ['link', packageToLink], {
+  const spawnArgs = ['link'];
+  if (packageToLink) {
+    spawnArgs.push(packageToLink);
+  }
+  await processes.spawn('yarn', spawnArgs, {
     cwd,
     tty: true
   });
 }
 
 export async function unLink(cwd: string, packageToUnLink?: string) {
-  await processes.spawn('yarn', ['unlink', packageToUnLink], {
+  const spawnArgs = ['unlink'];
+  if (packageToUnLink) {
+    spawnArgs.push(packageToUnLink);
+  }
+  await processes.spawn('yarn', spawnArgs, {
     cwd,
     tty: true
   });
