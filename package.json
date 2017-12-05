@@ -51,6 +51,7 @@
     "detect-indent": "^5.0.0",
     "find-up": "^2.1.0",
     "globby": "^6.1.0",
+    "graph-sequencer": "^1.0.0",
     "make-dir": "^1.0.0",
     "meow": "sindresorhus/meow#43401c3",
     "multimatch": "^2.1.0",

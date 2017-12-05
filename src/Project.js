@@ -11,6 +11,7 @@ import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import { BoltError } from './utils/errors';
 import * as globs from './utils/globs';
+import graphSequencer from 'graph-sequencer';
 
 export type Task = (workspace: Workspace) => Promise<mixed>;
 
@@ -139,16 +140,36 @@ export default class Project {
     return { valid, graph };
   }
 
-  // TODO: Properly sort packages using a topological sort, resolving cycles
-  // with groups specified in `package.json#pworkspaces`
-  static async runWorkspaceTasks(workspaces: Array<Workspace>, task: Task) {
+  async runWorkspaceTasks(workspaces: Array<Workspace>, task: Task) {
     let promises = [];
+    let { graph: dependentsGraph, valid } = await this.getDependentsGraph(
+      workspaces
+    );
 
-    for (let workspace of workspaces) {
-      promises.push(task(workspace));
+    let graph = {};
+
+    for (let [pkgName, pkgInfo] of dependentsGraph) {
+      graph[pkgName] = pkgInfo.dependents;
     }
 
-    await Promise.all(promises);
+    let groups = [Object.keys(graph)];
+    let { safe, chunks, cycles } = graphSequencer({ graph, groups });
+
+    if (!safe) {
+      console.log('Warning: Unsafe cycles detected in workspaces: ');
+      console.log(chunks);
+    }
+
+    for (let chunk of chunks) {
+      await Promise.all(
+        chunk.map(workspaceName => {
+          let workspace = this.getWorkspaceByName(workspaces, workspaceName);
+          if (workspace) {
+            return task(workspace);
+          }
+        })
+      );
+    }
   }
 
   getWorkspaceByName(workspaces: Array<Workspace>, workspaceName: string) {

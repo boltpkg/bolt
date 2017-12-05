@@ -50,7 +50,7 @@ describe('Project', () => {
       const workspaces = await project.getWorkspaces();
       const spy = jest.fn(() => Promise.resolve());
 
-      Project.runWorkspaceTasks(workspaces, spy);
+      await project.runWorkspaceTasks(workspaces, spy);
 
       expect(spy).toHaveBeenCalledTimes(2);
       // should be called with our workspace
