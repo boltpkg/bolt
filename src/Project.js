@@ -146,18 +146,18 @@ export default class Project {
       workspaces
     );
 
-    let graph = {};
+    let graph = new Map();
 
     for (let [pkgName, pkgInfo] of dependentsGraph) {
-      graph[pkgName] = pkgInfo.dependents;
+      graph.set(pkgName, pkgInfo.dependents);
     }
 
-    let groups = [Object.keys(graph)];
+    let groups = [Array.from(graph.keys())];
     let { safe, chunks, cycles } = graphSequencer({ graph, groups });
 
     if (!safe) {
       console.log('Warning: Unsafe cycles detected in workspaces: ');
-      console.log(chunks);
+      console.log(cycles);
     }
 
     for (let chunk of chunks) {
