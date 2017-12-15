@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "name": "dependent-workspaces-with-cycle",
+  "version": "1.0.0",
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  }
+}

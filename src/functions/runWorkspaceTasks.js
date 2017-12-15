@@ -21,7 +21,7 @@ export default async function runWorkspaceTasks(
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
 
-  await Project.runWorkspaceTasks(workspaces, workspace => {
+  await project.runWorkspaceTasks(workspaces, workspace => {
     return task({
       dir: workspace.pkg.dir,
       config: workspace.pkg.config.json

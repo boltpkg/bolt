@@ -94,7 +94,7 @@ export async function publish(opts: PublishOptions) {
       logger.warn(messages.noUnpublishedPackagesToPublish());
     }
 
-    await Project.runWorkspaceTasks(unpublishedWorkspaces, async workspace => {
+    await project.runWorkspaceTasks(unpublishedWorkspaces, async workspace => {
       const name = workspace.pkg.config.getName();
       const version = workspace.pkg.config.getVersion();
       logger.info(messages.publishingPackage(name, version));

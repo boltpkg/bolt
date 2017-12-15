@@ -11,6 +11,8 @@ import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import { BoltError } from './utils/errors';
 import * as globs from './utils/globs';
+import graphSequencer from 'graph-sequencer';
+import minimatch from 'minimatch';
 
 export type Task = (workspace: Workspace) => Promise<mixed>;
 
@@ -139,16 +141,62 @@ export default class Project {
     return { valid, graph };
   }
 
-  // TODO: Properly sort packages using a topological sort, resolving cycles
-  // with groups specified in `package.json#pworkspaces`
-  static async runWorkspaceTasks(workspaces: Array<Workspace>, task: Task) {
+  async runWorkspaceTasks(workspaces: Array<Workspace>, task: Task) {
     let promises = [];
+    let { graph: dependentsGraph, valid } = await this.getDependentsGraph(
+      workspaces
+    );
 
-    for (let workspace of workspaces) {
-      promises.push(task(workspace));
+    let graph = new Map();
+
+    for (let [pkgName, pkgInfo] of dependentsGraph) {
+      graph.set(pkgName, pkgInfo.dependents);
     }
 
-    await Promise.all(promises);
+    let workspaceGlobs = this.pkg.config.getWorkspaces() || [];
+    let buckets = new Map();
+
+    let unmatched = workspaces.filter(workspace => {
+      let pkgPath = path.relative(this.pkg.dir, workspace.pkg.dir);
+      let pkgName = workspace.pkg.config.getName();
+
+      let match =
+        workspaceGlobs.find(glob => pkgPath === glob) ||
+        workspaceGlobs.find(glob => minimatch.match([pkgPath], glob).length);
+
+      if (match) {
+        let prev = buckets.get(match) || [];
+        buckets.set(match, prev.concat(pkgName));
+      }
+
+      return !match;
+    });
+
+    if (unmatched.length) {
+      throw new Error(
+        'Unmatched packages to workspace globs: ' + unmatched.join(', ')
+      );
+    }
+
+    let groups = Array.from(buckets.values());
+    let { safe, chunks, cycles } = graphSequencer({ graph, groups });
+
+    if (!safe) {
+      logger.error(messages.createCycleWarning(cycles), {
+        prefix: false
+      });
+    }
+
+    for (let chunk of chunks) {
+      await Promise.all(
+        chunk.map(workspaceName => {
+          let workspace = this.getWorkspaceByName(workspaces, workspaceName);
+          if (workspace) {
+            return task(workspace);
+          }
+        })
+      );
+    }
   }
 
   getWorkspaceByName(workspaces: Array<Workspace>, workspaceName: string) {

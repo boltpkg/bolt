@@ -3,8 +3,11 @@ import path from 'path';
 import Project from '../Project';
 import Package from '../Package';
 import Workspace from '../Workspace';
+import * as logger from '../utils/logger';
 
 import { getFixturePath } from 'jest-fixtures';
+
+jest.mock('../utils/logger');
 
 const assertDependencies = (graph, pkg, dependencies) => {
   const val = graph.get(pkg);
@@ -29,7 +32,7 @@ const assertWorkspaces = (workspaces, expectedNames) => {
 describe('Project', () => {
   let project;
 
-  describe('A simple project', async () => {
+  describe('A simple project', () => {
     beforeEach(async () => {
       const filePath = await getFixturePath(__dirname, 'simple-project');
       project = await Project.init(filePath);
@@ -50,7 +53,7 @@ describe('Project', () => {
       const workspaces = await project.getWorkspaces();
       const spy = jest.fn(() => Promise.resolve());
 
-      Project.runWorkspaceTasks(workspaces, spy);
+      await project.runWorkspaceTasks(workspaces, spy);
 
       expect(spy).toHaveBeenCalledTimes(2);
       // should be called with our workspace
@@ -264,6 +267,60 @@ describe('Project', () => {
         ignore: '@scoped/baz'
       });
       assertWorkspaces(filtered, ['bar', 'baz']);
+    });
+  });
+
+  describe('runWorkspaceTasks()', () => {
+    test('independent workspaces', async () => {
+      let cwd = await getFixturePath(__dirname, 'independent-workspaces');
+      let project = await Project.init(cwd);
+      let workspaces = await project.getWorkspaces();
+      let ops = [];
+
+      await project.runWorkspaceTasks(workspaces, async workspace => {
+        ops.push('start:' + workspace.pkg.config.getName());
+        // wait until next tick
+        await Promise.resolve();
+        ops.push('end:' + workspace.pkg.config.getName());
+      });
+
+      expect(ops).toEqual(['start:bar', 'start:foo', 'end:bar', 'end:foo']);
+    });
+
+    test('dependent workspaces', async () => {
+      let cwd = await getFixturePath(__dirname, 'dependent-workspaces');
+      let project = await Project.init(cwd);
+      let workspaces = await project.getWorkspaces();
+      let ops = [];
+
+      await project.runWorkspaceTasks(workspaces, async workspace => {
+        ops.push('start:' + workspace.pkg.config.getName());
+        // wait until next tick
+        await Promise.resolve();
+        ops.push('end:' + workspace.pkg.config.getName());
+      });
+
+      expect(ops).toEqual(['start:foo', 'end:foo', 'start:bar', 'end:bar']);
+    });
+
+    test('dependent workspaces with cycle', async () => {
+      let cwd = await getFixturePath(
+        __dirname,
+        'dependent-workspaces-with-cycle'
+      );
+      let project = await Project.init(cwd);
+      let workspaces = await project.getWorkspaces();
+      let ops = [];
+
+      await project.runWorkspaceTasks(workspaces, async workspace => {
+        ops.push('start:' + workspace.pkg.config.getName());
+        // wait until next tick
+        await Promise.resolve();
+        ops.push('end:' + workspace.pkg.config.getName());
+      });
+
+      expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
+      expect(logger.error).toHaveBeenCalled();
     });
   });
 });

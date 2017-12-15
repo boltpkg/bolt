@@ -47,5 +47,6 @@ export async function workspaceRun(opts: WorkspaceRunOptions) {
         .dir}" does not have a script named "${opts.script}"`
     );
   }
+
   await yarn.run(workspace.pkg, opts.script, opts.scriptArgs);
 }

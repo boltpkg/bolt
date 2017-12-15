@@ -33,7 +33,7 @@ export async function workspacesExec(opts: WorkspacesExecOptions) {
     opts.filterOpts
   );
 
-  await Project.runWorkspaceTasks(filteredWorkspaces, async workspace => {
+  await project.runWorkspaceTasks(filteredWorkspaces, async workspace => {
     await execCommand(project, workspace.pkg, opts.command, opts.commandArgs);
   });
 }

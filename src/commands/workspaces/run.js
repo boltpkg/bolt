@@ -33,7 +33,7 @@ export async function workspacesRun(opts: WorkspacesRunOptions) {
     opts.filterOpts
   );
 
-  await Project.runWorkspaceTasks(filteredWorkspaces, async workspace => {
+  await project.runWorkspaceTasks(filteredWorkspaces, async workspace => {
     // no need to error if script doesn't exist
     await yarn.runIfExists(workspace.pkg, opts.script, opts.scriptArgs);
   });
