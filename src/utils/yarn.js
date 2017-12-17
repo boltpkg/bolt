@@ -122,3 +122,25 @@ export async function bin(cwd: string) {
     tty: true
   });
 }
+
+export async function link(cwd: string, packageToLink?: string) {
+  const spawnArgs = ['link'];
+  if (packageToLink) {
+    spawnArgs.push(packageToLink);
+  }
+  await processes.spawn('yarn', spawnArgs, {
+    cwd,
+    tty: true
+  });
+}
+
+export async function unLink(cwd: string, packageToUnLink?: string) {
+  const spawnArgs = ['unlink'];
+  if (packageToUnLink) {
+    spawnArgs.push(packageToUnLink);
+  }
+  await processes.spawn('yarn', spawnArgs, {
+    cwd,
+    tty: true
+  });
+}
