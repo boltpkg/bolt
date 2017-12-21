@@ -1,8 +1,10 @@
 // @flow
-import * as options from '../utils/options';
-import * as yarn from '../utils/yarn';
-import { BoltError } from '../utils/errors';
 import Project from '../Project';
+import * as yarn from '../utils/yarn';
+import * as logger from '../utils/logger';
+import * as options from '../utils/options';
+import { BoltError } from '../utils/errors';
+import * as messages from '../utils/messages';
 
 function getWorkspaceMap(workspaces) {
   let workspaceMap = new Map();
@@ -40,12 +42,14 @@ export async function unlink(opts: UnlinkOptions) {
   if (packagesToUnlink && packagesToUnlink.length) {
     packagesToUnlink.forEach(async packageToUnlink => {
       if (workspaceMap.has(packageToUnlink)) {
-        throw new BoltError(`Cannot unlink a workspace`);
+        logger.warn(messages.unlinkInternalPackage(packageToUnlink));
+      } else {
+        await yarn.unlink(cwd, packageToUnlink);
       }
-
-      await yarn.unlink(cwd, packageToUnlink);
     });
   } else {
-    throw new BoltError('Need to tell which package to unlink');
+    throw new BoltError(
+      'Please specify package to unlink. Try: bolt w [packageToUnlink] unlink'
+    );
   }
 }

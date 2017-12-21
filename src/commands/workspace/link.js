@@ -1,21 +1,11 @@
 // @flow
+import * as link from '../link';
 import Project from '../../Project';
+import * as yarn from '../../utils/yarn';
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
-import * as yarn from '../../utils/yarn';
-import * as link from '../link';
 
-function getWorkspaceMap(workspaces) {
-  let workspaceMap = new Map();
-
-  for (let workspace of workspaces) {
-    workspaceMap.set(workspace.pkg.config.getName(), workspace);
-  }
-
-  return workspaceMap;
-}
-
-export type LinkOptions = {|
+export type WorkspaceLinkOptions = {|
   cwd?: string,
   workspaceName: string,
   packagesToLink?: Array<string>
@@ -24,7 +14,7 @@ export type LinkOptions = {|
 export function toWorkspacelinkOptions(
   args: options.Args,
   flags: options.Flags
-): LinkOptions {
+): WorkspaceLinkOptions {
   const [workspaceName, ...packagesToLink] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
@@ -33,7 +23,7 @@ export function toWorkspacelinkOptions(
   };
 }
 
-export async function workspacelink(opts: LinkOptions) {
+export async function workspacelink(opts: WorkspaceLinkOptions) {
   let cwd = opts.cwd || process.cwd();
   let packagesToLink = opts.packagesToLink;
   let workspaceName = opts.workspaceName;
@@ -43,13 +33,18 @@ export async function workspacelink(opts: LinkOptions) {
     workspaces,
     opts.workspaceName
   );
-  let workspaceMap = getWorkspaceMap(workspaces);
+
+  if (!workspace) {
+    throw new BoltError(
+      `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
+    );
+  }
 
   // If there are packages to link then we can link then in the Project
   // as dependencies are symlinked
   if (packagesToLink && packagesToLink.length) {
     await link.link(await link.toLinkOptions(packagesToLink, { '--': [] }));
   } else {
-    workspace && (await yarn.link(workspace.pkg.dir));
+    await yarn.link(workspace.pkg.dir);
   }
 }

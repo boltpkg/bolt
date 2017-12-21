@@ -1,8 +1,10 @@
 // @flow
-import * as options from '../utils/options';
-import * as yarn from '../utils/yarn';
-import { BoltError } from '../utils/errors';
 import Project from '../Project';
+import * as yarn from '../utils/yarn';
+import * as logger from '../utils/logger';
+import * as options from '../utils/options';
+import { BoltError } from '../utils/errors';
+import * as messages from '../utils/messages';
 
 function getWorkspaceMap(workspaces) {
   let workspaceMap = new Map();
@@ -39,14 +41,14 @@ export async function link(opts: LinkOptions) {
   if (packagesToLink && packagesToLink.length) {
     packagesToLink.forEach(async packageToLink => {
       if (workspaceMap.has(packageToLink)) {
-        throw new BoltError(
-          `There is a workspace by the name ${packageToLink} already linked`
-        );
+        logger.warn(messages.linkInternalPackage(packageToLink));
+      } else {
+        await yarn.link(cwd, packageToLink);
       }
-
-      await yarn.link(cwd, packageToLink);
     });
   } else {
-    throw new BoltError(`Need to pass project that needs to be linked`);
+    throw new BoltError(
+      `Cannot create a link to entire workspace. Please specify package to link.`
+    );
   }
 }

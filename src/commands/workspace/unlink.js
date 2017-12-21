@@ -1,21 +1,11 @@
 // @flow
+import * as unlink from '../unlink';
 import Project from '../../Project';
+import * as yarn from '../../utils/yarn';
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
-import * as yarn from '../../utils/yarn';
-import * as unlink from '../unlink';
 
-function getWorkspaceMap(workspaces) {
-  let workspaceMap = new Map();
-
-  for (let workspace of workspaces) {
-    workspaceMap.set(workspace.pkg.config.getName(), workspace);
-  }
-
-  return workspaceMap;
-}
-
-export type LinkOptions = {|
+export type WorkspaceUnlinkOptions = {|
   cwd?: string,
   workspaceName: string,
   packagesToUnlink?: Array<string>
@@ -24,7 +14,7 @@ export type LinkOptions = {|
 export function toWorkspaceUnlinkOptions(
   args: options.Args,
   flags: options.Flags
-): LinkOptions {
+): WorkspaceUnlinkOptions {
   const [workspaceName, ...packagesToUnlink] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
@@ -33,7 +23,7 @@ export function toWorkspaceUnlinkOptions(
   };
 }
 
-export async function workspaceUnlink(opts: LinkOptions) {
+export async function workspaceUnlink(opts: WorkspaceUnlinkOptions) {
   let cwd = opts.cwd || process.cwd();
   let packagesToUnlink = opts.packagesToUnlink;
   let workspaceName = opts.workspaceName;
@@ -43,7 +33,12 @@ export async function workspaceUnlink(opts: LinkOptions) {
     workspaces,
     opts.workspaceName
   );
-  let workspaceMap = getWorkspaceMap(workspaces);
+
+  if (!workspace) {
+    throw new BoltError(
+      `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
+    );
+  }
 
   // If there are packages to link then we can link then in the Project
   // as dependencies are symlinked
@@ -52,6 +47,6 @@ export async function workspaceUnlink(opts: LinkOptions) {
       await unlink.toUnlinkOptions(packagesToUnlink, { '--': [] })
     );
   } else {
-    workspace && (await yarn.unlink(workspace.pkg.dir));
+    await yarn.unlink(workspace.pkg.dir);
   }
 }
