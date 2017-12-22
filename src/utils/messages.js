@@ -367,3 +367,7 @@ export function createCycleWarning(cycles: Array<Array<string>>): Message {
     ].join('')
   );
 }
+
+export function unsafeCycles(): Message {
+  return 'Unsafe dependency cycles detected in workspaces, continuing...';
+}

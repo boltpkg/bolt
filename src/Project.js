@@ -11,7 +11,7 @@ import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import { BoltError } from './utils/errors';
 import * as globs from './utils/globs';
-import graphSequencer from 'graph-sequencer';
+import graphSimpleSequencer from 'graph-simple-sequencer';
 import minimatch from 'minimatch';
 
 export type Task = (workspace: Workspace) => Promise<mixed>;
@@ -153,38 +153,41 @@ export default class Project {
       graph.set(pkgName, pkgInfo.dependents);
     }
 
-    let workspaceGlobs = this.pkg.config.getWorkspaces() || [];
-    let buckets = new Map();
+    // @todo: Renable groups once graph-sequencer is working well.
+    //
+    // let workspaceGlobs = this.pkg.config.getWorkspaces() || [];
+    // let buckets = new Map();
 
-    let unmatched = workspaces.filter(workspace => {
-      let pkgPath = path.relative(this.pkg.dir, workspace.pkg.dir);
-      let pkgName = workspace.pkg.config.getName();
+    // let unmatched = workspaces.filter(workspace => {
+    //   let pkgPath = path.relative(this.pkg.dir, workspace.pkg.dir);
+    //   let pkgName = workspace.pkg.config.getName();
+    //
+    //   let match =
+    //     workspaceGlobs.find(glob => pkgPath === glob) ||
+    //     workspaceGlobs.find(glob => minimatch.match([pkgPath], glob).length);
+    //
+    //   if (match) {
+    //     let prev = buckets.get(match) || [];
+    //     buckets.set(match, prev.concat(pkgName));
+    //   }
+    //
+    //   return !match;
+    // });
+    //
+    // if (unmatched.length) {
+    //   throw new Error(
+    //     'Unmatched packages to workspace globs: ' + unmatched.join(', ')
+    //   );
+    // }
 
-      let match =
-        workspaceGlobs.find(glob => pkgPath === glob) ||
-        workspaceGlobs.find(glob => minimatch.match([pkgPath], glob).length);
-
-      if (match) {
-        let prev = buckets.get(match) || [];
-        buckets.set(match, prev.concat(pkgName));
-      }
-
-      return !match;
-    });
-
-    if (unmatched.length) {
-      throw new Error(
-        'Unmatched packages to workspace globs: ' + unmatched.join(', ')
-      );
-    }
-
-    let groups = Array.from(buckets.values());
-    let { safe, chunks, cycles } = graphSequencer({ graph, groups });
+    // let groups = Array.from(buckets.values());
+    let { safe, chunks } = graphSimpleSequencer(graph);
 
     if (!safe) {
-      logger.error(messages.createCycleWarning(cycles), {
-        prefix: false
-      });
+      logger.error(messages.unsafeCycles());
+      // logger.error(messages.createCycleWarning(cycles), {
+      //   prefix: false
+      // });
     }
 
     for (let chunk of chunks) {
