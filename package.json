@@ -54,7 +54,7 @@
     "graph-simple-sequencer": "^1.0.3",
     "is-glob": "^4.0.0",
     "make-dir": "^1.0.0",
-    "meow": "sindresorhus/meow#43401c3",
+    "meow": "^4.0.0",
     "minimatch": "^3.0.4",
     "multimatch": "^2.1.0",
     "p-limit": "^1.1.0",
