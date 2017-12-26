@@ -76,7 +76,7 @@ const commandMap = {
   TEAM_REMOVE: { remove: true, rm: true },
   TEST: { test: true, t: true },
   UNLINK: { unlink: true },
-  UPGRADE: { upgrade: true },
+  UPGRADE: { upgrade: true, up: true },
   UPGRADE_INTERACTIVE: { 'upgrade-interactive': true },
   VERSION: { version: true },
   VERSIONS: { versions: true },
