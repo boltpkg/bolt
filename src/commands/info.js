@@ -5,8 +5,7 @@ import * as yarn from '../utils/yarn';
 
 export type InfoOptions = {|
   cwd?: string,
-  args: options.Args,
-  flags?: options.Flags
+  args: options.Args
 |};
 
 export function toInfoOptions(
