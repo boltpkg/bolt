@@ -150,3 +150,11 @@ export async function unlink(cwd: string, packageToLink?: string) {
     tty: true
   });
 }
+
+export async function info(cwd: string, dependencies: Array<string> = []) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  await processes.spawn(localYarn, ['info', ...dependencies], {
+    cwd,
+    tty: true
+  });
+}
