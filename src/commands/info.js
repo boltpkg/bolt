@@ -13,10 +13,15 @@ export function toInfoOptions(
   args: options.Args,
   flags: options.Flags
 ): InfoOptions {
+  const depsArgs = Array.prototype.concat([], args);
+  Object.keys(flags).forEach(key => {
+    if (flags[key] === true) {
+      depsArgs.push(`--${key}`);
+    }
+  });
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    args: args,
-    flags: flags
+    args: depsArgs
   };
 }
 
