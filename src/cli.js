@@ -32,7 +32,7 @@ const commandMap = {
   GLOBAL_BIN: { bin: true },
   GLOBAL_LIST: { list: true, ls: true },
   GLOBAL_REMOVE: { remove: true, rm: true },
-  GLOBAL_UPGRADE: { upgrade: true },
+  GLOBAL_UPGRADE: { upgrade: true, up: true },
   HELP: { help: true, h: true, man: true },
   IMPORT: { import: true },
   INFO: { info: true },
@@ -58,7 +58,7 @@ const commandMap = {
   PROJECT_EXEC: { exec: true },
   PROJECT_REMOVE: { remove: true, rm: true },
   PROJECT_RUN: { run: true },
-  PROJECT_UPGRADE: { upgrade: true },
+  PROJECT_UPGRADE: { upgrade: true, up: true },
   PUBLISH: { publish: true },
   PUBLISH_LOCK: { 'publish-lock': true },
   PUBLISH_UNLOCK: { 'publish-unlock': true },
@@ -86,13 +86,13 @@ const commandMap = {
   WORKSPACE_EXEC: { exec: true },
   WORKSPACE_REMOVE: { remove: true, rm: true },
   WORKSPACE_RUN: { run: true },
-  WORKSPACE_UPGRADE: { upgrade: true },
+  WORKSPACE_UPGRADE: { upgrade: true, up: true },
   WORKSPACES: { workspaces: true, ws: true },
   WORKSPACES_ADD: { add: true },
   WORKSPACES_EXEC: { exec: true },
   WORKSPACES_REMOVE: { remove: true, rm: true },
   WORKSPACES_RUN: { run: true },
-  WORKSPACES_UPGRADE: { upgrade: true }
+  WORKSPACES_UPGRADE: { upgrade: true, up: true }
 };
 
 function runCommandFromCli(args: options.Args, flags: options.Flags) {
