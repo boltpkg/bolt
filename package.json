@@ -22,7 +22,8 @@
     "build:modern": "BABEL_ENV=modern babel src -d dist/modern",
     "build": "yarn run clean && yarn build:legacy && yarn build:modern",
     "prepublish": "yarn build",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "watch": "./node_modules/.bin/gulp watch"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -32,6 +33,9 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "flow-bin": "^0.51.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-watch": "^4.3.11",
     "husky": "^0.14.3",
     "jest": "^20.0.4",
     "jest-expect-contain-deep": "^1.0.1",
