@@ -11,7 +11,7 @@ import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import { BoltError } from './utils/errors';
 import * as globs from './utils/globs';
-import graphSimpleSequencer from 'graph-simple-sequencer';
+import taskGraphRunner from 'task-graph-runner';
 import minimatch from 'minimatch';
 
 export type Task = (workspace: Workspace) => Promise<mixed>;
@@ -142,63 +142,29 @@ export default class Project {
   }
 
   async runWorkspaceTasks(workspaces: Array<Workspace>, task: Task) {
-    let promises = [];
-    let { graph: dependentsGraph, valid } = await this.getDependentsGraph(
+    let { graph: dependentsGraph, valid } = await this.getDependencyGraph(
       workspaces
     );
 
     let graph = new Map();
 
     for (let [pkgName, pkgInfo] of dependentsGraph) {
-      graph.set(pkgName, pkgInfo.dependents);
+      graph.set(pkgName, pkgInfo.dependencies);
     }
 
-    // @todo: Renable groups once graph-sequencer is working well.
-    //
-    // let workspaceGlobs = this.pkg.config.getWorkspaces() || [];
-    // let buckets = new Map();
-
-    // let unmatched = workspaces.filter(workspace => {
-    //   let pkgPath = path.relative(this.pkg.dir, workspace.pkg.dir);
-    //   let pkgName = workspace.pkg.config.getName();
-    //
-    //   let match =
-    //     workspaceGlobs.find(glob => pkgPath === glob) ||
-    //     workspaceGlobs.find(glob => minimatch.match([pkgPath], glob).length);
-    //
-    //   if (match) {
-    //     let prev = buckets.get(match) || [];
-    //     buckets.set(match, prev.concat(pkgName));
-    //   }
-    //
-    //   return !match;
-    // });
-    //
-    // if (unmatched.length) {
-    //   throw new Error(
-    //     'Unmatched packages to workspace globs: ' + unmatched.join(', ')
-    //   );
-    // }
-
-    // let groups = Array.from(buckets.values());
-    let { safe, chunks } = graphSimpleSequencer(graph);
+    let { safe } = await taskGraphRunner({
+      graph,
+      force: true,
+      task: async workspaceName => {
+        let workspace = this.getWorkspaceByName(workspaces, workspaceName);
+        if (workspace) {
+          return task(workspace);
+        }
+      }
+    });
 
     if (!safe) {
       logger.error(messages.unsafeCycles());
-      // logger.error(messages.createCycleWarning(cycles), {
-      //   prefix: false
-      // });
-    }
-
-    for (let chunk of chunks) {
-      await Promise.all(
-        chunk.map(workspaceName => {
-          let workspace = this.getWorkspaceByName(workspaces, workspaceName);
-          if (workspace) {
-            return task(workspace);
-          }
-        })
-      );
     }
   }
 

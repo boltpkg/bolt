@@ -300,7 +300,7 @@ describe('Project', () => {
         ops.push('end:' + workspace.pkg.config.getName());
       });
 
-      expect(ops).toEqual(['start:foo', 'end:foo', 'start:bar', 'end:bar']);
+      expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
     });
 
     test('dependent workspaces with cycle', async () => {
