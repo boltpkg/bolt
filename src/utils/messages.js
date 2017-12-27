@@ -318,56 +318,6 @@ Sometimes this is caused by incomplete packages or switching branches.
 Try removing the directory or fixing the package and run bolt again.`;
 }
 
-export function createCycleWarning(cycles: Array<Array<string>>): Message {
-  let str = '';
-
-  cycles.forEach((cycle, index) => {
-    str += '\n';
-    str += '    ╭──╮';
-    cycle.forEach((pkgName, index) => {
-      if (index !== 0) {
-        str += '\n';
-        str += `    │  ↓ ${chalk.italic('depends on')}`;
-      }
-      str += '\n';
-      str += '    │ ';
-      str += chalk.inverse(' ' + pkgName + ' ');
-    });
-    str += `\n    ╰──╯ ${chalk.italic('which depends on')}`;
-    str += '\n';
-  });
-
-  return chalk.red(
-    [
-      '\n',
-      chalk.inverse(' Warning! '),
-      ' ',
-      `Unsafe dependency cycles detected in workspaces:\n`,
-      str,
-      '\n',
-      'You can resolve cycles by giving one or more of the packages a ',
-      'higher or lower priority in your package.json workspaces config:\n',
-      '\n',
-      '  {\n',
-      '    "name": "my-project",\n',
-      '    ...\n',
-      '    "bolt": {\n',
-      '      "workspaces": [\n',
-      `        ${chalk.cyan('"packages/high-priority-package",')}\n`,
-      '        "packages/*",\n',
-      `        ${chalk.cyan('"packages/low-priority-package"')}\n`,
-      '      ]\n',
-      '    }\n',
-      '  }\n',
-      '\n',
-      'Bolt will attempt to resolve these cycles automatically, but it can ',
-      'lead to unpredictable behavior. You should try to resolve them ',
-      'manually as soon as possible.',
-      '\n'
-    ].join('')
-  );
-}
-
 export function unsafeCycles(): Message {
-  return 'Unsafe dependency cycles detected in workspaces, continuing...';
+  return 'Task ran with unsafe dependency cycles in workspaces.';
 }
