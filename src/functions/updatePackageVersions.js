@@ -3,6 +3,7 @@ import semver from 'semver';
 
 import Project from '../Project';
 import Workspace from '../Workspace';
+import DependencyGraph from '../DependencyGraph';
 import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
 import includes from 'array-includes';
@@ -41,14 +42,17 @@ export default async function updatePackageVersions(
   opts: Options = {}
 ): Promise<Array<string>> {
   let cwd = opts.cwd || process.cwd();
-  let project = await Project.init(cwd);
+  let project: Project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
-  let { graph } = await project.getDependencyGraph(workspaces);
+  let graph = new DependencyGraph(project, workspaces);
   let editedPackages = new Set();
 
-  let internalDeps = Object.keys(updatedPackages).filter(dep => graph.has(dep));
+  let internalDeps = Object.keys(updatedPackages).filter(dep =>
+    graph.getDepsByName(dep)
+  );
+
   let externalDeps = Object.keys(updatedPackages).filter(
-    dep => !graph.has(dep)
+    dep => !graph.getDepsByName(dep)
   );
 
   if (externalDeps.length !== 0) {

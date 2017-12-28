@@ -1,8 +1,9 @@
 // @flow
 import path from 'path';
-import Project from '../Project';
+import Project, { type DepGraph } from '../Project';
 import Package from '../Package';
 import Workspace from '../Workspace';
+import DependencyGraph from '../DependencyGraph';
 import * as logger from '../utils/logger';
 import fixtures from 'fixturez';
 
@@ -15,9 +16,24 @@ function assertDependencies(graph, pkg, dependencies) {
   expect(val && val.dependencies).toEqual(dependencies);
 }
 
-function assertDependents(graph, pkg, dependents) {
-  let val = graph.get(pkg);
-  expect(val && val.dependents).toEqual(dependents);
+type ExpectedDepGraph = {
+  [pkgName: string]: {
+    dependencies: Array<string>,
+    dependents: Array<string>
+  }
+};
+
+function assertDepGraph(graph: DependencyGraph, expected: ExpectedDepGraph) {
+  let actual: ExpectedDepGraph = {};
+
+  for (let [workspace, { dependencies, dependents }] of graph.entries()) {
+    actual[workspace.getName()] = {
+      dependencies: Array.from(dependencies).map(ws => ws.getName()),
+      dependents: Array.from(dependents).map(ws => ws.getName())
+    };
+  }
+
+  expect(actual).toEqual(expected);
 }
 
 // Asserts that a set of workspaces contains all (and only) the expected ones
@@ -31,7 +47,7 @@ function assertWorkspaces(workspaces, expectedNames) {
 }
 
 describe('Project', () => {
-  let project;
+  let project: Project;
 
   describe('A simple project', () => {
     beforeEach(async () => {
@@ -74,40 +90,16 @@ describe('Project', () => {
       expect(workspaces[0]).toBeInstanceOf(Workspace);
     });
 
-    it('should be able to getDependencyGraph', async () => {
+    it('should be able to getDepGraph', async () => {
       let workspaces = await project.getWorkspaces();
-      let { valid, graph } = await project.getDependencyGraph(workspaces);
-      let expectedDependencies = {
-        'fixture-project-nested-workspaces': [],
-        foo: ['bar'],
-        bar: [],
-        baz: ['bar']
-      };
+      let graph = new DependencyGraph(project, workspaces);
 
-      expect(valid).toEqual(true);
-      expect(graph).toBeInstanceOf(Map);
-      expect(graph.size).toBe(4);
+      expect(graph.isValid()).toEqual(true);
 
-      Object.entries(expectedDependencies).forEach(([pkg, dependencies]) => {
-        assertDependencies(graph, pkg, dependencies);
-      });
-    });
-
-    it('should be able to getDependentsGraph', async () => {
-      let workspaces = await project.getWorkspaces();
-      let { valid, graph } = await project.getDependentsGraph(workspaces);
-      let expectedDependents = {
-        bar: ['foo', 'baz'],
-        foo: [],
-        baz: []
-      };
-
-      expect(valid).toEqual(true);
-      expect(graph).toBeInstanceOf(Map);
-      expect(graph.size).toBe(Object.keys(expectedDependents).length);
-
-      Object.entries(expectedDependents).forEach(([pkg, dependents]) => {
-        assertDependents(graph, pkg, dependents);
+      assertDepGraph(graph, {
+        foo: { dependents: [], dependencies: ['bar'] },
+        bar: { dependents: ['foo', 'baz'], dependencies: [] },
+        baz: { dependents: [], dependencies: ['bar'] }
       });
     });
   });
@@ -124,47 +116,29 @@ describe('Project', () => {
       expect(workspaces[0]).toBeInstanceOf(Workspace);
     });
 
-    it('should be able to getDependencyGraph', async () => {
+    it('should be able to getDepGraph', async () => {
       let workspaces = await project.getWorkspaces();
-      let { valid, graph } = await project.getDependencyGraph(workspaces);
-      let expectedDependencies = {
-        'nested-workspaces-transitive-dependents': [],
-        'pkg-a': [],
-        'workspace-a': ['pkg-a'],
-        'pkg-b': ['pkg-a'],
-        'pkg-c': ['pkg-b']
-      };
+      let graph = new DependencyGraph(project, workspaces);
 
-      expect(valid).toEqual(true);
-      expect(graph).toBeInstanceOf(Map);
-      expect(graph.size).toBe(Object.keys(expectedDependencies).length);
-
-      let assertDependencies = (pkg, deps) => {
-        let val = graph.get(pkg);
-        expect(val && val.dependencies).toEqual(deps);
-      };
-
-      Object.entries(expectedDependencies).forEach(([pkg, dependencies]) => {
-        assertDependencies(pkg, dependencies);
+      expect(graph.isValid()).toEqual(true);
+      assertDepGraph(graph, {
+        'pkg-a': { dependents: ['workspace-a', 'pkg-b'], dependencies: [] },
+        'workspace-a': { dependents: [], dependencies: ['pkg-a'] },
+        'pkg-b': { dependents: ['pkg-c'], dependencies: ['pkg-a'] },
+        'pkg-c': { dependents: [], dependencies: ['pkg-b'] }
       });
     });
 
-    it('should be able to getDependentsGraph', async () => {
+    it('should be able to getDepGraph', async () => {
       let workspaces = await project.getWorkspaces();
-      let { valid, graph } = await project.getDependentsGraph(workspaces);
-      let expectedDependents = {
-        'pkg-a': ['workspace-a', 'pkg-b'],
-        'workspace-a': [],
-        'pkg-b': ['pkg-c'],
-        'pkg-c': []
-      };
+      let graph = new DependencyGraph(project, workspaces);
 
-      expect(valid).toEqual(true);
-      expect(graph).toBeInstanceOf(Map);
-      expect(graph.size).toBe(Object.keys(expectedDependents).length);
-
-      Object.entries(expectedDependents).forEach(([pkg, dependents]) => {
-        assertDependents(graph, pkg, dependents);
+      expect(graph.isValid()).toEqual(true);
+      assertDepGraph(graph, {
+        'pkg-a': { dependents: ['workspace-a', 'pkg-b'], dependencies: [] },
+        'pkg-b': { dependents: ['pkg-c'], dependencies: ['pkg-a'] },
+        'pkg-c': { dependents: [], dependencies: ['pkg-b'] },
+        'workspace-a': { dependents: [], dependencies: ['pkg-a'] }
       });
     });
   });

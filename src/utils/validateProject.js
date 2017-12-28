@@ -13,7 +13,7 @@ export default async function validateProject(project: Project) {
   let workspaces = await project.getWorkspaces();
   let projectDependencies = project.pkg.getAllDependencies();
   let projectConfig = project.pkg.config;
-  let { graph: depGraph } = await project.getDependencyGraph(workspaces);
+  // let { graph: depGraph } = await project.getDepGraph(workspaces);
 
   let projectIsValid = true;
 

@@ -28,7 +28,7 @@ export type Dependency = {
   version?: string
 };
 
-export type configDependencyType =
+export type ConfigDependencyType =
   | 'dependencies'
   | 'devDependencies'
   | 'peerDependencies'

@@ -13,8 +13,18 @@ import { BoltError } from './utils/errors';
 import * as globs from './utils/globs';
 import taskGraphRunner from 'task-graph-runner';
 import minimatch from 'minimatch';
+import Repository from './Repository';
+import DependencyGraph from './DependencyGraph';
 
 export type Task = (workspace: Workspace) => Promise<mixed>;
+
+export type DepGraph = Map<
+  Workspace,
+  {
+    dependencies: Set<Workspace>,
+    dependents: Set<Workspace>
+  }
+>;
 
 export default class Project {
   pkg: Package;
@@ -24,9 +34,11 @@ export default class Project {
   }
 
   static async init(cwd: string) {
-    let filePath = await Config.getProjectConfig(cwd);
-    if (!filePath)
+    let realPath = await fs.realpath(cwd);
+    let filePath = await Config.getProjectConfig(realPath);
+    if (!filePath) {
       throw new BoltError(`Unable to find root of project in ${cwd}`);
+    }
     let pkg = await Package.init(filePath);
     return new Project(pkg);
   }
@@ -57,110 +69,18 @@ export default class Project {
     return workspaces;
   }
 
-  async getDependencyGraph(workspaces: Array<Workspace>) {
-    let graph: Map<
-      string,
-      { pkg: Package, dependencies: Array<string> }
-    > = new Map();
-    let packages = [this.pkg];
-    let packagesByName = { [this.pkg.config.getName()]: this.pkg };
-    let valid = true;
-
-    for (let workspace of workspaces) {
-      packages.push(workspace.pkg);
-      packagesByName[workspace.pkg.config.getName()] = workspace.pkg;
-    }
-
-    for (let pkg of packages) {
-      let name = pkg.config.getName();
-      let dependencies = [];
-      let allDependencies = pkg.getAllDependencies();
-
-      for (let [depName, depVersion] of allDependencies) {
-        let match = packagesByName[depName];
-        if (!match) continue;
-
-        let actual = depVersion;
-        let expected = match.config.getVersion();
-
-        // Workspace dependencies only need to semver satisfy, not '==='
-        if (!semver.satisfies(expected, depVersion)) {
-          valid = false;
-          logger.error(
-            messages.packageMustDependOnCurrentVersion(
-              name,
-              depName,
-              expected,
-              depVersion
-            )
-          );
-          continue;
-        }
-
-        dependencies.push(depName);
-      }
-
-      graph.set(name, { pkg, dependencies });
-    }
-
-    return { graph, valid };
-  }
-
-  async getDependentsGraph(workspaces: Array<Workspace>) {
-    let graph = new Map();
-    let { valid, graph: dependencyGraph } = await this.getDependencyGraph(
-      workspaces
-    );
-
-    let dependentsLookup: {
-      [string]: { pkg: Package, dependents: Array<string> }
-    } = {};
-
-    workspaces.forEach(workspace => {
-      dependentsLookup[workspace.pkg.config.getName()] = {
-        pkg: workspace.pkg,
-        dependents: []
-      };
-    });
-
-    workspaces.forEach(workspace => {
-      let dependent = workspace.pkg.config.getName();
-      let valFromDependencyGraph = dependencyGraph.get(dependent) || {};
-      let dependencies = valFromDependencyGraph.dependencies || [];
-
-      dependencies.forEach(dependency => {
-        dependentsLookup[dependency].dependents.push(dependent);
-      });
-    });
-
-    // can't use Object.entries here as the flow type for it is Array<[string, mixed]>;
-    Object.keys(dependentsLookup).forEach(key => {
-      graph.set(key, dependentsLookup[key]);
-    });
-
-    return { valid, graph };
-  }
-
   async runWorkspaceTasks(workspaces: Array<Workspace>, task: Task) {
-    let { graph: dependentsGraph, valid } = await this.getDependencyGraph(
-      workspaces
-    );
-
+    let depGraph = new DependencyGraph(this, workspaces);
     let graph = new Map();
 
-    for (let [pkgName, pkgInfo] of dependentsGraph) {
-      graph.set(pkgName, pkgInfo.dependencies);
+    for (let [workspace, { dependencies }] of depGraph.entries()) {
+      graph.set(workspace, Array.from(dependencies));
     }
 
     let { safe } = await taskGraphRunner({
       graph,
       force: true,
-      task: async workspaceName => {
-        let workspace = this.getWorkspaceByName(workspaces, workspaceName);
-        if (workspace) {
-          return task(workspace);
-        }
-      }
+      task
     });
 
     if (!safe) {

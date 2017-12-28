@@ -3,9 +3,10 @@
 import semver from 'semver';
 
 import Project from '../Project';
-import type Workspace from '../Workspace';
-import type Package from '../Package';
-import type { Dependency, configDependencyType } from '../types';
+import Workspace from '../Workspace';
+import Package from '../Package';
+import DependencyGraph from '../DependencyGraph';
+import type { Dependency, ConfigDependencyType } from '../types';
 import * as messages from './messages';
 import { BoltError } from './errors';
 import * as logger from './logger';
@@ -16,16 +17,17 @@ export default async function addDependenciesToPackage(
   project: Project,
   pkg: Package,
   dependencies: Array<Dependency>,
-  type?: configDependencyType = 'dependencies'
+  type?: ConfigDependencyType = 'dependencies'
 ) {
   let workspaces = await project.getWorkspaces();
+  let graph = new DependencyGraph(project, workspaces);
+
   let projectDependencies = project.pkg.getAllDependencies();
   let pkgDependencies = pkg.getAllDependencies();
-  let { graph: depGraph } = await project.getDependencyGraph(workspaces);
 
   let dependencyNames = dependencies.map(dep => dep.name);
-  let externalDeps = dependencies.filter(dep => !depGraph.has(dep.name));
-  let internalDeps = dependencies.filter(dep => depGraph.has(dep.name));
+  let externalDeps = dependencies.filter(dep => !graph.has(dep.name));
+  let internalDeps = dependencies.filter(dep => graph.has(dep.name));
 
   let externalDepsToInstallForProject = externalDeps.filter(
     dep => !projectDependencies.has(dep.name)
@@ -64,8 +66,8 @@ export default async function addDependenciesToPackage(
   }
 
   for (let dep of internalDeps) {
-    let dependencyPkg = (depGraph.get(dep.name) || {}).pkg;
-    let internalVersion = dependencyPkg.config.getVersion();
+    let dependencyWorkspace = graph.getWorkspaceByName(dep.name);
+    let internalVersion = dependencyWorkspace.pkg.config.getVersion();
     // If no version is requested, default to caret at the current version
     let requestedVersion = dep.version || `^${internalVersion}`;
     if (!semver.satisfies(internalVersion, requestedVersion)) {

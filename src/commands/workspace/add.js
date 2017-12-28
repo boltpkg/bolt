@@ -5,14 +5,14 @@ import * as options from '../../utils/options';
 import * as logger from '../../utils/logger';
 import addDependenciesToPackage from '../../utils/addDependenciesToPackages';
 import { BoltError } from '../../utils/errors';
-import type { Dependency, configDependencyType } from '../../types';
+import type { Dependency, ConfigDependencyType } from '../../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../../constants';
 
 export type WorkspaceAddOptions = {
   cwd?: string,
   workspaceName: string,
   deps: Array<Dependency>,
-  type: configDependencyType
+  type: ConfigDependencyType
 };
 
 export function toWorkspaceAddOptions(

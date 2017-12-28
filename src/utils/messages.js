@@ -362,3 +362,48 @@ export function errorWorkspacesUpgrade(filterOpts: Array<string>): Message {
 export function noNeedToSymlinkInternalDependency(): Message {
   return `Internal packages are symlinked, there is no need update them`;
 }
+
+export function diff(): Message {
+  return 'Diff';
+}
+
+export function skip(): Message {
+  return 'Skip (no new version)';
+}
+
+export function patch(nextVersion: string): Message {
+  return `Patch (${nextVersion})`;
+}
+
+export function minor(nextVersion: string): Message {
+  return `Minor (${nextVersion})`;
+}
+
+export function major(nextVersion: string): Message {
+  return `Major (${nextVersion})`;
+}
+
+export function prerelease(nextVersion: string): Message {
+  return `Prerelease (${nextVersion})`;
+}
+
+export function prepatch(nextVersion: string): Message {
+  return `Prepatch (${nextVersion})`;
+}
+
+export function preminor(nextVersion: string): Message {
+  return `Preminor (${nextVersion})`;
+}
+
+export function premajor(nextVersion: string): Message {
+  return `Premajor (${nextVersion})`;
+}
+
+export function selectVersion(
+  pkgName: string,
+  currentVersion: string
+): Message {
+  return `Select a new version for ${normalPkg(
+    pkgName
+  )} (currently ${currentVersion}, depends on changed package(s) "foo", "bar", "baz", and 3 others)`;
+}

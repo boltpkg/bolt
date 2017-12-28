@@ -1,5 +1,6 @@
 // @flow
 import Project from '../Project';
+import DependencyGraph from '../DependencyGraph';
 
 type VersionMap = {
   [x: string]: any
@@ -20,9 +21,8 @@ export default async function updateWorkspaceDependencies(
   opts: Options = {}
 ) {
   let cwd = opts.cwd || process.cwd();
-  let project = await Project.init(cwd);
+  let project: Project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
-  let { graph } = await project.getDependencyGraph(workspaces);
   let editedPackages = new Set();
 
   // Note: all dependencyToUpgrade are external dependencies

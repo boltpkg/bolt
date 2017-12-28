@@ -23,3 +23,13 @@ export const DEPENDENCY_TYPE_FLAGS_MAP = {
 };
 
 export const BOLT_VERSION = boltPkg.version;
+
+export const SEMVER_TYPES = [
+  'patch',
+  'minor',
+  'major',
+  'prerelease',
+  'prepatch',
+  'preminor',
+  'premajor'
+];

@@ -12,14 +12,17 @@ jest.mock('../../utils/logger');
 jest.mock('../../utils/yarn');
 
 describe('bolt remove', () => {
-  test('removing a project dependency only used by the project', async () => {
-    let tempDir = f.copy('package-with-external-deps-installed');
+  test.only(
+    'removing a project dependency only used by the project',
+    async () => {
+      let tempDir = f.copy('package-with-external-deps-installed');
 
-    await remove(toRemoveOptions(['project-only-dep'], { cwd: tempDir }));
+      await remove(toRemoveOptions(['project-only-dep'], { cwd: tempDir }));
 
-    expect(yarn.remove).toHaveBeenCalledTimes(1);
-    expect(yarn.remove).toHaveBeenCalledWith(['project-only-dep'], tempDir);
-  });
+      expect(yarn.remove).toHaveBeenCalledTimes(1);
+      expect(yarn.remove).toHaveBeenCalledWith(['project-only-dep'], tempDir);
+    }
+  );
 
   test('removing a workspace dependency', async () => {
     let tempDir = f.copy('package-with-external-deps-installed');

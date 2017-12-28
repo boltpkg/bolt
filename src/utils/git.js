@@ -18,7 +18,7 @@ const gitCommandLimit = pLimit(1);
 const GIT_LOG_LINE_FORMAT_FLAG = '--pretty=format:%H %s';
 const GIT_LOG_LINE_FORMAT_SPLITTER = /^([a-zA-Z0-9]+) (.*)/;
 
-opaque type CommitHash = string;
+export opaque type CommitHash = string;
 
 export type Commit = {
   hash: CommitHash,
@@ -188,16 +188,22 @@ export async function showFileAtCommit(
 export const MAGIC_EMPTY_STATE_HASH: CommitHash =
   '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
 
+export const MAGIC_EMPTY_STATE_COMMIT: Commit = {
+  hash: MAGIC_EMPTY_STATE_HASH,
+  message: '(empty state)'
+};
+
 export async function getDiffForPathSinceCommit(
   filePath: string,
   commitHash: CommitHash,
-  opts: { cwd: string }
+  opts: { cwd: string, tty?: boolean }
 ) {
   let gitPath = toGitPath(opts.cwd, filePath);
   let { stdout } = await git(
     ['diff', commitHash, '--color=always', '--', filePath],
     {
-      cwd: opts.cwd
+      cwd: opts.cwd,
+      tty: opts.tty
     }
   );
   return stdout.trim();

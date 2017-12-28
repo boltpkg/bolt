@@ -2,7 +2,7 @@
 import includes from 'array-includes';
 import projectBinPath from 'project-bin-path';
 import * as path from 'path';
-import type { Dependency, configDependencyType } from '../types';
+import type { Dependency, ConfigDependencyType } from '../types';
 import type Package from '../Package';
 import Project from '../Project';
 import * as processes from './processes';
@@ -25,7 +25,7 @@ function depTypeToFlag(depType) {
 export async function add(
   pkg: Package,
   dependencies: Array<Dependency>,
-  type?: configDependencyType
+  type?: ConfigDependencyType
 ) {
   let localYarn = path.join(await getLocalBinPath(), 'yarn');
   let spawnArgs = ['add'];

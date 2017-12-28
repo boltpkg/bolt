@@ -46,7 +46,7 @@ export function spawn(
   cmd: string,
   args: Array<string>,
   opts: SpawnOptions = {}
-) {
+): Promise<{ code: number, stdout: string, stderr: string }> {
   return limit(
     () =>
       new Promise((resolve, reject) => {

@@ -41,8 +41,8 @@ describe('changes', () => {
       workspaces
     );
 
-    expect(versionCommits1.get(fooWorkspace)).toBe(null);
-    expect(versionCommits1.get(barWorkspace)).toBe(null);
+    expect(versionCommits1.get(fooWorkspace)).toBe(undefined);
+    expect(versionCommits1.get(barWorkspace)).toBe(undefined);
 
     await updateConfig(fooConfig, { version: '2.0.0' });
     await git.addAll({ cwd });

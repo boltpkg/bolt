@@ -11,4 +11,8 @@ export default class Workspace {
   static async init(pkg: Package) {
     return new Workspace(pkg);
   }
+
+  getName() {
+    return this.pkg.config.getName();
+  }
 }

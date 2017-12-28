@@ -42,6 +42,12 @@ describe('utils/symlinkPackageDependencies()', () => {
     let tempDir = f.copy('nested-workspaces-with-root-dependencies-installed');
     project = await Project.init(tempDir);
     workspaces = await project.getWorkspaces();
+    // We use the foo package as it has internal and external dependencies
+    let workspaceToSymlink =
+      project.getWorkspaceByName(workspaces, 'foo') || {};
+    pkgToSymlink = workspaceToSymlink.pkg;
+    nodeModules = pkgToSymlink.nodeModules;
+    nodeModulesBin = pkgToSymlink.nodeModulesBin;
   });
 
   /********************
@@ -49,15 +55,6 @@ describe('utils/symlinkPackageDependencies()', () => {
   ********************/
 
   describe('linking packages', () => {
-    beforeEach(() => {
-      // We use the foo package as it has internal and external dependencies
-      let workspaceToSymlink =
-        project.getWorkspaceByName(workspaces, 'foo') || {};
-      pkgToSymlink = workspaceToSymlink.pkg;
-      nodeModules = pkgToSymlink.nodeModules;
-      nodeModulesBin = pkgToSymlink.nodeModulesBin;
-    });
-
     it('should create node modules and node_modules/.bin if not existing', async () => {
       expect(await dirExists(pkgToSymlink.nodeModules)).toEqual(false);
       expect(await dirExists(pkgToSymlink.nodeModulesBin)).toEqual(false);
@@ -141,13 +138,18 @@ describe('utils/symlinkPackageDependencies()', () => {
     });
   });
 
-  it('should symlink internal dependencies bin files (when declared using string)', async () => {
-    expect(await symlinkExists(nodeModulesBin, 'bar')).toEqual(false);
+  it.only(
+    'should symlink internal dependencies bin files (when declared using string)',
+    async () => {
+      expect(await symlinkExists(nodeModulesBin, 'bar')).toEqual(false);
 
-    await symlinkPackageDependencies(project, pkgToSymlink, ['bar']);
+      console.log(pkgToSymlink);
 
-    expect(await symlinkExists(nodeModulesBin, 'bar')).toEqual(true);
-  });
+      await symlinkPackageDependencies(project, pkgToSymlink, ['bar']);
+
+      expect(await symlinkExists(nodeModulesBin, 'bar')).toEqual(true);
+    }
+  );
 
   it('should symlink internal dependencies bin files (when declared using object)', async () => {
     expect(await symlinkExists(nodeModulesBin, 'baz-1')).toEqual(false);
