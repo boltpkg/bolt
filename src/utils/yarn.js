@@ -99,9 +99,14 @@ export async function getScript(pkg: Package, script: string) {
   return result;
 }
 
-export async function init(cwd: string) {
+export async function init(cwd: string, args: {}) {
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  await processes.spawn(localYarn, ['init', '-s'], {
+  let spawnArgs = ['init', '-s'];
+
+  if (args.private) spawnArgs.push('-p');
+  if (args.yes) spawnArgs.push('-y');
+
+  await processes.spawn(localYarn, [...spawnArgs], {
     cwd: cwd,
     tty: true
   });
