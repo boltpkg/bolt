@@ -8,19 +8,30 @@ export type InfoOptions = {|
   args: options.Args
 |};
 
+function flagsToArgs(flagArgs: options.Flags): Array<string> {
+  const flagArgsKey = Object.keys(flagArgs);
+  // Flags has default -- key
+  if (flagArgsKey.length < 1) {
+    return [];
+  }
+  const flag = [];
+  flagArgsKey.forEach(key => {
+    if (flagArgs[key] === true) {
+      flag.push(`--${key}`);
+    }
+  });
+  return flag;
+}
+
 export function toInfoOptions(
   args: options.Args,
   flags: options.Flags
 ): InfoOptions {
-  const depsArgs = Array.prototype.concat([], args);
-  Object.keys(flags).forEach(key => {
-    if (flags[key] === true) {
-      depsArgs.push(`--${key}`);
-    }
-  });
+  const infoFlagArgs = flagsToArgs(flags);
+  const infoSpawnArgs = Array.prototype.concat([], args, infoFlagArgs);
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    args: depsArgs
+    args: infoSpawnArgs
   };
 }
 
