@@ -40,7 +40,7 @@ export async function unlink(opts: UnlinkOptions) {
 
   // guard to check if there are packages to unlink
   if (packagesToUnlink && packagesToUnlink.length) {
-    Promise.all(
+    await Promise.all(
       packagesToUnlink.map(async packageToUnlink => {
         if (workspaceMap.has(packageToUnlink)) {
           logger.warn(messages.unlinkInternalPackage(packageToUnlink));

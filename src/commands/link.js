@@ -39,7 +39,7 @@ export async function link(opts: LinkOptions) {
   let workspaceMap = getWorkspaceMap(workspaces);
 
   if (packagesToLink && packagesToLink.length) {
-    Promise.all(
+    await Promise.all(
       packagesToLink.map(async packageToLink => {
         if (workspaceMap.has(packageToLink)) {
           logger.warn(messages.linkInternalPackage(packageToLink));
