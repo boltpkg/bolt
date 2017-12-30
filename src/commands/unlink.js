@@ -40,13 +40,15 @@ export async function unlink(opts: UnlinkOptions) {
 
   // guard to check if there are packages to unlink
   if (packagesToUnlink && packagesToUnlink.length) {
-    packagesToUnlink.forEach(async packageToUnlink => {
-      if (workspaceMap.has(packageToUnlink)) {
-        logger.warn(messages.unlinkInternalPackage(packageToUnlink));
-      } else {
-        await yarn.unlink(cwd, packageToUnlink);
-      }
-    });
+    Promise.all(
+      packagesToUnlink.map(async packageToUnlink => {
+        if (workspaceMap.has(packageToUnlink)) {
+          logger.warn(messages.unlinkInternalPackage(packageToUnlink));
+        } else {
+          await yarn.unlink(cwd, packageToUnlink);
+        }
+      })
+    );
   } else {
     throw new BoltError(
       'Please specify package to unlink. Try: bolt w [packageToUnlink] unlink'

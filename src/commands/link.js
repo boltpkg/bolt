@@ -39,13 +39,15 @@ export async function link(opts: LinkOptions) {
   let workspaceMap = getWorkspaceMap(workspaces);
 
   if (packagesToLink && packagesToLink.length) {
-    packagesToLink.forEach(async packageToLink => {
-      if (workspaceMap.has(packageToLink)) {
-        logger.warn(messages.linkInternalPackage(packageToLink));
-      } else {
-        await yarn.link(cwd, packageToLink);
-      }
-    });
+    Promise.all(
+      packagesToLink.map(async packageToLink => {
+        if (workspaceMap.has(packageToLink)) {
+          logger.warn(messages.linkInternalPackage(packageToLink));
+        } else {
+          await yarn.link(cwd, packageToLink);
+        }
+      })
+    );
   } else {
     throw new BoltError(
       `Cannot create a link to entire workspace. Please specify package to link.`
