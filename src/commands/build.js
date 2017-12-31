@@ -5,7 +5,8 @@ import { run } from './run';
 
 export type BuildOptions = {|
   cwd?: string,
-  args: options.Args
+  args: options.Args,
+  scriptFlags: Array<string>
 |};
 
 export function toBuildOptions(
@@ -14,7 +15,8 @@ export function toBuildOptions(
 ): BuildOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    args: args
+    args: args,
+    scriptFlags: options.toScriptFlags(flags)
   };
 }
 
@@ -22,6 +24,7 @@ export async function build(opts: BuildOptions) {
   await run({
     cwd: opts.cwd,
     script: 'build',
-    scriptArgs: opts.args
+    scriptArgs: opts.args,
+    scriptFlags: opts.scriptFlags
   });
 }

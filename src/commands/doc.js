@@ -5,7 +5,8 @@ import { run } from './run';
 
 export type DocOptions = {|
   cwd?: string,
-  args: options.Args
+  args: options.Args,
+  scriptFlags: Array<string>
 |};
 
 export function toDocOptions(
@@ -14,7 +15,8 @@ export function toDocOptions(
 ): DocOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    args: args
+    args: args,
+    scriptFlags: options.toScriptFlags(flags)
   };
 }
 
@@ -22,6 +24,7 @@ export async function doc(opts: DocOptions) {
   await run({
     cwd: opts.cwd,
     script: 'doc',
-    scriptArgs: opts.args
+    scriptArgs: opts.args,
+    scriptFlags: opts.scriptFlags
   });
 }

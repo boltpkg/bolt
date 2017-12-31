@@ -53,13 +53,18 @@ export async function add(
 export async function run(
   pkg: Package,
   script: string,
-  args: Array<string> = []
+  args: Array<string> = [],
+  flags: Array<string> = []
 ) {
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
   let spawnArgs = ['run', '-s', script];
 
   if (args.length) {
     spawnArgs = spawnArgs.concat('--', args);
+  }
+
+  if (flags.length) {
+    spawnArgs = spawnArgs.concat(flags);
   }
 
   await processes.spawn(localYarn, spawnArgs, {

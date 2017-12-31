@@ -5,7 +5,8 @@ import { run } from './run';
 
 export type FormatOptions = {|
   cwd?: string,
-  args: options.Args
+  args: options.Args,
+  scriptFlags: Array<string>
 |};
 
 export function toFormatOptions(
@@ -14,7 +15,8 @@ export function toFormatOptions(
 ): FormatOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    args: args
+    args: args,
+    scriptFlags: options.toScriptFlags(flags)
   };
 }
 
@@ -22,6 +24,7 @@ export async function format(opts: FormatOptions) {
   await run({
     cwd: opts.cwd,
     script: 'format',
-    scriptArgs: opts.args
+    scriptArgs: opts.args,
+    scriptFlags: opts.scriptFlags
   });
 }

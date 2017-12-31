@@ -8,7 +8,8 @@ import { BoltError } from '../utils/errors';
 export type RunOptions = {|
   cwd?: string,
   script: string,
-  scriptArgs: options.Args
+  scriptArgs: options.Args,
+  scriptFlags: Array<string>
 |};
 
 export function toRunOptions(
@@ -19,7 +20,8 @@ export function toRunOptions(
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     script,
-    scriptArgs
+    scriptArgs,
+    scriptFlags: options.toScriptFlags(flags)
   };
 }
 
@@ -30,7 +32,7 @@ export async function run(opts: RunOptions) {
 
   if (script) {
     logger.cmd(script, opts.scriptArgs);
-    await yarn.run(pkg, opts.script, opts.scriptArgs);
+    await yarn.run(pkg, opts.script, opts.scriptArgs, opts.scriptFlags);
   } else {
     throw new BoltError(
       `Package at "${pkg.dir}" does not have a script named "${opts.script}"`

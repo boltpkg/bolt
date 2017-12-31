@@ -12,7 +12,7 @@ import * as options from './utils/options';
 const commandMap = {
   ADD: { add: true },
   BIN: { bin: true },
-  CACHE: { cache: true },
+  BUILD: { build: true },
   CACHE_CLEAN: { clean: true },
   CACHE_DIR: { dir: true },
   CACHE_LIST: { list: true, ls: true },
@@ -103,7 +103,7 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.add(commands.toAddOptions(commandArgs, flags));
   } else if (commandMap.BIN[command]) {
     return commands.bin(commands.toBinOptions(commandArgs, flags));
-  } else if (commandMap.CACHE[command]) {
+  } else if (commandMap.BUILD[command]) {
     return commands.build(commands.toBuildOptions(commandArgs, flags));
   } else if (commandMap.CACHE_CLEAN[command]) {
     if (commandMap.CACHE_DIR[command]) {
