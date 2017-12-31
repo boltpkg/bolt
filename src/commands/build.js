@@ -21,7 +21,6 @@ export function toBuildOptions(
 }
 
 export async function build(opts: BuildOptions) {
-  console.log(opts);
   await run({
     cwd: opts.cwd,
     script: 'build',
