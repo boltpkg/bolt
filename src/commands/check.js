@@ -5,7 +5,8 @@ import { run } from './run';
 
 export type CheckOptions = {|
   cwd?: string,
-  args: options.Args
+  args: options.Args,
+  scriptFlags: Array<string>
 |};
 
 export function toCheckOptions(
@@ -14,7 +15,8 @@ export function toCheckOptions(
 ): CheckOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    args: args
+    args: args,
+    scriptFlags: options.toScriptFlags(flags)
   };
 }
 
@@ -22,6 +24,7 @@ export async function check(opts: CheckOptions) {
   await run({
     cwd: opts.cwd,
     script: 'check',
-    scriptArgs: opts.args
+    scriptArgs: opts.args,
+    scriptFlags: opts.scriptFlags
   });
 }

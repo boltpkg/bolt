@@ -47,3 +47,18 @@ export function toDependency(dependencyString: string): Dependency {
   }
   return version ? { name, version } : { name };
 }
+
+export function toScriptFlags(flags: Flags) {
+  let scriptFlags = [];
+
+  Object.keys(flags).map(flag => {
+    if (flag === '--') return;
+    if (typeof flags[flag] === 'string') {
+      scriptFlags.push(`--${flag}=${flags[flag]}`);
+    } else {
+      scriptFlags.push(`--${flag}`);
+    }
+  });
+
+  return scriptFlags;
+}
