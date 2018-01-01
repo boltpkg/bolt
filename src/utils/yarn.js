@@ -150,3 +150,13 @@ export async function unlink(cwd: string, packageToLink?: string) {
     tty: true
   });
 }
+
+export async function licenses(cwd: string, scriptArgs?: string = 'list') {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let spawnArgs = ['licenses'];
+
+  if (scriptArgs.length) {
+    spawnArgs = spawnArgs.concat(scriptArgs);
+  }
+  await processes.spawn(localYarn, spawnArgs, { cwd, tty: true });
+}

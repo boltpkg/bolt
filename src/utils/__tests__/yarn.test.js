@@ -67,4 +67,23 @@ describe('utils/yarn', () => {
   });
   describe('run()', () => {});
   describe('init()', () => {});
+  describe('licenses()', () => {
+    let cwd;
+    let localYarn;
+    beforeEach(async () => {
+      // just a dummy path for testing
+      cwd = 'dummyPattern/dummyPath';
+      localYarn = path.join(await getLocalBinPath(), 'yarn');
+    });
+
+    it('should be able to call licenses with list script if no scripts are passes', async () => {
+      await yarn.licenses(cwd);
+      assertSpawnCalls(localYarn, ['licenses', 'list'], cwd);
+    });
+
+    it('should be able to call licenses with passed script option', async () => {
+      await yarn.licenses(cwd, 'generate-disclaimer');
+      assertSpawnCalls(localYarn, ['licenses', 'generate-disclaimer'], cwd);
+    });
+  });
 });
