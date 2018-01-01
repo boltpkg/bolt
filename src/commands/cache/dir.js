@@ -1,16 +1,22 @@
 // @flow
 import * as options from '../../utils/options';
-import { BoltError } from '../../utils/errors';
+import * as yarn from '../../utils/yarn';
 
-export type CacheDirOptions = {};
+export type CacheDirOptions = {
+  cwd?: string
+};
 
 export function toCacheDirOptions(
   args: options.Args,
   flags: options.Flags
 ): CacheDirOptions {
-  return {};
+  return {
+    cwd: options.string(flags.cwd, 'cwd')
+  };
 }
 
 export async function cacheDir(opts: CacheDirOptions) {
-  throw new BoltError('Unimplemented command "cache dir"');
+  let cwd = opts.cwd || process.cwd();
+
+  await yarn.cache(cwd, 'dir');
 }

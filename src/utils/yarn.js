@@ -151,12 +151,34 @@ export async function unlink(cwd: string, packageToLink?: string) {
   });
 }
 
-export async function licenses(cwd: string, scriptArgs?: string = 'list') {
+export async function licenses(cwd: string, subCommand?: string = 'list') {
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
   let spawnArgs = ['licenses'];
 
-  if (scriptArgs.length) {
-    spawnArgs = spawnArgs.concat(scriptArgs);
+  if (subCommand) {
+    spawnArgs = spawnArgs.concat(subCommand);
   }
   await processes.spawn(localYarn, spawnArgs, { cwd, tty: true });
+}
+
+export async function cache(
+  cwd: string,
+  subCommand?: string = 'list',
+  subCommandArgs?: string = ''
+) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let spawnArgs = ['cache'];
+
+  if (subCommand) {
+    spawnArgs.push(subCommand);
+  }
+
+  if (subCommandArgs) {
+    spawnArgs.push(subCommandArgs);
+  }
+
+  await processes.spawn(localYarn, spawnArgs, {
+    cwd,
+    tty: true
+  });
 }
