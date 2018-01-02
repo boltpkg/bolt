@@ -178,3 +178,12 @@ export async function cache(
     tty: true
   });
 }
+
+export async function outdated(cwd: string, dependencies: Array<string> = []) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+
+  await processes.spawn(localYarn, ['outdated', ...dependencies], {
+    cwd,
+    tty: true
+  });
+}
