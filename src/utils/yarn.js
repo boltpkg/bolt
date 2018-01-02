@@ -187,3 +187,12 @@ export async function outdated(cwd: string, dependencies: Array<string> = []) {
     tty: true
   });
 }
+
+export async function create(cwd: string, spawnArgs: Array<string> = []) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+
+  await processes.spawn(localYarn, ['create', ...spawnArgs], {
+    cwd,
+    tty: true
+  });
+}
