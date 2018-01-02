@@ -181,7 +181,6 @@ export async function cache(
 
 export async function outdated(cwd: string, dependencies: Array<string> = []) {
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
-
   await processes.spawn(localYarn, ['outdated', ...dependencies], {
     cwd,
     tty: true
@@ -190,8 +189,15 @@ export async function outdated(cwd: string, dependencies: Array<string> = []) {
 
 export async function create(cwd: string, spawnArgs: Array<string> = []) {
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
-
   await processes.spawn(localYarn, ['create', ...spawnArgs], {
+    cwd,
+    tty: true
+  });
+}
+
+export async function pack(cwd: string, spawnArgs: Array<string> = []) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  await processes.spawn(localYarn, ['pack', ...spawnArgs], {
     cwd,
     tty: true
   });
