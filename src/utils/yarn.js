@@ -163,18 +163,14 @@ export async function licenses(cwd: string, subCommand?: string = 'list') {
 
 export async function cache(
   cwd: string,
-  subCommand?: string = 'list',
-  subCommandArgs?: string = ''
+  subCommand: string = 'list',
+  subCommandArgs?: Array<string> = []
 ) {
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  let spawnArgs = ['cache'];
+  let spawnArgs = ['cache', subCommand];
 
-  if (subCommand) {
-    spawnArgs.push(subCommand);
-  }
-
-  if (subCommandArgs) {
-    spawnArgs.push(subCommandArgs);
+  if (subCommandArgs.length) {
+    spawnArgs = spawnArgs.concat(subCommandArgs);
   }
 
   await processes.spawn(localYarn, spawnArgs, {

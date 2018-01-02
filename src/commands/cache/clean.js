@@ -1,25 +1,28 @@
 // @flow
 import * as options from '../../utils/options';
+import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
 
 export type CacheCleanOptions = {
   cwd?: string,
-  subCommandArg?: string
+  args?: Array<string>
 };
 
 export function toCacheCleanOptions(
   args: options.Args,
   flags: options.Flags
 ): CacheCleanOptions {
-  const [subCommandArg] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    subCommandArg
+    args
   };
 }
 
 export async function cacheClean(opts: CacheCleanOptions) {
   let cwd = opts.cwd || process.cwd();
-  let subCommandArgs = opts.subCommandArg || '';
-  await yarn.cache(cwd, 'clean', subCommandArgs);
+  try {
+    await yarn.cache(cwd, 'clean', opts.args);
+  } catch (err) {
+    throw new BoltError(err);
+  }
 }
