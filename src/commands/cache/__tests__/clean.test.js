@@ -11,11 +11,9 @@ describe('bolt cache clean', () => {
         cwd: 'dummyPattern/dummyPath'
       })
     );
-    expect(yarn.cache).toHaveBeenCalledWith(
-      'dummyPattern/dummyPath',
-      'clean',
-      []
-    );
+    expect(
+      yarn.cliCommand
+    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'cache', ['clean']);
   });
 
   it('should handle passing the arguments down to yarn clean', async () => {
@@ -24,7 +22,10 @@ describe('bolt cache clean', () => {
         cwd: 'dummyPattern/dummyPath'
       })
     );
-    expect(yarn.cache).toHaveBeenCalledWith('dummyPattern/dummyPath', 'clean', [
+    expect(
+      yarn.cliCommand
+    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'cache', [
+      'clean',
       'jest'
     ]);
   });

@@ -20,7 +20,7 @@ export async function cacheDir(opts: CacheDirOptions) {
   let cwd = opts.cwd || process.cwd();
 
   try {
-    await yarn.cache(cwd, 'dir');
+    await yarn.cliCommand(cwd, 'cache', ['dir']);
   } catch (err) {
     throw new BoltError(err);
   }

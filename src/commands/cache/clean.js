@@ -5,7 +5,7 @@ import * as yarn from '../../utils/yarn';
 
 export type CacheCleanOptions = {
   cwd?: string,
-  args?: Array<string>
+  args: Array<string>
 };
 
 export function toCacheCleanOptions(
@@ -14,14 +14,19 @@ export function toCacheCleanOptions(
 ): CacheCleanOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    args
+    args: args || []
   };
 }
 
 export async function cacheClean(opts: CacheCleanOptions) {
   let cwd = opts.cwd || process.cwd();
+  let args = ['clean'];
+
+  if (opts.args.length) {
+    args = args.concat(opts.args);
+  }
   try {
-    await yarn.cache(cwd, 'clean', opts.args);
+    await yarn.cliCommand(cwd, 'cache', args);
   } catch (err) {
     throw new BoltError(err);
   }

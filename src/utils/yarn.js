@@ -115,24 +115,6 @@ export async function remove(dependencies: Array<string>, cwd: string) {
   });
 }
 
-export async function cache(
-  cwd: string,
-  subCommand: string = 'list',
-  subCommandArgs?: Array<string> = []
-) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  let spawnArgs = ['cache', subCommand];
-
-  if (subCommandArgs.length) {
-    spawnArgs = spawnArgs.concat(subCommandArgs);
-  }
-
-  await processes.spawn(localYarn, spawnArgs, {
-    cwd,
-    tty: true
-  });
-}
-
 export async function cliCommand(
   cwd: string,
   command: string = '',

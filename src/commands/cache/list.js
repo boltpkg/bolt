@@ -20,9 +20,13 @@ export function toCacheListOptions(
 
 export async function cacheList(opts: CacheListOptions) {
   let cwd = opts.cwd || process.cwd();
-  let args = opts.pattern ? [`--pattern=${opts.pattern}`] : [];
+  let args = ['list'];
+  if (opts.pattern) {
+    args = args.concat([`--pattern=${opts.pattern}`]);
+  }
+
   try {
-    await yarn.cache(cwd, 'list', args);
+    await yarn.cliCommand(cwd, 'cache', args);
   } catch (err) {
     throw new BoltError(err);
   }

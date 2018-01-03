@@ -11,6 +11,8 @@ describe('bolt cache dir', () => {
         cwd: 'dummyPattern/dummyPath'
       })
     );
-    expect(yarn.cache).toHaveBeenCalledWith('dummyPattern/dummyPath', 'dir');
+    expect(
+      yarn.cliCommand
+    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'cache', ['dir']);
   });
 });
