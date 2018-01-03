@@ -202,3 +202,11 @@ export async function pack(cwd: string, spawnArgs: Array<string> = []) {
     tty: true
   });
 }
+
+export async function why(cwd: string, spawnArgs: Array<string> = []) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  await processes.spawn(localYarn, ['why', ...spawnArgs], {
+    cwd,
+    tty: true
+  });
+}
