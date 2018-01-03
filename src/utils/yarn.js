@@ -122,3 +122,31 @@ export async function bin(cwd: string) {
     tty: true
   });
 }
+
+export async function link(cwd: string, packageToLink?: string) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let spawnArgs = ['link'];
+
+  if (packageToLink) {
+    spawnArgs.push(packageToLink);
+  }
+
+  await processes.spawn(localYarn, spawnArgs, {
+    cwd,
+    tty: true
+  });
+}
+
+export async function unlink(cwd: string, packageToLink?: string) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let spawnArgs = ['unlink'];
+
+  if (packageToLink) {
+    spawnArgs.push(packageToLink);
+  }
+
+  await processes.spawn(localYarn, spawnArgs, {
+    cwd,
+    tty: true
+  });
+}

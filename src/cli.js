@@ -84,8 +84,10 @@ const commandMap = {
   WORKSPACE: { workspace: true, w: true },
   WORKSPACE_ADD: { add: true },
   WORKSPACE_EXEC: { exec: true },
+  WORKSPACE_LINK: { link: true },
   WORKSPACE_REMOVE: { remove: true, rm: true },
   WORKSPACE_RUN: { run: true },
+  WORKSPACE_UNLINK: { unlink: true },
   WORKSPACE_UPGRADE: { upgrade: true, up: true },
   WORKSPACES: { workspaces: true, ws: true },
   WORKSPACES_ADD: { add: true },
@@ -339,6 +341,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
       return commands.workspaceExec(
         commands.toWorkspaceExecOptions(workspaceArgs, flags)
       );
+    } else if (commandMap.WORKSPACE_LINK[workspaceCommand]) {
+      return commands.workspacelink(
+        commands.toWorkspacelinkOptions(workspaceArgs, flags)
+      );
     } else if (commandMap.WORKSPACE_REMOVE[workspaceCommand]) {
       return commands.workspaceRemove(
         commands.toWorkspaceRemoveOptions(workspaceArgs, flags)
@@ -346,6 +352,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     } else if (commandMap.WORKSPACE_RUN[workspaceCommand]) {
       return commands.workspaceRun(
         commands.toWorkspaceRunOptions(workspaceArgs, flags)
+      );
+    } else if (commandMap.WORKSPACE_UNLINK[workspaceCommand]) {
+      return commands.workspaceUnlink(
+        commands.toWorkspaceUnlinkOptions(workspaceArgs, flags)
       );
     } else if (commandMap.WORKSPACE_UPGRADE[workspaceCommand]) {
       return commands.workspaceUpgrade(

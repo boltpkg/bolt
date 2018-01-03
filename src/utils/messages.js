@@ -321,3 +321,11 @@ Try removing the directory or fixing the package and run bolt again.`;
 export function unsafeCycles(): Message {
   return 'Task ran with unsafe dependency cycles in workspaces.';
 }
+
+export function linkInternalPackage(internalPackageName: string): Message {
+  return `Cannot link project package (${internalPackageName}), as these are already linked`;
+}
+
+export function unlinkInternalPackage(internalPackageName: string): Message {
+  return `Cannot unlink project package (${internalPackageName})`;
+}
