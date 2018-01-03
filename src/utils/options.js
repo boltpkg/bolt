@@ -24,6 +24,14 @@ export function boolean(val: mixed, name: string): boolean | void {
   }
 }
 
+export function number(val: mixed, name: string): number | void {
+  if (typeof val !== 'undefined' && typeof val !== 'number') {
+    throw new Error(`Flag "${name}" must be number`);
+  } else {
+    return val;
+  }
+}
+
 export function toFilterOpts(flags: Flags) {
   let filterOpts = {};
 
