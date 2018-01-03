@@ -21,7 +21,7 @@ describe('workspace link', () => {
   it('should create link to package if there are no packages to link in args', async () => {
     const pathToFooWorksapce = path.join(projectDir, 'packages', 'foo');
     await workspacelink(toWorkspacelinkOptions(['foo'], { cwd: projectDir }));
-    expect(yarn.link).toHaveBeenCalledWith(pathToFooWorksapce);
+    expect(yarn.cliCommand).toHaveBeenCalledWith(pathToFooWorksapce, 'link');
   });
 
   it('should link packages to root of project', async () => {

@@ -11,6 +11,8 @@ describe('bolt why', () => {
         cwd: 'dummyPattern/dummyPath'
       })
     );
-    expect(yarn.why).toHaveBeenCalledWith('dummyPattern/dummyPath', ['jest']);
+    expect(
+      yarn.cliCommand
+    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'why', ['jest']);
   });
 });

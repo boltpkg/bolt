@@ -22,7 +22,7 @@ export async function create(opts: CreateOptions) {
   let cwd = opts.cwd || process.cwd();
 
   try {
-    await yarn.create(cwd, opts.args);
+    await yarn.cliCommand(cwd, 'create', opts.args);
   } catch (err) {
     throw new BoltError(err);
   }

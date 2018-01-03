@@ -44,7 +44,7 @@ export async function link(opts: LinkOptions) {
         if (workspaceMap.has(packageToLink)) {
           logger.warn(messages.linkInternalPackage(packageToLink));
         } else {
-          await yarn.link(cwd, packageToLink);
+          await yarn.cliCommand(cwd, 'link', [packageToLink]);
         }
       })
     );

@@ -21,7 +21,7 @@ export function toWhyOptions(
 export async function why(opts: WhyOptions) {
   let cwd = opts.cwd || process.cwd();
   try {
-    await yarn.why(cwd, opts.args);
+    await yarn.cliCommand(cwd, 'why', opts.args);
   } catch (err) {
     throw new BoltError(err);
   }

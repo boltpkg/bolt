@@ -67,23 +67,18 @@ describe('utils/yarn', () => {
   });
   describe('run()', () => {});
   describe('init()', () => {});
-  describe('licenses()', () => {
-    let cwd;
+  describe('cliCommand()', () => {
     let localYarn;
     beforeEach(async () => {
-      // just a dummy path for testing
-      cwd = 'dummyPattern/dummyPath';
       localYarn = path.join(await getLocalBinPath(), 'yarn');
     });
-
-    it('should be able to call licenses with list script if no scripts are passes', async () => {
-      await yarn.licenses(cwd);
-      assertSpawnCalls(localYarn, ['licenses', 'list'], cwd);
+    it('should be able to handle spawnArgs', async () => {
+      await yarn.cliCommand('dummyPattern/dummyPath', 'test', ['jest']);
+      assertSpawnCalls(localYarn, ['test', 'jest'], 'dummyPattern/dummyPath');
     });
-
-    it('should be able to call licenses with passed script option', async () => {
-      await yarn.licenses(cwd, 'generate-disclaimer');
-      assertSpawnCalls(localYarn, ['licenses', 'generate-disclaimer'], cwd);
+    it('should be able to handle empty spawnArgs', async () => {
+      await yarn.cliCommand('dummyPattern/dummyPath', 'test', []);
+      assertSpawnCalls(localYarn, ['test'], 'dummyPattern/dummyPath');
     });
   });
 });

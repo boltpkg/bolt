@@ -21,7 +21,7 @@ export function toOutdatedOptions(
 export async function outdated(opts: OutdatedOptions) {
   let cwd = opts.cwd || process.cwd();
   try {
-    await yarn.outdated(cwd, opts.args);
+    await yarn.cliCommand(cwd, 'outdated', opts.args);
   } catch (err) {
     throw new BoltError(err);
   }

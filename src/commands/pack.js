@@ -25,7 +25,7 @@ export async function pack(opts: PackOptions) {
   let fileName = opts.fileName ? [`--filename=${opts.fileName}`] : [];
 
   try {
-    await yarn.pack(cwd, fileName);
+    await yarn.cliCommand(cwd, 'pack', fileName);
   } catch (err) {
     throw new BoltError(err);
   }

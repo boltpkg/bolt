@@ -13,9 +13,10 @@ describe('bolt licenses generate-disclaimer', () => {
       toLicensesGenerateDisclaimerOptions([], { cwd: 'dummyPattern/dummyPath' })
     );
 
-    expect(yarn.licenses).toHaveBeenCalledWith(
-      'dummyPattern/dummyPath',
+    expect(
+      yarn.cliCommand
+    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'licenses', [
       'generate-disclaimer'
-    );
+    ]);
   });
 });
