@@ -8,37 +8,26 @@ export type InfoOptions = {|
   args: options.Args
 |};
 
-function flagsToArgs(flagArgs: options.Flags): Array<string> {
-  const flagArgsKey = Object.keys(flagArgs);
-  // Flags has default -- key
-  if (flagArgsKey.length < 1) {
-    return [];
-  }
-  const flag = [];
-  flagArgsKey.forEach(key => {
-    if (flagArgs[key] === true) {
-      flag.push(`--${key}`);
-    }
-  });
-  return flag;
-}
-
 export function toInfoOptions(
   args: options.Args,
   flags: options.Flags
 ): InfoOptions {
-  const infoFlagArgs = flagsToArgs(flags);
-  const infoSpawnArgs = Array.prototype.concat([], args, infoFlagArgs);
+  console.log('flags', flags);
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    args: infoSpawnArgs
+    args,
+    flags
   };
 }
 
 export async function info(opts: InfoOptions) {
   let cwd = opts.cwd || process.cwd();
+  const spawnArgs = Array.prototype.concat([], opts.args);
+  if (opts.flags.json) {
+    spawnArgs.push('--json');
+  }
   try {
-    await yarn.info(cwd, opts.args);
+    // await yarn.info(cwd, spawnArgs);
   } catch (err) {
     throw new BoltError(err);
   }
