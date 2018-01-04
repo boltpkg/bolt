@@ -12,7 +12,6 @@ export function toInfoOptions(
   args: options.Args,
   flags: options.Flags
 ): InfoOptions {
-  console.log('flags', flags);
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     args,
@@ -27,7 +26,7 @@ export async function info(opts: InfoOptions) {
     spawnArgs.push('--json');
   }
   try {
-    // await yarn.info(cwd, spawnArgs);
+    await yarn.info(cwd, spawnArgs);
   } catch (err) {
     throw new BoltError(err);
   }
