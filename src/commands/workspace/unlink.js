@@ -47,6 +47,6 @@ export async function workspaceUnlink(opts: WorkspaceUnlinkOptions) {
       await unlink.toUnlinkOptions(packagesToUnlink, { '--': [] })
     );
   } else {
-    await yarn.unlink(workspace.pkg.dir);
+    await yarn.cliCommand(workspace.pkg.dir, 'unlink');
   }
 }

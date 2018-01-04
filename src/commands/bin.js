@@ -20,7 +20,7 @@ export async function bin(opts: BinOptions) {
   let cwd = opts.cwd || process.cwd();
 
   try {
-    await yarn.bin(cwd);
+    await yarn.cliCommand(cwd, 'bin');
   } catch (err) {
     throw new BoltError(err);
   }

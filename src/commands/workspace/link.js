@@ -45,6 +45,6 @@ export async function workspacelink(opts: WorkspaceLinkOptions) {
   if (packagesToLink && packagesToLink.length) {
     await link.link(await link.toLinkOptions(packagesToLink, { '--': [] }));
   } else {
-    await yarn.link(workspace.pkg.dir);
+    await yarn.cliCommand(workspace.pkg.dir, 'link');
   }
 }

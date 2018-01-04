@@ -67,4 +67,18 @@ describe('utils/yarn', () => {
   });
   describe('run()', () => {});
   describe('init()', () => {});
+  describe('cliCommand()', () => {
+    let localYarn;
+    beforeEach(async () => {
+      localYarn = path.join(await getLocalBinPath(), 'yarn');
+    });
+    it('should be able to handle spawnArgs', async () => {
+      await yarn.cliCommand('dummyPattern/dummyPath', 'test', ['jest']);
+      assertSpawnCalls(localYarn, ['test', 'jest'], 'dummyPattern/dummyPath');
+    });
+    it('should be able to handle empty spawnArgs', async () => {
+      await yarn.cliCommand('dummyPattern/dummyPath', 'test', []);
+      assertSpawnCalls(localYarn, ['test'], 'dummyPattern/dummyPath');
+    });
+  });
 });

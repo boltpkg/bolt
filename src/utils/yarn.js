@@ -115,37 +115,14 @@ export async function remove(dependencies: Array<string>, cwd: string) {
   });
 }
 
-export async function bin(cwd: string) {
+export async function cliCommand(
+  cwd: string,
+  command: string = '',
+  spawnArgs: Array<string> = []
+) {
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  await processes.spawn(localYarn, ['bin'], {
-    cwd,
-    tty: true
-  });
-}
 
-export async function link(cwd: string, packageToLink?: string) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  let spawnArgs = ['link'];
-
-  if (packageToLink) {
-    spawnArgs.push(packageToLink);
-  }
-
-  await processes.spawn(localYarn, spawnArgs, {
-    cwd,
-    tty: true
-  });
-}
-
-export async function unlink(cwd: string, packageToLink?: string) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  let spawnArgs = ['unlink'];
-
-  if (packageToLink) {
-    spawnArgs.push(packageToLink);
-  }
-
-  await processes.spawn(localYarn, spawnArgs, {
+  return await processes.spawn(localYarn, [command, ...spawnArgs], {
     cwd,
     tty: true
   });

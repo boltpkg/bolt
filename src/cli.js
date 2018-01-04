@@ -106,18 +106,16 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
   } else if (commandMap.BIN[command]) {
     return commands.bin(commands.toBinOptions(commandArgs, flags));
   } else if (commandMap.CACHE[command]) {
-    return commands.build(commands.toBuildOptions(commandArgs, flags));
-  } else if (commandMap.CACHE_CLEAN[command]) {
-    if (commandMap.CACHE_DIR[command]) {
+    if (commandMap.CACHE_CLEAN[subCommand]) {
       return commands.cacheClean(
         commands.toCacheCleanOptions(subCommandArgs, flags)
       );
-    } else if (commandMap.CACHE_DIR[command]) {
+    } else if (commandMap.CACHE_DIR[subCommand]) {
       return commands.cacheDir(
         commands.toCacheDirOptions(subCommandArgs, flags)
       );
     } else if (
-      commandMap.CACHE_LIST[command] ||
+      commandMap.CACHE_LIST[subCommand] ||
       typeof subCommand === 'undefined'
     ) {
       return commands.cacheList(

@@ -45,7 +45,7 @@ export async function unlink(opts: UnlinkOptions) {
         if (workspaceMap.has(packageToUnlink)) {
           logger.warn(messages.unlinkInternalPackage(packageToUnlink));
         } else {
-          await yarn.unlink(cwd, packageToUnlink);
+          await yarn.cliCommand(cwd, 'unlink', [packageToUnlink]);
         }
       })
     );

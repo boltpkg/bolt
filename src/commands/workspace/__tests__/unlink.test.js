@@ -23,7 +23,7 @@ describe('workspace unlink', () => {
     await workspaceUnlink(
       toWorkspaceUnlinkOptions(['foo'], { cwd: projectDir })
     );
-    expect(yarn.unlink).toHaveBeenCalledWith(pathToFooWorksapce);
+    expect(yarn.cliCommand).toHaveBeenCalledWith(pathToFooWorksapce, 'unlink');
   });
 
   it('should link packages to root of project', async () => {
