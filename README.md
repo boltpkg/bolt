@@ -2,6 +2,8 @@
 
 > Super-powered JavaScript project management
 
+[![Build Status](https://travis-ci.org/boltpkg/bolt.svg?branch=master)](https://travis-ci.org/boltpkg/bolt)
+
 ### Introduction
 
 Find it difficult to manage lots of components, libraries, or services?
