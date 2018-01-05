@@ -6,9 +6,9 @@
 
 ### Introduction
 
-Are you sharing components, libraries or services between different projects and find it difficult to manage?
-Juggling lots of Node packages in lots of different repositories? What if there
-was a better way?
+Are you sharing components, libraries or services between different projects and
+find it difficult to manage? Juggling lots of Node packages in lots of different
+repositories? What if there was a better way?
 
 ![Diagram: One package per project](https://raw.githubusercontent.com/boltpkg/assets/master/diagram-multirepo.png)
 
@@ -25,13 +25,16 @@ Instead of all that, what if you put all of your packages together?
 
 ![Diagram: Project with many packages](https://raw.githubusercontent.com/boltpkg/assets/master/diagram-monorepo.png)
 
-This is the idea behind "workspaces" = packages, grouped inside a single repo, also called "monorepo" ([more about this approach](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/)).
-
-Note: does that remind you of a tool called [lerna](https://github.com/lerna/lerna)? Indeed, bolt is a new take at solving some of the same problems.
+This is the idea behind "workspaces".
 
 #### What are workspaces?
 
-Within a project, a workspace is just a directory with its own `package.json`.
+A _workspace_ is like any other node package: It's just a directory with its
+own `package.json`.
+
+Workspaces are grouped into a single "project". A _project_ is also just a
+node package at the root of your repository. This is sometimes referred to
+as a "monorepo", but we prefer the term "multi-package repo".
 
 ```
 project
@@ -55,6 +58,10 @@ Using Bolt, you can install the dependencies for all of these packages at once
 But here's where it gets really cool: When you specify a dependency from one
 workspace to another. It will get linked to the actual source. This way, when
 you go to test your code. All your changes get tested together.
+
+> **Note:** This idea is not new, other tools like [Lerna](https://lernajs.io)
+> have existed for awhile and are used by many projects. Bolt is a fresh take
+> on the idea.
 
 #### What is Bolt?
 
@@ -135,15 +142,19 @@ yarn global add bolt
 | └ `bolt g license [license]`            | Create a LICENSE file in your package (Default: MIT)                      |❌|
 
 ## Configuration
+
 Bolt config is in the root `package.json`.
 
 For examples, for declaring workspaces in sub-directories:
+
 ```json
-"name": "mono-repo",
-"bolt": {
+{
+  "name": "my-project",
+  "bolt": {
     "workspaces": [
       "utils/*",
       "apps/*"
     ]
   }
+}
 ```
