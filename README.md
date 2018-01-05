@@ -25,7 +25,7 @@ Instead of all that, what if you put all of your packages together?
 
 ![Diagram: Project with many packages](https://raw.githubusercontent.com/boltpkg/assets/master/diagram-monorepo.png)
 
-This is the idea behind "workspaces" = packages, grouped inside a single repo, also called "monorepo". [more about this approach](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/)
+This is the idea behind "workspaces" = packages, grouped inside a single repo, also called "monorepo" ([more about this approach](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/)).
 
 Note: does that remind you of a tool called [lerna](https://github.com/lerna/lerna)? Indeed, bolt is a new take at solving some of the same problems.
 
@@ -144,6 +144,6 @@ For examples, for declaring workspaces in sub-directories:
     "workspaces": [
       "utils/*",
       "apps/*"
-    }
+    ]
   }
 ```
