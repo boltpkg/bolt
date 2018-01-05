@@ -6,14 +6,14 @@
 
 ### Introduction
 
-Find it difficult to manage lots of components, libraries, or services?
+Are you sharing components, libraries or services between different projects and find it difficult to manage?
 Juggling lots of Node packages in lots of different repositories? What if there
 was a better way?
 
 ![Diagram: One package per project](https://raw.githubusercontent.com/boltpkg/assets/master/diagram-multirepo.png)
 
 Most JavaScript projects have 1 package per project (repo). So when you have
-lots of packages, you have to do a lot of work to manage them all.
+lots of packages, you have to do a lot of work to manage them all:
 
 - You need to install every single package one by one.
 - If you make changes to one package and want to test them in another, you need
@@ -25,7 +25,9 @@ Instead of all that, what if you put all of your packages together?
 
 ![Diagram: Project with many packages](https://raw.githubusercontent.com/boltpkg/assets/master/diagram-monorepo.png)
 
-This is the idea behind "workspaces".
+This is the idea behind "workspaces" = packages, grouped inside a single repo, also called "monorepo". [more about this approach](https://yarnpkg.com/blog/2017/08/02/introducing-workspaces/)
+
+Note: does that remind you of a tool called [lerna](https://github.com/lerna/lerna)? Indeed, bolt is a new take at solving some of the same problems.
 
 #### What are workspaces?
 
@@ -43,8 +45,9 @@ project
 ```
 
 Put another way, workspaces are just like any other package, except they are
-nested within a larger project. Each workspace can have its own dependencies
-with its own code and scripts.
+nested within a larger project/repo. Each workspace can have its own dependencies
+with its own code and scripts. Workspaces can also be grouped into
+sub-directories for further organization.
 
 Using Bolt, you can install the dependencies for all of these packages at once
 (and you can do it really really fast).
@@ -130,3 +133,17 @@ yarn global add bolt
 | └ `bolt p upgrade [dependency]`         | Upgrade a dependency on the project package                               |❌|
 | `bolt generate/g [generator]`           | **Create files in your package using a generator:**                       ||
 | └ `bolt g license [license]`            | Create a LICENSE file in your package (Default: MIT)                      |❌|
+
+## Configuration
+Bolt config is in the root `package.json`.
+
+For examples, for declaring workspaces in sub-directories:
+```json
+"name": "mono-repo",
+"bolt": {
+    "workspaces": [
+      "utils/*",
+      "apps/*"
+    }
+  }
+```
