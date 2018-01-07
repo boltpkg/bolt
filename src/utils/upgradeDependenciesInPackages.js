@@ -9,11 +9,13 @@ import { BoltError } from './errors';
 import * as logger from './logger';
 import * as yarn from './yarn';
 import updatePackageVersions from '../functions/updatePackageVersions';
+import updateWorkspaceDependencies from '../functions/updateWorkspaceDependencies';
 
 export default async function upgradeDependenciesInPackage(
   project: Project,
   pkg: Package,
-  dependencies: Array<Dependency>
+  dependencies: Array<Dependency>,
+  flags: Array<string>
 ) {
   const workspaces = await project.getWorkspaces();
   const pkgDependencies = pkg.getAllDependencies();
@@ -31,24 +33,25 @@ export default async function upgradeDependenciesInPackage(
           messages.cannotUpgradeWorkspaceDependencyInProject(dep.name)
         );
       });
-      throw new BoltError();
+      throw new BoltError(
+        'Internal packages are symlinked, there is no need update them'
+      );
     }
   }
 
-  await yarn.upgrade(project.pkg, externalDeps);
+  await yarn.upgrade(project.pkg, externalDeps, flags);
 
   // we reinitialise the project config because it may be modified externally by yarn
   const newProject = await Project.init(project.pkg.dir);
   // get the new versions of everything from the project config
-  const newProjectDependencies = project.pkg.getAllDependencies();
+  const newProjectDependencies = newProject.pkg.getAllDependencies();
   const depsToUpgrade = {};
 
-  externalDeps.forEach(dep => {
-    // TODO: Should we bother checking if the dep exists in the project? It /should/
-    depsToUpgrade[dep.name] = newProjectDependencies.get(dep.name);
+  newProjectDependencies.forEach((value, key) => {
+    depsToUpgrade[key] = value;
   });
 
-  console.log(depsToUpgrade);
-
-  await updatePackageVersions(depsToUpgrade, { cwd: project.pkg.dir });
+  return await updateWorkspaceDependencies(depsToUpgrade, {
+    cwd: project.pkg.dir
+  });
 }

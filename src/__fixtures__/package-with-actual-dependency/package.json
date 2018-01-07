@@ -1,0 +1,15 @@
+{
+  "name": "package-with-actual-dependency",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  },
+  "dependencies": {
+    "lodash": "^2",
+    "project-bin-path": "^1.1.1"
+  }
+}
