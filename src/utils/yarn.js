@@ -50,19 +50,25 @@ export async function add(
   });
 }
 
-export async function upgrade(pkg: Package, dependencies: Array<Dependency>) {
+export async function upgrade(
+  pkg: Package,
+  dependencies: Array<Dependency> = [],
+  flags: Array<string> = []
+) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
   const spawnArgs = ['upgrade'];
-  if (!dependencies.length) return;
 
-  dependencies.forEach(dep => {
-    if (dep.version) {
-      spawnArgs.push(`"${dep.name}@${dep.version}"`);
-    } else {
-      spawnArgs.push(dep.name);
-    }
-  });
+  if (dependencies.length) {
+    dependencies.forEach(dep => {
+      if (dep.version) {
+        spawnArgs.push(`"${dep.name}@${dep.version}"`);
+      } else {
+        spawnArgs.push(dep.name);
+      }
+    });
+  }
 
-  await processes.spawn('yarn', spawnArgs, {
+  await processes.spawn(localYarn, [...spawnArgs, ...flags], {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true
