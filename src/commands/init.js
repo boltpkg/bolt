@@ -23,9 +23,13 @@ export function toInitOptions(
 
 export async function init(opts: InitOptions) {
   let cwd = opts.cwd || process.cwd();
+  let spawnArgs = ['-s'];
+
+  if (opts.args.private) spawnArgs.push('-p');
+  if (opts.args.yes) spawnArgs.push('-y');
 
   try {
-    await yarn.init(cwd, opts.args);
+    await yarn.cliCommand(cwd, 'init', spawnArgs);
   } catch (err) {
     throw new BoltError(`Unable to create new package due to: ${err}`);
   }
