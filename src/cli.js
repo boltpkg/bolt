@@ -8,6 +8,7 @@ import { BoltError } from './utils/errors';
 import cleanStack from 'clean-stack';
 import * as commands from './commands';
 import * as options from './utils/options';
+import * as flagHelpers from './functions/flagHelper';
 
 const commandMap = {
   ADD: { add: true },
@@ -99,7 +100,12 @@ const commandMap = {
   WORKSPACES_UPGRADE: { upgrade: true, up: true }
 };
 
-function runCommandFromCli(args: options.Args, flags: options.Flags) {
+function runCommandFromCli(args: options.Args, flags: options.Flags, pureArgs) {
+  console.log(flags);
+  let flagsArgs = flagHelpers.identifyFlags(pureArgs);
+  let { additionalArgs, updatedFlags } = flagHelpers.extractPossibleArgs(flags);
+
+  args = args.concat(additionalArgs);
   let [command, ...commandArgs] = args;
   let [subCommand, ...subCommandArgs] = commandArgs;
 
@@ -425,7 +431,7 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
   processes.handleSignals();
 
   try {
-    await runCommandFromCli(input, flags);
+    await runCommandFromCli(input, flags, argv);
   } catch (err) {
     if (err instanceof BoltError) {
       logger.error(err.message);
