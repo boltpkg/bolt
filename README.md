@@ -126,10 +126,10 @@ yarn global add bolt
 | └ `bolt ws exec -- [cmd]`               | Run a shell cmd in every package                                          |✅|
 | └ `bolt ws upgrade [dependency]`        | Upgrade a dependency from every package that depends on it                |❌|
 | └ `bolt ws remove [dependency]`         | Remove a dependency from every package that depends on it                 |✅|
-| └ `bolt ws ... --only [name glob]`      | Filter workspaces by name                                                 |❌|
-| └ `bolt ws ... --ignore [name glob]`    | Filter out workspaces by name                                             |❌|
-| └ `bolt ws ... --only-fs [file glob]`   | Filter workspaces by file path                                            |❌|
-| └ `bolt ws ... --ignore-fs [file glob]` | Filter out workspaces by file path                                        |❌|
+| └ `bolt ws ... --only [name glob]`      | Filter workspaces by name                                                 |✅|
+| └ `bolt ws ... --ignore [name glob]`    | Filter out workspaces by name                                             |✅|
+| └ `bolt ws ... --only-fs [file glob]`   | Filter workspaces by file path                                            |✅|
+| └ `bolt ws ... --ignore-fs [file glob]` | Filter out workspaces by file path                                        |✅|
 | `bolt workspace/w [name]`               | **Run the following commands on a single workspace:**                     ||
 | └ `bolt w [name] run [script]`          | Run a script in a single workspace                                        |✅|
 | └ `bolt w [name] add [dependency]`      | Add a dependency to a single workspace                                    |✅|
