@@ -123,6 +123,7 @@ yarn global add bolt
 | `bolt bin`                              | Print the folder where executable files for the package will be installed |✅|
 | `bolt workspaces/ws`                    | **Run the following commands across all workspaces:**                     ||
 | └ `bolt ws run [script]`                | Run a script in every package                                             |✅|
+| └ `bolt ws exec -- [cmd]`               | Run a shell cmd in every package                                          |✅|
 | └ `bolt ws upgrade [dependency]`        | Upgrade a dependency from every package that depends on it                |❌|
 | └ `bolt ws remove [dependency]`         | Remove a dependency from every package that depends on it                 |✅|
 | └ `bolt ws ... --only [name glob]`      | Filter workspaces by name                                                 |❌|
