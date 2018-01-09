@@ -99,14 +99,6 @@ export async function getScript(pkg: Package, script: string) {
   return result;
 }
 
-export async function init(cwd: string) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  await processes.spawn(localYarn, ['init', '-s'], {
-    cwd: cwd,
-    tty: true
-  });
-}
-
 export async function remove(dependencies: Array<string>, cwd: string) {
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
   await processes.spawn(localYarn, ['remove', ...dependencies], {

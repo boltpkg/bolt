@@ -55,3 +55,12 @@ export function toDependency(dependencyString: string): Dependency {
   }
   return version ? { name, version } : { name };
 }
+
+export function toYarnInit(flags: Flags) {
+  let flagOpts = {};
+
+  if (flags.yes || flags.y) flagOpts.yes = true;
+  if (flags.private || flags.p) flagOpts.private = true;
+
+  return flagOpts;
+}
