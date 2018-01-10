@@ -1,8 +1,8 @@
 ## Developing
 
-**Note:** Recommended to use Node > 8.5, and Node < 4 is not supported
+**Note:** Recommended to use Node > 8.5, (*Node < 4 is not supported*)
 
-> Please make sure your have [yarn](https://yarnpkg.com/en/docs/install) installed
+> Please make sure you have latest [yarn](https://yarnpkg.com/en/docs/install) installed
 
 Folder Structure:
 
@@ -10,13 +10,16 @@ Folder Structure:
 - bin.js                         # node executable, this where bolt starts
   - src
     - cli.js                     # taking in user args, and converting them to command map, - also calls the command as per argv
-    - Package.js
-    - Project.js
-    - types.js
-    - Workspace.js
+    - Package.js                 # exports function to initialise a package
+    - Project.js                 # exports function to initialise a project
+    - types.js                   # flow types
+    - Workspace.js               # # exports function to initialise a workspace
     - commands                   # all the commands are here
       - workspace                # workspace related commands
       - workspaces               # workspaces related commands
+      : : : : : : :
+      - add.js                   # bolt add command
+      - bin.js                   # bolt bin command
       : : : : : : :
     - utils
       - messages.js              # log messages
@@ -26,8 +29,7 @@ Folder Structure:
 
 SetUp:
 
-- Fork the repo
-- Clone repo - `git clone git@github.com:<your-git-username->/bolt.git`
+- Clone the repo - `git clone https://github.com/boltpkg/bolt.git`
 - cd into the repo, `cd bolt`
 - install dependencies - `yarn install`
 
