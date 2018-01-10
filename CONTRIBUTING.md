@@ -4,7 +4,7 @@
 
 > Please make sure you have latest [yarn](https://yarnpkg.com/en/docs/install) installed
 
-Folder Structure:
+### Folder Structure:
 
 ```yml
 - bin.js                         # node executable, this where bolt starts
@@ -13,7 +13,7 @@ Folder Structure:
     - Package.js                 # exports function to initialise a package
     - Project.js                 # exports function to initialise a project
     - types.js                   # flow types
-    - Workspace.js               # # exports function to initialise a workspace
+    - Workspace.js               # exports function to initialise a workspace
     - commands                   # all the commands are here
       - workspace                # workspace related commands
       - workspaces               # workspaces related commands
@@ -27,13 +27,13 @@ Folder Structure:
       : : : : : : :
 ```
 
-SetUp:
+### SetUp:
 
 - Clone the repo - `git clone https://github.com/boltpkg/bolt.git`
 - cd into the repo, `cd bolt`
 - install dependencies - `yarn install`
 
-Develop:
+### Develop:
 
 Running the build in watch mode:
 
@@ -41,7 +41,7 @@ Running the build in watch mode:
 yarn build:modern --watch
 ```
 
-Testing:
+### Testing:
 
 Running test in watch mode:
 
