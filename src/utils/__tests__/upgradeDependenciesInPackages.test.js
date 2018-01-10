@@ -12,7 +12,7 @@ import Package from '../../Package';
 import Config from '../../Config';
 
 jest.mock('../yarn');
-// jest.mock('../logger');
+jest.mock('../logger');
 
 const unsafeYarn: any & typeof yarn = yarn;
 
@@ -33,7 +33,6 @@ async function depsAtVersion(pkgPath: string, expectedDeps: DependencySet) {
   Object.entries(expectedDeps).forEach(([name, version]) => {
     allDepsCorrect = allDepsCorrect && deps.get(name) === version;
   });
-  console.log(deps);
   return allDepsCorrect;
 }
 

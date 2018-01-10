@@ -15,7 +15,7 @@ export default async function upgradeDependenciesInPackage(
   project: Project,
   pkg: Package,
   dependencies: Array<Dependency>,
-  flags: Array<string>
+  flags?: Array<string>
 ) {
   const workspaces = await project.getWorkspaces();
   const pkgDependencies = pkg.getAllDependencies();

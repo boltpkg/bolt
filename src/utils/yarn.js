@@ -32,7 +32,7 @@ export async function add(
 
   dependencies.forEach(dep => {
     if (dep.version) {
-      spawnArgs.push(`"${dep.name}@${dep.version}"`);
+      spawnArgs.push(`${dep.name}@${dep.version}`);
     } else {
       spawnArgs.push(dep.name);
     }
