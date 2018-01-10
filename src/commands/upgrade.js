@@ -6,7 +6,7 @@ import Package from '../Package';
 import type { Dependency } from '../types';
 import upgradeDependenciesInPackage from '../utils/upgradeDependenciesInPackages';
 
-// TODO: pass flags individially, upgrade as many flags this is here for testing
+// TODO: pass flags individially, upgrade has many flags this is here for testing
 function toScriptFlags(flags: options.Flags) {
   let scriptFlags = [];
 
