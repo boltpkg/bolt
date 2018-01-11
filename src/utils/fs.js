@@ -41,6 +41,10 @@ function unlink(filePath: string) {
   return promisify(cb => fs.unlink(filePath, cb));
 }
 
+export function realpath(filePath: string) {
+  return promisify(cb => fs.realpath(filePath, cb));
+}
+
 function _symlink(src: string, dest: string, type: string) {
   return promisify(cb => fs.symlink(src, dest, type, cb));
 }
