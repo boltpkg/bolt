@@ -33,7 +33,7 @@ export class ChildProcessError extends Error {
   }
 }
 
-type SpawnOptions = {
+export type SpawnOptions = {
   cwd?: string,
   pkg?: Package,
   silent?: boolean,
@@ -51,6 +51,7 @@ export function spawn(
       new Promise((resolve, reject) => {
         let stdoutBuf = Buffer.from('');
         let stderrBuf = Buffer.from('');
+        let isTTY = process.stdout.isTTY && opts.tty;
 
         let cmdStr = cmd + ' ' + args.join(' ');
 
@@ -59,7 +60,7 @@ export function spawn(
           env: opts.env || process.env
         };
 
-        if (opts.tty) {
+        if (isTTY) {
           spawnOpts.shell = true;
           spawnOpts.stdio = 'inherit';
         }
