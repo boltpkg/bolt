@@ -320,7 +320,7 @@ describe('Project', () => {
       });
 
       expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
-      expect(logger.error).toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalled();
     });
   });
 });
