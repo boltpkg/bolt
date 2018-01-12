@@ -1,11 +1,12 @@
 // @flow
 import path from 'path';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
-
 import symlinkPackageDependencies from '../symlinkPackageDependencies';
 import * as fs from '../fs';
 import * as yarn from '../yarn';
 import Project from '../../Project';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../yarn');
 
@@ -14,7 +15,7 @@ const unsafeYarn: any & typeof yarn = yarn;
 
 async function dirExists(dir: string) {
   try {
-    const stat = await fs.stat(dir);
+    let stat = await fs.stat(dir);
     return stat.isDirectory();
   } catch (err) {
     return false;
@@ -23,7 +24,7 @@ async function dirExists(dir: string) {
 
 async function symlinkExists(dir: string, symlink: string) {
   try {
-    const stat = await fs.lstat(path.join(dir, symlink));
+    let stat = await fs.lstat(path.join(dir, symlink));
     return stat.isSymbolicLink();
   } catch (err) {
     return false;
@@ -38,10 +39,7 @@ describe('utils/symlinkPackageDependencies()', () => {
   let nodeModulesBin;
 
   beforeEach(async () => {
-    const tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'nested-workspaces-with-root-dependencies-installed'
-    );
+    let tempDir = f.copy('nested-workspaces-with-root-dependencies-installed');
     project = await Project.init(tempDir);
     workspaces = await project.getWorkspaces();
   });
@@ -53,7 +51,7 @@ describe('utils/symlinkPackageDependencies()', () => {
   describe('linking packages', () => {
     beforeEach(() => {
       // We use the foo package as it has internal and external dependencies
-      const workspaceToSymlink =
+      let workspaceToSymlink =
         project.getWorkspaceByName(workspaces, 'foo') || {};
       pkgToSymlink = workspaceToSymlink.pkg;
       nodeModules = pkgToSymlink.nodeModules;
@@ -95,7 +93,7 @@ describe('utils/symlinkPackageDependencies()', () => {
       await symlinkPackageDependencies(project, pkgToSymlink, ['bar']);
 
       expect(yarn.runIfExists).toHaveBeenCalledTimes(4);
-      const yarnCalls = unsafeYarn.runIfExists.mock.calls;
+      let yarnCalls = unsafeYarn.runIfExists.mock.calls;
       expect(yarnCalls[0][1]).toEqual('preinstall');
       expect(yarnCalls[1][1]).toEqual('postinstall');
       expect(yarnCalls[2][1]).toEqual('prepublish');
@@ -107,7 +105,7 @@ describe('utils/symlinkPackageDependencies()', () => {
     beforeEach(() => {
       // We use the zee package as it has internal and external dependencies that have various
       // kinds of bin set ups
-      const workspaceToSymlink =
+      let workspaceToSymlink =
         project.getWorkspaceByName(workspaces, 'zee') || {};
       pkgToSymlink = workspaceToSymlink.pkg;
       nodeModules = pkgToSymlink.nodeModules;

@@ -1,6 +1,4 @@
 // @flow
-
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
 import path from 'path';
 
 import addDependenciesToPackage from '../addDependenciesToPackages';
@@ -9,6 +7,9 @@ import * as yarn from '../yarn';
 import Project from '../../Project';
 import Package from '../../Package';
 import Config from '../../Config';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../yarn');
 jest.mock('../logger');
@@ -41,8 +42,8 @@ describe('utils/addDependenciesToPackages', () => {
   });
 
   test('it should just yarn add at the root when run from the root of a project', async () => {
-    const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
-    const project = await Project.init(cwd);
+    let cwd = f.copy('nested-workspaces');
+    let project = await Project.init(cwd);
 
     await addDependenciesToPackage(project, project.pkg, [{ name: 'chalk' }]);
 
@@ -55,13 +56,10 @@ describe('utils/addDependenciesToPackages', () => {
   });
 
   test('it should still run yarn add at the root when run from another package', async () => {
-    const rootDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'nested-workspaces'
-    );
-    const project = await Project.init(rootDir);
-    const workspaces = await project.getWorkspaces();
-    const wsToRunIn = project.getWorkspaceByName(workspaces, 'foo') || {};
+    let rootDir = f.copy('nested-workspaces');
+    let project = await Project.init(rootDir);
+    let workspaces = await project.getWorkspaces();
+    let wsToRunIn = project.getWorkspaceByName(workspaces, 'foo') || {};
 
     await addDependenciesToPackage(project, wsToRunIn.pkg, [{ name: 'chalk' }]);
 
@@ -74,8 +72,8 @@ describe('utils/addDependenciesToPackages', () => {
   });
 
   test('it should not yarn install packages that are already installed', async () => {
-    const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
-    const project = await Project.init(cwd);
+    let cwd = f.copy('nested-workspaces');
+    let project = await Project.init(cwd);
 
     await addDependenciesToPackage(project, project.pkg, [{ name: 'react' }]);
 
@@ -83,10 +81,10 @@ describe('utils/addDependenciesToPackages', () => {
   });
 
   test('it should throw if version does not match version in project config', async () => {
-    const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
-    const project = await Project.init(cwd);
-    const workspaces = await project.getWorkspaces();
-    const wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
+    let cwd = f.copy('nested-workspaces');
+    let project = await Project.init(cwd);
+    let workspaces = await project.getWorkspaces();
+    let wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
 
     await expect(
       addDependenciesToPackage(project, wsToAddTo.pkg, [
@@ -96,13 +94,10 @@ describe('utils/addDependenciesToPackages', () => {
   });
 
   test('should call symlinkPackageDependencies to symlink dependencies in workspace', async () => {
-    const cwd = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
-    const project = await Project.init(cwd);
-    const workspaces = await project.getWorkspaces();
-    const wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
+    let cwd = f.copy('package-with-external-deps-installed');
+    let project = await Project.init(cwd);
+    let workspaces = await project.getWorkspaces();
+    let wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
 
     await addDependenciesToPackage(project, wsToAddTo.pkg, [
       { name: 'project-only-dep' }
@@ -114,13 +109,10 @@ describe('utils/addDependenciesToPackages', () => {
   });
 
   test('should update packages dependencies in package config', async () => {
-    const cwd = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
-    const project = await Project.init(cwd);
-    const workspaces = await project.getWorkspaces();
-    const wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
+    let cwd = f.copy('package-with-external-deps-installed');
+    let project = await Project.init(cwd);
+    let workspaces = await project.getWorkspaces();
+    let wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
 
     expect(wsToAddTo.pkg.getDependencyVersionRange('project-only-dep')).toEqual(
       null
@@ -138,13 +130,10 @@ describe('utils/addDependenciesToPackages', () => {
   });
 
   test('should be able to add packages with tagged versions (without specifying)', async () => {
-    const cwd = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
-    const project = await Project.init(cwd);
-    const workspaces = await project.getWorkspaces();
-    const wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
+    let cwd = f.copy('package-with-external-deps-installed');
+    let project = await Project.init(cwd);
+    let workspaces = await project.getWorkspaces();
+    let wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
 
     await addDependenciesToPackage(project, wsToAddTo.pkg, [
       { name: 'project-only-dep-with-beta-tag' }
@@ -158,10 +147,10 @@ describe('utils/addDependenciesToPackages', () => {
   describe('when adding internal package', () => {
     test('should set version as current version of internal package if no version passed', async () => {
       // i.e if we have bar 1.0.1 installed locally addDependenciesToPackages should add ^1.0.1
-      const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
-      const project = await Project.init(cwd);
-      const workspaces = await project.getWorkspaces();
-      const wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
+      let cwd = f.copy('nested-workspaces');
+      let project = await Project.init(cwd);
+      let workspaces = await project.getWorkspaces();
+      let wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
 
       expect(wsToAddTo.pkg.getDependencyVersionRange('baz')).toEqual(null);
       await addDependenciesToPackage(project, wsToAddTo.pkg, [{ name: 'baz' }]);
@@ -172,10 +161,10 @@ describe('utils/addDependenciesToPackages', () => {
 
     test('should allow any version range that satisfies local dep', async () => {
       // i.e if we have bar 1.0.1 installed locally ^1.0.0 should still install
-      const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
-      const project = await Project.init(cwd);
-      const workspaces = await project.getWorkspaces();
-      const wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
+      let cwd = f.copy('nested-workspaces');
+      let project = await Project.init(cwd);
+      let workspaces = await project.getWorkspaces();
+      let wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
 
       expect(wsToAddTo.pkg.getDependencyVersionRange('baz')).toEqual(null);
       await addDependenciesToPackage(project, wsToAddTo.pkg, [
@@ -187,10 +176,10 @@ describe('utils/addDependenciesToPackages', () => {
     });
 
     test('should throw if attempting to set to version that doesnt satisfy local', async () => {
-      const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
-      const project = await Project.init(cwd);
-      const workspaces = await project.getWorkspaces();
-      const wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
+      let cwd = f.copy('nested-workspaces');
+      let project = await Project.init(cwd);
+      let workspaces = await project.getWorkspaces();
+      let wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
 
       // local baz version is 1.0.0, so we'll install ^2.0.0
       await expect(
@@ -201,10 +190,10 @@ describe('utils/addDependenciesToPackages', () => {
     });
 
     test('should not add internal to root package', async () => {
-      const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
-      const project = await Project.init(cwd);
-      const workspaces = await project.getWorkspaces();
-      const wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
+      let cwd = f.copy('nested-workspaces');
+      let project = await Project.init(cwd);
+      let workspaces = await project.getWorkspaces();
+      let wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
 
       expect(project.pkg.getDependencyVersionRange('baz')).toEqual(null);
       await addDependenciesToPackage(project, wsToAddTo.pkg, [{ name: 'baz' }]);

@@ -1,6 +1,5 @@
 // @flow
 
-import { getFixturePath } from 'jest-fixtures';
 import path from 'path';
 import validateProject from '../validateProject';
 import * as yarn from '../yarn';
@@ -8,6 +7,9 @@ import Project from '../../Project';
 import Package from '../../Package';
 import Config from '../../Config';
 import * as Constants from '../../constants';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../yarn');
 jest.mock('../logger');
@@ -20,20 +22,17 @@ describe('utils/validateProject', () => {
   });
 
   test('should return true for a valid Project', async () => {
-    const cwd = await getFixturePath(__dirname, 'simple-project');
-    const project = await Project.init(cwd);
-    const valid = await validateProject(project);
+    let cwd = f.find('simple-project');
+    let project = await Project.init(cwd);
+    let valid = await validateProject(project);
 
     expect(valid).toBe(true);
   });
 
   test('should return false if project has a dependency on a workspace', async () => {
-    const cwd = await getFixturePath(
-      __dirname,
-      'invalid-project-root-dependency-on-ws'
-    );
-    const project = await Project.init(cwd);
-    const valid = await validateProject(project);
+    let cwd = f.find('invalid-project-root-dependency-on-ws');
+    let project = await Project.init(cwd);
+    let valid = await validateProject(project);
 
     expect(valid).toBe(false);
   });
@@ -41,28 +40,22 @@ describe('utils/validateProject', () => {
   describe('bolt.version field', () => {
     test('should return true if bolt version matches specified range', async () => {
       // expected version range is "0.14.x"
-      const cwd = await getFixturePath(
-        __dirname,
-        'simple-project-with-bolt-version-check'
-      );
-      const project = await Project.init(cwd);
+      let cwd = f.find('simple-project-with-bolt-version-check');
+      let project = await Project.init(cwd);
       // $FlowFixMe
       Constants.BOLT_VERSION = '0.14.6';
-      const valid = await validateProject(project);
+      let valid = await validateProject(project);
 
       expect(valid).toBe(true);
     });
 
     test('should return false if bolt version doesnt match engines field', async () => {
       // expected version range is "0.14.x"
-      const cwd = await getFixturePath(
-        __dirname,
-        'simple-project-with-bolt-version-check'
-      );
-      const project = await Project.init(cwd);
+      let cwd = f.find('simple-project-with-bolt-version-check');
+      let project = await Project.init(cwd);
       // $FlowFixMe
       Constants.BOLT_VERSION = '0.13.0';
-      const valid = await validateProject(project);
+      let valid = await validateProject(project);
 
       expect(valid).toBe(false);
     });

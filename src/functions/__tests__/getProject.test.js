@@ -1,14 +1,15 @@
 // @flow
 import path from 'path';
 import getProject from '../getProject';
+import fixtures from 'fixturez';
 
-import { getFixturePath } from 'jest-fixtures';
+const f = fixtures(__dirname);
 
 describe('function/getProject', () => {
   describe('A simple project', () => {
     it('should return path to a project root folder from a workspace', async () => {
-      const projectRoot = await getFixturePath(__dirname, 'simple-project');
-      const workspacePath = path.join(projectRoot, 'packages', 'bar');
+      let projectRoot = f.find('simple-project');
+      let workspacePath = path.join(projectRoot, 'packages', 'bar');
       return getProject({ cwd: workspacePath }).then(pr =>
         expect(pr.dir).toBe(projectRoot)
       );
@@ -17,16 +18,16 @@ describe('function/getProject', () => {
 
   describe('A project with nested workspaces', () => {
     it('should return path to a project root folder from a workspace', async () => {
-      const projectRoot = await getFixturePath(__dirname, 'nested-workspaces');
-      const workspacePath = path.join(projectRoot, 'packages', 'foo');
+      let projectRoot = f.find('nested-workspaces');
+      let workspacePath = path.join(projectRoot, 'packages', 'foo');
       return getProject({ cwd: workspacePath }).then(pr =>
         expect(pr.dir).toBe(projectRoot)
       );
     });
 
     it('should return path to a project root folder from a nested workspace', async () => {
-      const projectRoot = await getFixturePath(__dirname, 'nested-workspaces');
-      const workspacePath = path.join(
+      let projectRoot = f.find('nested-workspaces');
+      let workspacePath = path.join(
         projectRoot,
         'packages',
         'foo',

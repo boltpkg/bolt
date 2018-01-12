@@ -1,11 +1,12 @@
 // @flow
-
-import { getFixturePath } from 'jest-fixtures';
 import projectBinPath from 'project-bin-path';
 import * as path from 'path';
 import * as yarn from '../yarn';
 import * as processes from '../processes';
 import Project from '../../Project';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../processes');
 
@@ -15,7 +16,7 @@ async function getLocalBinPath(): Promise<string> {
 const unsafeProcesses: any & typeof processes = processes;
 
 function assertSpawnCalls(expectedProcess, expectedArgs, expectedCwd) {
-  const spawnCalls = unsafeProcesses.spawn.mock.calls;
+  let spawnCalls = unsafeProcesses.spawn.mock.calls;
 
   expect(spawnCalls.length).toEqual(1);
   expect(spawnCalls[0][0]).toEqual(expectedProcess);
@@ -30,7 +31,7 @@ describe('utils/yarn', () => {
     let localYarn;
 
     beforeEach(async () => {
-      cwd = await getFixturePath(__dirname, 'simple-project');
+      cwd = f.find('simple-project');
       project = await Project.init(cwd);
       localYarn = path.join(await getLocalBinPath(), 'yarn');
     });

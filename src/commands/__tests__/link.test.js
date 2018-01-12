@@ -2,7 +2,9 @@
 import { link, toLinkOptions } from '../link';
 import * as yarn from '../../utils/yarn';
 import * as logger from '../../utils/logger';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../utils/yarn');
 jest.mock('../../utils/logger');
@@ -10,11 +12,8 @@ jest.mock('../../utils/logger');
 describe('bolt link', () => {
   let projectDir;
 
-  beforeEach(async () => {
-    projectDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+  beforeEach(() => {
+    projectDir = f.copy('package-with-external-deps-installed');
   });
 
   it('should show warning on linking internal dependency', async () => {

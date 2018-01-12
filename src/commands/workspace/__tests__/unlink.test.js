@@ -1,25 +1,24 @@
 // @flow
-
 import { toWorkspaceUnlinkOptions, workspaceUnlink } from '../unlink';
 import * as path from 'path';
 import * as yarn from '../../../utils/yarn';
 import * as PackageUnlink from '../../unlink';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../../utils/yarn');
 jest.mock('../../unlink');
 
 describe('workspace unlink', () => {
   let projectDir;
-  beforeEach(async () => {
-    projectDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+
+  beforeEach(() => {
+    projectDir = f.copy('package-with-external-deps-installed');
   });
 
   it('should unlink the package if there are no packages to unlink in args', async () => {
-    const pathToFooWorksapce = path.join(projectDir, 'packages', 'foo');
+    let pathToFooWorksapce = path.join(projectDir, 'packages', 'foo');
     await workspaceUnlink(
       toWorkspaceUnlinkOptions(['foo'], { cwd: projectDir })
     );

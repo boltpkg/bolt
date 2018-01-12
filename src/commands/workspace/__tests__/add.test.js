@@ -1,12 +1,14 @@
 // @flow
 import { workspaceAdd, toWorkspaceAddOptions } from '../add';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
 import * as path from 'path';
 import * as processes from '../../../utils/processes';
 import * as yarn from '../../../utils/yarn';
 import * as fs from '../../../utils/fs';
 import Package from '../../../Package';
 import pathExists from 'path-exists';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../../utils/yarn');
 jest.mock('../../../utils/logger');
@@ -50,10 +52,7 @@ describe('bolt workspace add', () => {
   let barWorkspaceDir;
 
   beforeEach(async () => {
-    projectDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+    projectDir = f.copy('package-with-external-deps-installed');
     fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
     unsafeYarn.add.mockImplementation(fakeYarnAdd);

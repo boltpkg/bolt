@@ -1,21 +1,19 @@
 // @flow
 import { workspaceRemove, toWorkspaceRemoveOptions } from '../remove';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yarn from '../../../utils/yarn';
 import pathExists from 'path-exists';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../../utils/logger');
 jest.mock('../../../utils/yarn');
 
 describe('bolt workspace remove', () => {
   test('removing a workspace dependency that exists', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
-
+    let tempDir = f.copy('package-with-external-deps-installed');
     let workspaceDir = path.join(tempDir, 'packages', 'foo');
 
     await workspaceRemove(
@@ -35,10 +33,7 @@ describe('bolt workspace remove', () => {
   });
 
   test('removing a workspace dependency that doesnt exist in that package', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+    let tempDir = f.copy('package-with-external-deps-installed');
 
     await expect(
       workspaceRemove(
@@ -48,10 +43,7 @@ describe('bolt workspace remove', () => {
   });
 
   test('removing a workspace dependency from inside another directory', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+    let tempDir = f.copy('package-with-external-deps-installed');
 
     let fooWorkspaceDir = path.join(tempDir, 'packages', 'foo');
     let barWorkspaceDir = path.join(tempDir, 'packages', 'bar');

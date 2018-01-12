@@ -1,9 +1,11 @@
 // @flow
 import { workspaceRun, toWorkspaceRunOptions } from '../run';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
 import projectBinPath from 'project-bin-path';
 import * as path from 'path';
 import * as processes from '../../../utils/processes';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../../utils/processes');
 jest.mock('../../../utils/logger');
@@ -20,7 +22,7 @@ describe('bolt workspace run', () => {
   let localYarn;
 
   beforeEach(async () => {
-    projectDir = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
+    projectDir = f.copy('nested-workspaces');
     fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
     localYarn = path.join(await getLocalBinPath(), 'yarn');

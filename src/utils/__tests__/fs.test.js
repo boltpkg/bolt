@@ -2,19 +2,17 @@
 import * as fs from '../fs';
 import * as path from 'path';
 import { realpathSync } from 'fs';
-import { getFixturePath, createTempDir } from 'jest-fixtures';
 import modeToPermissions from 'mode-to-permissions';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 const REAL_PLATFORM = process.platform;
 
 describe('fs', () => {
   describe('readFile()', () => {
     it('should read a file', async () => {
-      let filePath = await getFixturePath(
-        __dirname,
-        'simple-package',
-        'package.json'
-      );
+      let filePath = path.join(f.find('simple-package'), 'package.json');
       let fileContents = await fs.readFile(filePath);
       expect(fileContents.toString()).toContain('fixture-basic');
     });
@@ -22,7 +20,7 @@ describe('fs', () => {
 
   describe('writeFile()', () => {
     it('should write a file', async () => {
-      let dirName = await createTempDir();
+      let dirName = f.temp();
       let filePath = path.join(dirName, 'file.txt');
       await fs.writeFile(filePath, 'test');
       let fileContents = await fs.readFile(filePath);
@@ -32,7 +30,7 @@ describe('fs', () => {
 
   describe('rimraf()', () => {
     it('should delete a directory', async () => {
-      let dirName = await createTempDir();
+      let dirName = f.temp();
       let filePath = path.join(dirName, 'file.txt');
       await fs.writeFile(filePath, 'test');
       await fs.rimraf(dirName);
@@ -49,18 +47,14 @@ describe('fs', () => {
 
   describe('stat()', () => {
     it('should get the stats of a file', async () => {
-      let fixturePath = await getFixturePath(
-        __dirname,
-        'simple-package',
-        'package.json'
-      );
+      let fixturePath = path.join(f.find('simple-package'), 'package.json');
       let stat = await fs.stat(fixturePath);
       expect(stat.isFile()).toBe(true);
       expect(stat.isDirectory()).toBe(false);
     });
 
     it('should get the stats of a directory', async () => {
-      let fixturePath = await getFixturePath(__dirname, 'simple-package');
+      let fixturePath = f.find('simple-package');
       let stat = await fs.stat(fixturePath);
       expect(stat.isFile()).toBe(false);
       expect(stat.isDirectory()).toBe(true);
@@ -69,18 +63,14 @@ describe('fs', () => {
 
   describe('lstat()', () => {
     it('should get the stats of a file', async () => {
-      let fixturePath = await getFixturePath(
-        __dirname,
-        'simple-package',
-        'package.json'
-      );
+      let fixturePath = path.join(f.find('simple-package'), 'package.json');
       let stat = await fs.lstat(fixturePath);
       expect(stat.isFile()).toBe(true);
       expect(stat.isDirectory()).toBe(false);
     });
 
     it('should get the stats of a directory', async () => {
-      let fixturePath = await getFixturePath(__dirname, 'simple-package');
+      let fixturePath = f.find('simple-package');
       let stat = await fs.lstat(fixturePath);
       expect(stat.isFile()).toBe(false);
       expect(stat.isDirectory()).toBe(true);
@@ -98,8 +88,8 @@ describe('fs', () => {
       });
 
       it('should create a relative symlink to a directory', async () => {
-        let tempDir = await createTempDir();
-        let src = await getFixturePath(__dirname, 'symlinks', 'file.txt');
+        let tempDir = f.temp();
+        let src = path.join(f.find('symlinks'), 'file.txt');
         let dest = path.resolve(tempDir, 'file.txt');
         await fs.symlink(src, dest, 'junction');
         let realPath = (await fs.readlink(dest)) || '';
@@ -108,8 +98,8 @@ describe('fs', () => {
       });
 
       it('should create a relative symlink to an executable file', async () => {
-        let tempDir = await createTempDir();
-        let src = await getFixturePath(__dirname, 'symlinks', 'executable.sh');
+        let tempDir = f.temp();
+        let src = path.join(f.find('symlinks'), 'executable.sh');
         let dest = path.resolve(tempDir, 'executable.sh');
         await fs.symlink(src, dest, 'exec');
         let realPath = (await fs.readlink(dest)) || '';
@@ -118,9 +108,9 @@ describe('fs', () => {
       });
 
       it('should overwrite an existing symlink', async () => {
-        let tempDir = await createTempDir();
-        let src1 = await getFixturePath(__dirname, 'symlinks', 'file.txt');
-        let src2 = await getFixturePath(__dirname, 'symlinks', 'file2.txt');
+        let tempDir = f.temp();
+        let src1 = path.join(f.find('symlinks'), 'file.txt');
+        let src2 = path.join(f.find('symlinks'), 'file2.txt');
         let dest = path.resolve(tempDir, 'file.txt');
         await fs.symlink(src1, dest, 'junction');
         await fs.symlink(src2, dest, 'junction');
@@ -136,8 +126,8 @@ describe('fs', () => {
       });
 
       it('should create a command shim to an executable file', async () => {
-        let tempDir = await createTempDir();
-        let src = await getFixturePath(__dirname, 'symlinks', 'executable.sh');
+        let tempDir = f.temp();
+        let src = path.join(f.find('symlinks'), 'executable.sh');
         let dest = path.resolve(tempDir, 'executable.sh');
         await fs.symlink(src, dest, 'exec');
         let files = await fs.readdir(tempDir);
@@ -145,8 +135,8 @@ describe('fs', () => {
       });
 
       it('should always use absolute paths when creating symlinks', async () => {
-        let tempDir = await createTempDir();
-        let src = await getFixturePath(__dirname, 'symlinks', 'file.txt');
+        let tempDir = f.temp();
+        let src = path.join(f.find('symlinks'), 'file.txt');
         let dest = path.resolve(tempDir, 'file.txt');
         await fs.symlink(src, dest, 'junction');
         let files = await fs.readdir(tempDir);
@@ -158,7 +148,7 @@ describe('fs', () => {
 
   describe('readdir()', () => {
     it('should list a directory of files', async () => {
-      let fixturePath = await getFixturePath(__dirname, 'simple-project');
+      let fixturePath = f.find('simple-project');
       let files = await fs.readdir(fixturePath);
       expect(files).toEqual(['package.json', 'packages']);
     });
@@ -166,7 +156,7 @@ describe('fs', () => {
 
   describe('readdirSafe()', () => {
     it('should list a directory of files', async () => {
-      let fixturePath = await getFixturePath(__dirname, 'simple-project');
+      let fixturePath = f.find('simple-project');
       let files = await fs.readdirSafe(fixturePath);
       expect(files).toEqual(['package.json', 'packages']);
     });

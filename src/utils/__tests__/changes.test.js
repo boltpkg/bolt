@@ -5,11 +5,9 @@ import * as git from '../git';
 import * as fs from '../fs';
 import * as changes from '../changes';
 import * as path from 'path';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
+import fixtures from 'fixturez';
 
-async function copy(name) {
-  return await fs.realpath(await copyFixtureIntoTempDir(__dirname, name));
-}
+const f = fixtures(__dirname);
 
 function expectCommitMessage(message) {
   return { hash: expect.stringContaining(''), message };
@@ -23,7 +21,7 @@ async function updateConfig(config, props) {
 
 describe('changes', () => {
   test('changes.getWorkspaceVersionCommits()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     await git.initRepository({ cwd });
 
     let project = await Project.init(cwd);

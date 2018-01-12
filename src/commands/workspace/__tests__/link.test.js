@@ -4,7 +4,9 @@ import { toWorkspacelinkOptions, workspacelink } from '../link';
 import * as path from 'path';
 import * as PackageLink from '../../link';
 import * as yarn from '../../../utils/yarn';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../../utils/yarn');
 jest.mock('../../link');
@@ -12,10 +14,7 @@ jest.mock('../../link');
 describe('workspace link', () => {
   let projectDir;
   beforeEach(async () => {
-    projectDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+    projectDir = f.copy('package-with-external-deps-installed');
   });
 
   it('should create link to package if there are no packages to link in args', async () => {
