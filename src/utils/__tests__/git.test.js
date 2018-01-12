@@ -2,11 +2,9 @@
 import * as git from '../../utils/git';
 import * as fs from '../../utils/fs';
 import * as path from 'path';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
+import fixtures from 'fixturez';
 
-async function copy(name) {
-  return await fs.realpath(await copyFixtureIntoTempDir(__dirname, name));
-}
+const f = fixtures(__dirname);
 
 function expectCommitMessages(messages) {
   return messages.map(message => {
@@ -19,14 +17,14 @@ function expectCommitMessages(messages) {
 
 describe('git', () => {
   test('git.initRepository()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     await git.initRepository({ cwd });
     let stat = await fs.stat(path.join(cwd, '.git'));
     expect(stat.isDirectory()).toBe(true);
   });
 
   test('git.getRootDirectory()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     let dir = path.join(cwd, 'packages', 'foo');
 
     expect(await git.getRootDirectory({ cwd })).toBe(null);
@@ -36,7 +34,7 @@ describe('git', () => {
   });
 
   test('git.status()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     await git.initRepository({ cwd });
     let status = await git.status({ cwd });
 
@@ -45,7 +43,7 @@ describe('git', () => {
   });
 
   test('git.addAll()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     await git.initRepository({ cwd });
     await git.addAll({ cwd });
     let status = await git.status({ cwd });
@@ -57,7 +55,7 @@ describe('git', () => {
   });
 
   test('git.addFiles()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     await git.initRepository({ cwd });
     await git.addFiles([path.join(cwd, 'package.json')], { cwd });
     let status = await git.status({ cwd });
@@ -67,7 +65,7 @@ describe('git', () => {
   });
 
   test('git.commit() & git.getAllCommits()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     expect(await git.getAllCommits({ cwd })).toEqual(expectCommitMessages([]));
 
     await git.initRepository({ cwd });
@@ -93,7 +91,7 @@ describe('git', () => {
   });
 
   test('git.listTags() & git.addTag() & git.removeTag()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
 
     expect(await git.listTags({ cwd })).toEqual([]);
 
@@ -111,7 +109,7 @@ describe('git', () => {
   });
 
   test('git.getCommitsToFile()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     let pkg = path.join(cwd, 'package.json');
     let fooPkg = path.join(cwd, 'packages', 'foo', 'package.json');
     expect(await git.getCommitsToFile(pkg, { cwd })).toEqual(
@@ -147,7 +145,7 @@ describe('git', () => {
   });
 
   test('git.getCommitParent()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     let pkg = path.join(cwd, 'package.json');
     let pkgs = path.join(cwd, 'packages');
 
@@ -165,7 +163,7 @@ describe('git', () => {
   });
 
   test('git.showFileAtCommit()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     let pkg = path.join(cwd, 'package.json');
 
     await git.initRepository({ cwd });
@@ -186,7 +184,7 @@ describe('git', () => {
   });
 
   test('git.getDiffForPathSinceCommit()', async () => {
-    let cwd = await copy('simple-repo');
+    let cwd = f.copy('simple-repo');
     let pkg = path.join(cwd, 'package.json');
 
     await git.initRepository({ cwd });

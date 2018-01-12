@@ -2,18 +2,18 @@
 import { unlink, toUnlinkOptions } from '../unlink';
 import * as yarn from '../../utils/yarn';
 import * as logger from '../../utils/logger';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../utils/yarn');
 jest.mock('../../utils/logger');
 
 describe('bolt unlink', () => {
   let projectDir;
-  beforeEach(async () => {
-    projectDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+
+  beforeEach(() => {
+    projectDir = f.copy('package-with-external-deps-installed');
   });
 
   it('should warn if unlink a internal package', async () => {

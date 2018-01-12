@@ -1,8 +1,10 @@
 // @flow
-import { getFixturePath } from 'jest-fixtures';
 import { publish, toPublishOptions } from '../publish';
 import * as locks from '../../utils/locks';
 import * as npm from '../../utils/npm';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../utils/logger');
 jest.mock('../../utils/locks');
@@ -45,16 +47,16 @@ describe('bolt publish', () => {
 
   test('should run publish on all unpublished packages', async () => {
     untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
-    const cwd = await getFixturePath(__dirname, 'simple-project');
+    let cwd = f.find('simple-project');
 
     await publish({ cwd });
     expect(npmPublishSpy).toHaveBeenCalledTimes(1);
   });
   test('should return publishedPackages', async () => {
     untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
-    const cwd = await getFixturePath(__dirname, 'simple-project');
+    let cwd = f.find('simple-project');
     untypedNpm.publish.mockReturnValueOnce({ published: true });
-    const published = await publish({ cwd });
+    let published = await publish({ cwd });
     expect(untypedNpm.publish).toHaveBeenCalledTimes(1);
 
     expect(published).toEqual([
@@ -63,9 +65,9 @@ describe('bolt publish', () => {
   });
   test('should return published false if it fails', async () => {
     untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
-    const cwd = await getFixturePath(__dirname, 'simple-project');
+    let cwd = f.find('simple-project');
     untypedNpm.publish.mockReturnValueOnce({ published: false });
-    const published = await publish({ cwd });
+    let published = await publish({ cwd });
     expect(untypedNpm.publish).toHaveBeenCalledTimes(1);
 
     expect(published).toEqual([

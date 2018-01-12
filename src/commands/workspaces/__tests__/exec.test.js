@@ -1,9 +1,11 @@
 // @flow
 import { workspacesExec, toWorkspacesExecOptions } from '../exec';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
 import * as path from 'path';
 import * as processes from '../../../utils/processes';
 import containDeep from 'jest-expect-contain-deep';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../../utils/processes');
 
@@ -25,10 +27,7 @@ function assertSpawn(opts) {
 
 describe('bolt workspaces exec', () => {
   test('running in a project', async () => {
-    let projectDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'project-with-bins'
-    );
+    let projectDir = f.copy('project-with-bins');
     let fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     let barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
     let projectBinDir = path.join(projectDir, binDir);
@@ -66,10 +65,7 @@ describe('bolt workspaces exec', () => {
   });
 
   test('running from inside a workspace', async () => {
-    let projectDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'project-with-bins'
-    );
+    let projectDir = f.copy('project-with-bins');
     let fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     let barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
     let projectBinDir = path.join(projectDir, binDir);
@@ -107,10 +103,7 @@ describe('bolt workspaces exec', () => {
   });
 
   test('running from inside a workspace that doesnt have the command', async () => {
-    let projectDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'project-with-bins'
-    );
+    let projectDir = f.copy('project-with-bins');
     let fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     let barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
     let projectBinDir = path.join(projectDir, binDir);

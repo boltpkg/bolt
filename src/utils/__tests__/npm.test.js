@@ -1,10 +1,11 @@
 // @flow
 
-import { getFixturePath } from 'jest-fixtures';
-
 import * as npm from '../npm';
 import Project from '../../Project';
 import * as processes from '../processes';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../logger');
 jest.mock('../processes');
@@ -17,7 +18,7 @@ describe('npm', () => {
     let result;
 
     beforeEach(async () => {
-      cwd = await getFixturePath(__dirname, 'simple-project');
+      cwd = f.find('simple-project');
     });
 
     test('returns published true when npm publish <package> is successesful', async () => {

@@ -1,12 +1,14 @@
 // @flow
 import path from 'path';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
-
 import updatePackageVersions from '../updatePackageVersions';
 import * as fs from '../../utils/fs';
 import * as logger from '../../utils/logger';
 import Config from '../../Config';
 import * as messages from '../../utils/messages';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
+
 jest.mock('../../utils/logger');
 
 /*
@@ -29,17 +31,14 @@ describe('function/updatePackageVersions', () => {
 
   describe('A simple project with lots of internally linked deps', async () => {
     beforeEach(async () => {
-      cwd = await copyFixtureIntoTempDir(
-        __dirname,
-        'lots-of-internally-linked-deps'
-      );
+      cwd = f.copy('lots-of-internally-linked-deps');
       pkgWithDepsPath = path.join(cwd, 'packages', 'has-all-deps');
       pkgPeerDepsPath = path.join(cwd, 'packages', 'has-all-deps-with-peers');
       loggerSpy = jest.spyOn(logger, 'warn');
     });
 
     it('should update internal deps with caret deps', async () => {
-      const updatedPackages = { 'caret-dep': '1.2.0', 'has-all-deps': '1.1.2' };
+      let updatedPackages = { 'caret-dep': '1.2.0', 'has-all-deps': '1.1.2' };
       expect(await getDepVersion(pkgWithDepsPath, 'caret-dep')).toBe('^1.1.1');
       // pretend we've just updated 'caret-dep' to 2.0.0
       await updatePackageVersions(updatedPackages, { cwd });
@@ -48,7 +47,7 @@ describe('function/updatePackageVersions', () => {
     });
 
     it('should update internal deps with tilde deps', async () => {
-      const updatePackages = { 'tilde-dep': '2.0.0', 'has-all-deps': '1.1.2' };
+      let updatePackages = { 'tilde-dep': '2.0.0', 'has-all-deps': '1.1.2' };
       expect(await getDepVersion(pkgWithDepsPath, 'tilde-dep')).toBe('~1.1.1');
       // pretend we've just updated 'tilde-dep' to 2.0.0
       await updatePackageVersions(updatePackages, { cwd });
@@ -57,7 +56,7 @@ describe('function/updatePackageVersions', () => {
     });
 
     it('should update internal deps with pinned deps', async () => {
-      const updatePackages = { 'pinned-dep': '2.0.0', 'has-all-deps': '1.1.2' };
+      let updatePackages = { 'pinned-dep': '2.0.0', 'has-all-deps': '1.1.2' };
       expect(await getDepVersion(pkgWithDepsPath, 'pinned-dep')).toBe('1.1.1');
       // pretend we've just updated 'pinned-dep' to 2.0.0
       await updatePackageVersions(updatePackages, { cwd });
@@ -66,21 +65,21 @@ describe('function/updatePackageVersions', () => {
     });
 
     it('should return list of updated packages', async () => {
-      const updatePackages = {
+      let updatePackages = {
         'caret-dep': '1.2.0',
         'has-all-deps': '1.1.2',
         'pinned-dep': '1.2.2'
       };
 
-      const updated = await updatePackageVersions(updatePackages, { cwd });
-      const expectedUpdated = [
+      let updated = await updatePackageVersions(updatePackages, { cwd });
+      let expectedUpdated = [
         'packages/has-all-deps/package.json',
         'packages/pinned-dep/package.json'
       ];
 
       expect(updated.length).toEqual(expectedUpdated.length);
       expectedUpdated.forEach(expected => {
-        const found = updated.find(p => path.relative(cwd, p) === expected);
+        let found = updated.find(p => path.relative(cwd, p) === expected);
         expect(found).toBeDefined();
       });
     });
@@ -132,7 +131,7 @@ describe('function/updatePackageVersions', () => {
       ).toBe('^1.2.0');
     });
     it('should skip updating dependencies for packages not in the udpatedPackages', async () => {
-      const updatePackages = { 'caret-dep': '1.2.0' };
+      let updatePackages = { 'caret-dep': '1.2.0' };
       expect(
         await getDepVersion(pkgPeerDepsPath, 'caret-dep', 'peerDependencies')
       ).toBe('^1.1.1');
@@ -145,8 +144,8 @@ describe('function/updatePackageVersions', () => {
       ).toBe('^1.1.1');
     });
     it('should throw when you will leave a version range without it being included', async () => {
-      const updatePackages = { 'tilde-dep': '2.0.0' };
-      const message = messages.invalidBoltWorkspacesFromUpdate(
+      let updatePackages = { 'tilde-dep': '2.0.0' };
+      let message = messages.invalidBoltWorkspacesFromUpdate(
         'has-all-deps',
         'tilde-dep',
         '~1.1.1',

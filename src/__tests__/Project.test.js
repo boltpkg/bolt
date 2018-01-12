@@ -4,8 +4,9 @@ import Project from '../Project';
 import Package from '../Package';
 import Workspace from '../Workspace';
 import * as logger from '../utils/logger';
+import fixtures from 'fixturez';
 
-import { getFixturePath } from 'jest-fixtures';
+const f = fixtures(__dirname);
 
 jest.mock('../utils/logger');
 
@@ -34,7 +35,7 @@ describe('Project', () => {
 
   describe('A simple project', () => {
     beforeEach(async () => {
-      const filePath = await getFixturePath(__dirname, 'simple-project');
+      let filePath = f.find('simple-project');
       project = await Project.init(filePath);
     });
 
@@ -44,14 +45,14 @@ describe('Project', () => {
     });
 
     it('should be able to getWorkspaces', async () => {
-      const workspaces = await project.getWorkspaces();
+      let workspaces = await project.getWorkspaces();
       expect(workspaces.length).toEqual(2);
       expect(workspaces[0]).toBeInstanceOf(Workspace);
     });
 
     it('should be able to runWorkspaceTasks', async () => {
-      const workspaces = await project.getWorkspaces();
-      const spy = jest.fn(() => Promise.resolve());
+      let workspaces = await project.getWorkspaces();
+      let spy = jest.fn(() => Promise.resolve());
 
       await project.runWorkspaceTasks(workspaces, spy);
 
@@ -63,20 +64,20 @@ describe('Project', () => {
 
   describe('A project with nested workspaces', () => {
     beforeEach(async () => {
-      const filePath = await getFixturePath(__dirname, 'nested-workspaces');
+      let filePath = f.find('nested-workspaces');
       project = await Project.init(filePath);
     });
 
     it('should be able to getWorkspaces (including nested)', async () => {
-      const workspaces = await project.getWorkspaces();
+      let workspaces = await project.getWorkspaces();
       expect(workspaces.length).toEqual(3);
       expect(workspaces[0]).toBeInstanceOf(Workspace);
     });
 
     it('should be able to getDependencyGraph', async () => {
-      const workspaces = await project.getWorkspaces();
-      const { valid, graph } = await project.getDependencyGraph(workspaces);
-      const expectedDependencies = {
+      let workspaces = await project.getWorkspaces();
+      let { valid, graph } = await project.getDependencyGraph(workspaces);
+      let expectedDependencies = {
         'fixture-project-nested-workspaces': [],
         foo: ['bar'],
         bar: [],
@@ -93,9 +94,9 @@ describe('Project', () => {
     });
 
     it('should be able to getDependentsGraph', async () => {
-      const workspaces = await project.getWorkspaces();
-      const { valid, graph } = await project.getDependentsGraph(workspaces);
-      const expectedDependents = {
+      let workspaces = await project.getWorkspaces();
+      let { valid, graph } = await project.getDependentsGraph(workspaces);
+      let expectedDependents = {
         bar: ['foo', 'baz'],
         foo: [],
         baz: []
@@ -113,23 +114,20 @@ describe('Project', () => {
 
   describe('A project with nested workspaces and transitive dependents', () => {
     beforeEach(async () => {
-      const filePath = await getFixturePath(
-        __dirname,
-        'nested-workspaces-transitive-dependents'
-      );
+      let filePath = f.find('nested-workspaces-transitive-dependents');
       project = await Project.init(filePath);
     });
 
     it('should be able to getWorkspaces (including nested)', async () => {
-      const workspaces = await project.getWorkspaces();
+      let workspaces = await project.getWorkspaces();
       expect(workspaces.length).toEqual(4);
       expect(workspaces[0]).toBeInstanceOf(Workspace);
     });
 
     it('should be able to getDependencyGraph', async () => {
-      const workspaces = await project.getWorkspaces();
-      const { valid, graph } = await project.getDependencyGraph(workspaces);
-      const expectedDependencies = {
+      let workspaces = await project.getWorkspaces();
+      let { valid, graph } = await project.getDependencyGraph(workspaces);
+      let expectedDependencies = {
         'nested-workspaces-transitive-dependents': [],
         'pkg-a': [],
         'workspace-a': ['pkg-a'],
@@ -141,8 +139,8 @@ describe('Project', () => {
       expect(graph).toBeInstanceOf(Map);
       expect(graph.size).toBe(Object.keys(expectedDependencies).length);
 
-      const assertDependencies = (pkg, deps) => {
-        const val = graph.get(pkg);
+      let assertDependencies = (pkg, deps) => {
+        let val = graph.get(pkg);
         expect(val && val.dependencies).toEqual(deps);
       };
 
@@ -152,9 +150,9 @@ describe('Project', () => {
     });
 
     it('should be able to getDependentsGraph', async () => {
-      const workspaces = await project.getWorkspaces();
-      const { valid, graph } = await project.getDependentsGraph(workspaces);
-      const expectedDependents = {
+      let workspaces = await project.getWorkspaces();
+      let { valid, graph } = await project.getDependentsGraph(workspaces);
+      let expectedDependents = {
         'pkg-a': ['workspace-a', 'pkg-b'],
         'workspace-a': [],
         'pkg-b': ['pkg-c'],
@@ -177,7 +175,7 @@ describe('Project', () => {
     let workspaces;
 
     beforeEach(async () => {
-      cwd = await getFixturePath(__dirname, 'nested-workspaces');
+      cwd = f.find('nested-workspaces');
       project = project = await Project.init(cwd);
       workspaces = await project.getWorkspaces();
     });
@@ -245,10 +243,7 @@ describe('Project', () => {
     });
 
     it('should support scoped workspaces', async () => {
-      cwd = await getFixturePath(
-        __dirname,
-        'nested-workspaces-with-scoped-package-names'
-      );
+      cwd = f.find('nested-workspaces-with-scoped-package-names');
       project = project = await Project.init(cwd);
       workspaces = await project.getWorkspaces();
 
@@ -272,7 +267,7 @@ describe('Project', () => {
 
   describe('runWorkspaceTasks()', () => {
     test('independent workspaces', async () => {
-      let cwd = await getFixturePath(__dirname, 'independent-workspaces');
+      let cwd = f.find('independent-workspaces');
       let project = await Project.init(cwd);
       let workspaces = await project.getWorkspaces();
       let ops = [];
@@ -288,7 +283,7 @@ describe('Project', () => {
     });
 
     test('dependent workspaces', async () => {
-      let cwd = await getFixturePath(__dirname, 'dependent-workspaces');
+      let cwd = f.find('dependent-workspaces');
       let project = await Project.init(cwd);
       let workspaces = await project.getWorkspaces();
       let ops = [];
@@ -304,10 +299,7 @@ describe('Project', () => {
     });
 
     test('dependent workspaces with cycle', async () => {
-      let cwd = await getFixturePath(
-        __dirname,
-        'dependent-workspaces-with-cycle'
-      );
+      let cwd = f.find('dependent-workspaces-with-cycle');
       let project = await Project.init(cwd);
       let workspaces = await project.getWorkspaces();
       let ops = [];

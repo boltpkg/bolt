@@ -1,20 +1,19 @@
 // @flow
 import { remove, toRemoveOptions } from '../remove';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yarn from '../../utils/yarn';
 import pathExists from 'path-exists';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../utils/logger');
 jest.mock('../../utils/yarn');
 
 describe('bolt remove', () => {
   test('removing a project dependency only used by the project', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+    let tempDir = f.copy('package-with-external-deps-installed');
 
     await remove(toRemoveOptions(['project-only-dep'], { cwd: tempDir }));
 
@@ -23,11 +22,7 @@ describe('bolt remove', () => {
   });
 
   test('removing a workspace dependency', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
-
+    let tempDir = f.copy('package-with-external-deps-installed');
     let workspaceDir = path.join(tempDir, 'packages', 'foo');
 
     await remove(toRemoveOptions(['foo-dep'], { cwd: workspaceDir }));
@@ -45,10 +40,7 @@ describe('bolt remove', () => {
   });
 
   test('removing a dependency that does not exist', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+    let tempDir = f.copy('package-with-external-deps-installed');
 
     await expect(
       remove(toRemoveOptions(['nonexistent-dep'], { cwd: tempDir }))
@@ -56,10 +48,7 @@ describe('bolt remove', () => {
   });
 
   test('removing a dependency that is used by a workspace', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+    let tempDir = f.copy('package-with-external-deps-installed');
 
     await expect(
       remove(toRemoveOptions(['global-dep'], { cwd: tempDir }))

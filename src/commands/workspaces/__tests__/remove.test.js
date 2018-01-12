@@ -1,21 +1,19 @@
 // @flow
 import { workspacesRemove, toWorkspacesRemoveOptions } from '../remove';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yarn from '../../../utils/yarn';
 import pathExists from 'path-exists';
+import fixtures from 'fixturez';
+
+const f = fixtures(__dirname);
 
 jest.mock('../../../utils/logger');
 jest.mock('../../../utils/yarn');
 
 describe('bolt workspaces remove', () => {
   test('removing a dependency from all workspaces', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
-
+    let tempDir = f.copy('package-with-external-deps-installed');
     let fooWorkspaceDir = path.join(tempDir, 'packages', 'foo');
     let barWorkspaceDir = path.join(tempDir, 'packages', 'bar');
 
@@ -42,11 +40,7 @@ describe('bolt workspaces remove', () => {
   });
 
   test('removing a dependency that only exists in some of the workspaces', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
-
+    let tempDir = f.copy('package-with-external-deps-installed');
     let workspaceDir = path.join(tempDir, 'packages', 'foo');
 
     await workspacesRemove(
@@ -66,10 +60,7 @@ describe('bolt workspaces remove', () => {
   });
 
   test('removing a dependency that doesnt exist in any of the workspaces', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+    let tempDir = f.copy('package-with-external-deps-installed');
 
     await expect(
       workspacesRemove(
@@ -79,10 +70,7 @@ describe('bolt workspaces remove', () => {
   });
 
   test('removing a dependency that doesnt exist in any of the filtered workspaces', async () => {
-    let tempDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+    let tempDir = f.copy('package-with-external-deps-installed');
 
     await expect(
       workspacesRemove(
