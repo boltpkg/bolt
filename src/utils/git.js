@@ -20,6 +20,11 @@ const GIT_LOG_LINE_FORMAT_SPLITTER = /^([a-zA-Z0-9]+) (.*)/;
 
 opaque type CommitHash = string;
 
+export type Commit = {
+  hash: CommitHash,
+  message: string
+};
+
 function git(args: Array<string>, opts: processes.SpawnOptions) {
   return gitCommandLimit(() => {
     return processes.spawn('git', args, { silent: true, ...opts });
@@ -38,9 +43,7 @@ function linesToArray(lines: string) {
   return lines === '' ? [] : lines.split(os.EOL);
 }
 
-function formattedLogLinesToArray(
-  lines: string
-): Array<{ hash: CommitHash, message: string }> {
+function formattedLogLinesToArray(lines: string): Array<Commit> {
   return linesToArray(lines).map(line => {
     let [, hash, message] = GIT_LOG_LINE_FORMAT_SPLITTER.exec(line);
     return { hash, message };
@@ -98,7 +101,7 @@ export async function commit(message: string, opts: { cwd: string }) {
 
 export async function getAllCommits(opts: {
   cwd: string
-}): Promise<Array<CommitHash>> {
+}): Promise<Array<Commit>> {
   try {
     let { stdout } = await git(['log', '--pretty=format:%H %s'], {
       cwd: opts.cwd
@@ -135,7 +138,7 @@ export async function removeTag(tagName: string, opts: { cwd: string }) {
 export async function getCommitsToFile(
   filePath: string,
   opts: { cwd: string }
-): Promise<Array<CommitHash>> {
+): Promise<Array<Commit>> {
   let gitPath = toGitPath(opts.cwd, filePath);
   try {
     let { stdout } = await git(
@@ -156,18 +159,11 @@ export async function getCommitsToFile(
 export async function getCommitParent(
   commitHash: CommitHash,
   opts: { cwd: string }
-): Promise<CommitHash | null> {
-  try {
-    let { stdout } = await git(['rev-parse', `${commitHash}^`], {
-      cwd: opts.cwd
-    });
-    return stdout.trim();
-  } catch (err) {
-    if (!isGitFatalError(err)) {
-      throw err;
-    }
-  }
-  return null;
+): Promise<CommitHash> {
+  let { stdout } = await git(['rev-parse', `${commitHash}^`], {
+    cwd: opts.cwd
+  });
+  return stdout.trim();
 }
 
 export async function showFileAtCommit(
