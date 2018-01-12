@@ -1,5 +1,7 @@
 # Contributing to Bolt
 
+Join the boltpkg community slack room at https://boltpkg.slack.com
+
 **Note:** Recommended to use Node > 8.5, (*Node < 4 is not supported*)
 
 > Please make sure you have latest [yarn](https://yarnpkg.com/en/docs/install) installed
