@@ -151,8 +151,6 @@ describe('git', () => {
     let pkg = path.join(cwd, 'package.json');
     let pkgs = path.join(cwd, 'packages');
 
-    await git.getCommitParent('', { cwd });
-
     await git.initRepository({ cwd });
     await git.addFiles([pkg], { cwd });
     await git.commit('msg', { cwd });
