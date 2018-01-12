@@ -36,7 +36,7 @@ function toGitPath(cwd: string, filePath: string) {
 }
 
 function isGitFatalError(err) {
-  return err instanceof processes.ChildProcessError && err.code === 128;
+  return err.code === 128;
 }
 
 function linesToArray(lines: string) {
