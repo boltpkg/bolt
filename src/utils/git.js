@@ -159,11 +159,18 @@ export async function getCommitsToFile(
 export async function getCommitParent(
   commitHash: CommitHash,
   opts: { cwd: string }
-): Promise<CommitHash> {
-  let { stdout } = await git(['rev-parse', `${commitHash}^`], {
-    cwd: opts.cwd
-  });
-  return stdout.trim();
+): Promise<CommitHash | null> {
+  try {
+    let { stdout } = await git(['rev-parse', `${commitHash}^`], {
+      cwd: opts.cwd
+    });
+    return stdout.trim();
+  } catch (err) {
+    if (!isGitFatalError(err)) {
+      throw err;
+    }
+  }
+  return null;
 }
 
 export async function showFileAtCommit(
