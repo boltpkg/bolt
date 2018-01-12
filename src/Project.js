@@ -164,7 +164,7 @@ export default class Project {
     });
 
     if (!safe) {
-      logger.error(messages.unsafeCycles());
+      logger.warn(messages.unsafeCycles());
     }
   }
 
