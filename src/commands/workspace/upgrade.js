@@ -2,7 +2,6 @@
 import * as options from '../../utils/options';
 import * as messages from '../../utils/messages';
 import { BoltError } from '../../utils/errors';
-import chalk from 'chalk';
 
 export type WorkspaceUpgradeOptions = {
   cwd?: string,

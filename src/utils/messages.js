@@ -295,7 +295,8 @@ export function cannotInstallWorkspaceInProject(pkgName: string): Message {
 export function cannotUpgradeWorkspaceDependencyInProject(
   pkgName: string
 ): Message {
-  return `Cannot upgrade workspace "${pkgName}" as a dependency of a project`;
+  return `Cannot upgrade workspace "${pkgName}" as a dependency of a project. 
+  All the workspaces are symlinked, upgrading workspce dependency is invalid.`;
 }
 
 export function errorParsingJSON(filePath: string): Message {
@@ -344,4 +345,20 @@ export function errorWorkspaceUpgrade(): Message {
 	In order to upgrade a dependency [across all the workspaces] please run ${cmd(
     '"bolt upgrade [...args]"'
   )} or ${cmd('"bolt workspaces upgrade [...args]"')}`;
+}
+
+export function errorWorkspacesUpgrade(filterOpts: Array<string>): Message {
+  return `${chalk.red.bold(
+    '[bolt workspaces upgrade]'
+  )} Unable to upgrade dependencies for a single or some workspace.
+  Therefore, flags ${chalk.red.bold(
+    filterOpts.join(' ')
+  )} are not applicable here.
+  In order to upgrade a dependency please run without filter flags - ${cmd(
+    '"bolt upgrade [...args]"'
+  )} or ${cmd('"bolt workspaces upgrade [...args]"')}`;
+}
+
+export function noNeedToSymlinkInternalDependency(): Message {
+  return `Internal packages are symlinked, there is no need update them`;
 }
