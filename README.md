@@ -109,6 +109,7 @@ yarn global add bolt
 | `bolt install`                          | Install all the dependencies for a project                                |✅|
 | `bolt add [dependency]`                 | Add a dependency                                                          |✅|
 | `bolt upgrade [dependency]`             | Upgrade a dependency                                                      |❌|
+| `bolt remove [dependency]`              | remove a dependency                                                       |✅|
 | `bolt version`                          | Updates the version of your package(s)                                    |❌|
 | `bolt publish`                          | Publish new version(s) of your package(s) to npm                          |✅|
 | └ `bolt publish-lock`                   | Lock your package(s) on the npm registry                                  |✅|
