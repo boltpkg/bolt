@@ -1,6 +1,6 @@
 // @flow
 import { upgrade, toUpgradeOptions } from '../upgrade';
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
+import fixtures from 'fixturez';
 import * as path from 'path';
 import * as processes from '../../utils/processes';
 import * as yarn from '../../utils/yarn';
@@ -11,6 +11,8 @@ import readPkg from 'read-pkg';
 
 jest.mock('../../utils/yarn');
 jest.mock('../../utils/logger');
+
+const f = fixtures(__dirname);
 
 const unsafeProcessses: any & typeof processes = processes;
 const unsafeYarn: any & typeof yarn = yarn;
@@ -51,10 +53,7 @@ describe.only('bolt upgrade', () => {
   let fooWorkspaceDir;
   let barWorkspaceDir;
   beforeEach(async () => {
-    projectDir = await copyFixtureIntoTempDir(
-      __dirname,
-      'package-with-external-deps-installed'
-    );
+    projectDir = f.copy('package-with-external-deps-installed');
     fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
     unsafeYarn.upgrade.mockImplementation(fakeYarnUpgrade);

@@ -1,9 +1,9 @@
 // @flow
 import type { FilterOpts } from '../../types';
 import * as options from '../../utils/options';
+import * as messages from '../../utils/messages';
 import { BoltError } from '../../utils/errors';
 import * as Upgrade from '../upgrade';
-import chalk from 'chalk';
 
 export type WorkspacesUpgradeOptions = {
   cwd?: string,
@@ -28,15 +28,7 @@ export async function workspacesUpgrade(opts: WorkspacesUpgradeOptions) {
   let filterOpts = Object.keys(opts.filterOpts);
 
   if (filterOpts.length) {
-    throw new BoltError(
-      `${chalk.red.bold(
-        '[bolt workspace upgrade]'
-      )} Unable to upgrade dependencies for a single/ some workspace. \nTherefore, flags ${chalk.red.bold(
-        filterOpts.join(' ')
-      )} are not applicable here. \nIn order to upgrade a dependency please run without filter flags - ${chalk.green.bold(
-        '"bolt upgrade [...args]"'
-      )} or ${chalk.green.bold('"bolt workspaces upgrade [...args]"')}`
-    );
+    throw new BoltError(messages.errorWorkspacesUpgrade(filterOpts));
   }
 
   // Calling upgrade on project

@@ -33,9 +33,7 @@ export default async function upgradeDependenciesInPackage(
           messages.cannotUpgradeWorkspaceDependencyInProject(dep.name)
         );
       });
-      throw new BoltError(
-        'Internal packages are symlinked, there is no need update them'
-      );
+      throw new BoltError(messages.noNeedToSymlinkInternalDependency());
     }
   }
 

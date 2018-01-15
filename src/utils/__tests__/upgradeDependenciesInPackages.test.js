@@ -1,7 +1,7 @@
 // @flow
 
-import { copyFixtureIntoTempDir } from 'jest-fixtures';
 import path from 'path';
+import fixtures from 'fixturez';
 
 import upgradeDependenciesInPackage from '../upgradeDependenciesInPackages';
 import * as fs from '../../utils/fs';
@@ -13,6 +13,8 @@ import Config from '../../Config';
 
 jest.mock('../yarn');
 jest.mock('../logger');
+
+const f = fixtures(__dirname);
 
 const unsafeYarn: any & typeof yarn = yarn;
 
@@ -41,12 +43,13 @@ function getFooDir(project: Project) {
 }
 
 describe('utils/upgradeDependenciesInPackage', () => {
+  let cwd;
   beforeEach(() => {
     unsafeYarn.upgrade.mockImplementation(fakeYarnUpgrade);
+    cwd = f.copy('nested-workspaces');
   });
 
   test('upgrading existing dep in project', async () => {
-    const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
     const project = await Project.init(cwd);
 
     await upgradeDependenciesInPackage(project, project.pkg, [
@@ -59,8 +62,7 @@ describe('utils/upgradeDependenciesInPackage', () => {
     );
   });
 
-  test.only('upgrading shared existing dep in project', async () => {
-    const cwd = await copyFixtureIntoTempDir(__dirname, 'nested-workspaces');
+  test('upgrading shared existing dep in project', async () => {
     const project = await Project.init(cwd);
 
     await upgradeDependenciesInPackage(project, project.pkg, [
