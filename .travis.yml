@@ -10,4 +10,4 @@ cache:
   yarn: true
   directories:
   - node_modules
-script: yarn test -- --coverage && yarn flow
+script: yarn test --maxWorkers=4 && yarn flow
