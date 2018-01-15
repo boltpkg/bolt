@@ -46,6 +46,5 @@ export async function add(opts: AddOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);
-
   await addDependenciesToPackage(project, pkg, opts.deps, opts.type);
 }
