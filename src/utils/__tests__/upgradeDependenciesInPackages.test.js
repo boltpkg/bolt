@@ -71,9 +71,9 @@ describe('utils/upgradeDependenciesInPackage', () => {
 
     const deps = (await Project.init(cwd)).pkg.getAllDependencies;
     const fooDir = getFooDir(project);
-    // expect(await depsAtVersion(project.pkg.dir, { react: '^26.0.0' })).toBe(
-    //   true
-    // );
+    expect(await depsAtVersion(project.pkg.dir, { react: '^26.0.0' })).toBe(
+      true
+    );
     expect(await depsAtVersion(fooDir, { react: '^26.0.0' })).toBe(true);
   });
 });
