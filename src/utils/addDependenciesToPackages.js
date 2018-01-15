@@ -35,7 +35,6 @@ export default async function addDependenciesToPackage(
     // we reinitialise the project config because it will be modified externally by yarn
     project = await Project.init(project.pkg.dir);
   }
-
   if (pkg.isSamePackage(project.pkg)) {
     if (internalDeps.length > 0) {
       throw new BoltError(
