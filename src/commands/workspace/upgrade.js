@@ -1,5 +1,6 @@
 // @flow
 import * as options from '../../utils/options';
+import * as messages from '../../utils/messages';
 import { BoltError } from '../../utils/errors';
 import chalk from 'chalk';
 
@@ -18,11 +19,5 @@ export function toWorkspaceUpgradeOptions(
 }
 
 export async function workspaceUpgrade(opts: WorkspaceUpgradeOptions) {
-  throw new BoltError(
-    `${chalk.red.bold(
-      '[bolt workspace upgrade]'
-    )} Unable to upgrade dependencies for a single workspace. \nIn order to upgrade a dependency [across all the workspaces] please run ${chalk.green.bold(
-      '"bolt upgrade [...args]"'
-    )} or ${chalk.green.bold('"bolt workspaces upgrade [...args]"')}`
-  );
+  throw new BoltError(messages.errorWorkspaceUpgrade());
 }

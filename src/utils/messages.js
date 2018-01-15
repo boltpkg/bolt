@@ -335,3 +335,13 @@ export function linkInternalPackage(internalPackageName: string): Message {
 export function unlinkInternalPackage(internalPackageName: string): Message {
   return `Cannot unlink project package (${internalPackageName})`;
 }
+
+export function errorWorkspaceUpgrade(): Message {
+  return `${chalk.red.bold(
+    '[bolt workspace upgrade]'
+  )} Unable to upgrade dependencies for a single workspace.
+	
+	In order to upgrade a dependency [across all the workspaces] please run ${cmd(
+    '"bolt upgrade [...args]"'
+  )} or ${cmd('"bolt workspaces upgrade [...args]"')}`;
+}
