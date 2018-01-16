@@ -20,12 +20,14 @@ describe('bolt workspace run', () => {
   let fooWorkspaceDir;
   let barWorkspaceDir;
   let localYarn;
+  let relativeYarn;
 
   beforeEach(async () => {
     projectDir = f.copy('nested-workspaces');
     fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
     localYarn = path.join(await getLocalBinPath(), 'yarn');
+    relativeYarn = path.relative(projectDir, localYarn);
   });
 
   test('running script that exists', async () => {
@@ -36,7 +38,7 @@ describe('bolt workspace run', () => {
     );
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      localYarn,
+      relativeYarn,
       ['run', '-s', 'test'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
@@ -51,7 +53,7 @@ describe('bolt workspace run', () => {
 
     // Ensure the extra '--' gets passed in
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      localYarn,
+      relativeYarn,
       ['run', '-s', 'test', '--', '--first-arg', '--second-arg'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
@@ -65,7 +67,7 @@ describe('bolt workspace run', () => {
     );
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      localYarn,
+      relativeYarn,
       ['run', '-s', 'test'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );

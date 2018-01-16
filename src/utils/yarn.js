@@ -4,6 +4,7 @@ import projectBinPath from 'project-bin-path';
 import * as path from 'path';
 import type { Dependency, configDependencyType } from '../types';
 import type Package from '../Package';
+import Project from '../Project';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
 import * as logger from '../utils/fs';
@@ -80,14 +81,16 @@ export async function run(
   script: string,
   args: Array<string> = []
 ) {
+  const project = await Project.init(pkg.dir);
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  // We use a relative path because the absolute paths are very long and noisy in logs
+  const localYarnRelative = path.relative(project.pkg.dir, localYarn);
   let spawnArgs = ['run', '-s', script];
 
   if (args.length) {
     spawnArgs = spawnArgs.concat('--', args);
   }
-
-  await processes.spawn(localYarn, spawnArgs, {
+  await processes.spawn(localYarnRelative, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true
