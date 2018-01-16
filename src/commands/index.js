@@ -1,11 +1,11 @@
 // @flow
 module.exports = {
   ...require('./add'),
+  ...require('./autoclean'),
   ...require('./bin'),
   ...require('./build'),
   ...require('./cache'),
   ...require('./check'),
-  ...require('./clean'),
   ...require('./config'),
   ...require('./create'),
   ...require('./doc'),
