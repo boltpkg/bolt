@@ -27,7 +27,7 @@ describe('bolt workspace run', () => {
     fooWorkspaceDir = path.join(projectDir, 'packages', 'foo');
     barWorkspaceDir = path.join(projectDir, 'packages', 'bar');
     localYarn = path.join(await getLocalBinPath(), 'yarn');
-    relativeYarn = path.relative(projectDir, localYarn);
+    relativeYarn = pkgDir => path.relative(pkgDir, localYarn);
   });
 
   test('running script that exists', async () => {
@@ -36,9 +36,10 @@ describe('bolt workspace run', () => {
         cwd: projectDir
       })
     );
+    const expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      relativeYarn,
+      expectedRelativeYarnPath,
       ['run', '-s', 'test'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
@@ -50,10 +51,11 @@ describe('bolt workspace run', () => {
         cwd: projectDir
       })
     );
+    const expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
 
     // Ensure the extra '--' gets passed in
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      relativeYarn,
+      expectedRelativeYarnPath,
       ['run', '-s', 'test', '--', '--first-arg', '--second-arg'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
@@ -65,9 +67,10 @@ describe('bolt workspace run', () => {
         cwd: barWorkspaceDir
       })
     );
+    const expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
-      relativeYarn,
+      expectedRelativeYarnPath,
       ['run', '-s', 'test'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );

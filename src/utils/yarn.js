@@ -84,7 +84,7 @@ export async function run(
   const project = await Project.init(pkg.dir);
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
   // We use a relative path because the absolute paths are very long and noisy in logs
-  const localYarnRelative = path.relative(project.pkg.dir, localYarn);
+  const localYarnRelative = path.relative(pkg.dir, localYarn);
   let spawnArgs = ['run', '-s', script];
 
   if (args.length) {
