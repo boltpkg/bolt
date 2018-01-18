@@ -1,16 +1,26 @@
 // @flow
 import * as options from '../utils/options';
+import * as npm from '../utils/npm';
 import { BoltError } from '../utils/errors';
 
-export type LogoutOptions = {};
+export type LogoutOptions = {
+  cwd?: string
+};
 
 export function toLogoutOptions(
   args: options.Args,
   flags: options.Flags
 ): LogoutOptions {
-  return {};
+  return {
+    cwd: options.string(flags.cwd, 'cwd')
+  };
 }
 
 export async function logout(opts: LogoutOptions) {
-  throw new BoltError('Unimplemented command "logout"');
+  let cwd = opts.cwd || process.cwd();
+  try {
+    await npm.logout(cwd);
+  } catch (err) {
+    throw new BoltError(err);
+  }
 }
