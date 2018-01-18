@@ -6,6 +6,7 @@ import * as logger from '../utils/logger';
 import addDependenciesToPackage from '../utils/addDependenciesToPackages';
 import type { Dependency, configDependencyType } from '../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
+import { ProjectAddOptions } from './project/add';
 
 export type AddOptions = {
   cwd?: string,
@@ -42,7 +43,7 @@ export function toAddOptions(
   };
 }
 
-export async function add(opts: AddOptions) {
+export async function add(opts: AddOptions | ProjectAddOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);
