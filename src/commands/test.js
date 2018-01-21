@@ -3,7 +3,6 @@ import Package from '../Package';
 import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
 import * as options from '../utils/options';
-import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
 import { run } from './run';
 
