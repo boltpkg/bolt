@@ -362,3 +362,11 @@ export function errorWorkspacesUpgrade(filterOpts: Array<string>): Message {
 export function noNeedToSymlinkInternalDependency(): Message {
   return `Internal packages are symlinked, there is no need update them`;
 }
+
+export function runningDefaultScript(
+  orignalScript: string,
+  defaultScript: string,
+  packageDir: string
+): Message {
+  return `Script "${orignalScript}" is not available in "${packageDir}", so running default script "${defaultScript}"`;
+}

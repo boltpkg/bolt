@@ -1,6 +1,10 @@
 // @flow
+import Package from '../Package';
+import * as logger from '../utils/logger';
+import * as messages from '../utils/messages';
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
+import * as yarn from '../utils/yarn';
 import { run } from './run';
 
 export type TestOptions = {|
@@ -19,9 +23,22 @@ export function toTestOptions(
 }
 
 export async function test(opts: TestOptions) {
+  let script = 'test';
+  let cwd = opts.cwd || process.cwd();
+  let pkg = await Package.closest(cwd);
+  let testScript = await yarn.getScript(pkg, 'test');
+
+  if (!testScript) {
+    logger.warn(messages.runningDefaultScript('test', 'jest', pkg.dir), {
+      emoji: '😎',
+      prefix: false
+    });
+    script = 'jest';
+  }
+
   await run({
     cwd: opts.cwd,
-    script: 'test',
+    script,
     scriptArgs: opts.args
   });
 }
