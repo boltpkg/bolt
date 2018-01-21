@@ -3,7 +3,7 @@ import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import Project from '../../Project';
 import Package from '../../Package';
-import type { Dependency } from '../types';
+import type { Dependency } from '../../types';
 import upgradeDependenciesInPackage from '../../utils/upgradeDependenciesInPackages';
 
 // TODO: pass flags individially, upgrade has many flags this is here for testing
