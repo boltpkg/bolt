@@ -1,0 +1,6 @@
+{
+  "name": "simple-project-with-scripts",
+  "scripts": {
+    "test": "echo 'testing from simple-project-with-scripts"
+  }
+}
