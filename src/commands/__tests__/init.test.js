@@ -1,8 +1,12 @@
 // @flow
 import { init, toInitOptions } from '../init';
 import * as yarn from '../../utils/yarn';
+import * as prompts from '../../utils/prompts';
+import Package from '../../Package';
 
 jest.mock('../../utils/yarn');
+jest.mock('../../utils/prompts');
+
 const dummyPath = '/dummyPattern/dummyPath';
 describe('bolt init', () => {
   it('should be able to pass yes to yarn when y flag is passed', async () => {
@@ -44,5 +48,10 @@ describe('bolt init', () => {
       '-p',
       '-y'
     ]);
+  });
+
+  it('should be able to add workspaces', async () => {
+    await init(toInitOptions([], { cwd: dummyPath }));
+    expect(prompts.isWorkspaceNeeded).toHaveBeenCalledTimes(1);
   });
 });
