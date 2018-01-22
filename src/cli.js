@@ -11,6 +11,7 @@ import * as options from './utils/options';
 
 const commandMap = {
   ADD: { add: true },
+  AUTOCLEAN: { autoclean: true },
   BIN: { bin: true },
   CACHE: { cache: true },
   CACHE_CLEAN: { clean: true },
@@ -103,6 +104,8 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
 
   if (commandMap.ADD[command]) {
     return commands.add(commands.toAddOptions(commandArgs, flags));
+  } else if (commandMap.AUTOCLEAN[command]) {
+    return commands.autoclean(commands.toAutocleanOptions(commandArgs, flags));
   } else if (commandMap.BIN[command]) {
     return commands.bin(commands.toBinOptions(commandArgs, flags));
   } else if (commandMap.CACHE[command]) {
