@@ -139,7 +139,7 @@ yarn global add bolt
 | └ `bolt p run [script]`                 | Run a script on the project package                                       |✅|
 | └ `bolt p add [dependency]`             | Add a dependency to the project package                                   |✅|
 | └ `bolt p remove [dependency]`          | Remove a dependency from the project package                              |✅|
-| └ `bolt p upgrade [dependency]`         | Upgrade a dependency on the project package                               |❌|
+| └ `bolt p upgrade [dependency]`         | Upgrade a dependency on the project package                               |✅|
 | `bolt generate/g [generator]`           | **Create files in your package using a generator:**                       ||
 | └ `bolt g license [license]`            | Create a LICENSE file in your package (Default: MIT)                      |❌|
 
