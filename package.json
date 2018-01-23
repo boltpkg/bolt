@@ -51,6 +51,7 @@
     "detect-indent": "^5.0.0",
     "find-up": "^2.1.0",
     "globby": "^6.1.0",
+    "inquirer": "3.3.0",
     "is-glob": "^4.0.0",
     "make-dir": "^1.0.0",
     "meow": "^4.0.0",
