@@ -1,5 +1,5 @@
 // @flow
-import isWorkspaceNeeded from '../prompts';
+import * as prompts from '../prompts';
 
 describe('Prompts', () => {
   test('isWorkspaceNeeded');

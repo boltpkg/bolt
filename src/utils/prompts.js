@@ -1,3 +1,5 @@
+// @flow
+
 import inquirer from 'inquirer';
 
 export async function isWorkspaceNeeded() {
