@@ -93,3 +93,17 @@ export function removeTag(pkgName: string, tag: string) {
     }
   });
 }
+
+export async function login(cwd: string) {
+  await processes.spawn('npm', ['login'], {
+    cwd,
+    tty: true
+  });
+}
+
+export async function logout(cwd: string) {
+  await processes.spawn('npm', ['logout'], {
+    cwd,
+    tty: true
+  });
+}
