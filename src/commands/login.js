@@ -3,9 +3,9 @@ import * as options from '../utils/options';
 import * as npm from '../utils/npm';
 import { BoltError } from '../utils/errors';
 
-export type LoginOptions = {
+export type LoginOptions = {|
   cwd?: string
-};
+|};
 
 export function toLoginOptions(
   args: options.Args,

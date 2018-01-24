@@ -23,7 +23,7 @@ export function toInfoOptions(
 export async function info(opts: InfoOptions) {
   let cwd = opts.cwd || process.cwd();
   const spawnArgs = Array.prototype.concat([], opts.args);
-  if (opts.flags.json) {
+  if (opts.flags && opts.flags.json) {
     spawnArgs.push('--json');
   }
   try {
