@@ -12,10 +12,7 @@ export function toConfigListOptions(
   args: options.Args,
   flags: options.Flags
 ): ConfigListOptions {
-  if (
-    args.length !== 0 ||
-    Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).length !== 0
-  ) {
+  if (args.length !== 0) {
     throw new BoltError('Invalid subcommand, try bolt config list');
   }
   return { cwd: options.string(flags.cwd, 'cwd') };
@@ -24,7 +21,7 @@ export function toConfigListOptions(
 export async function configList(opts: ConfigListOptions) {
   let cwd = opts.cwd || process.cwd();
   try {
-    await yarn.cliCommand(cwd, 'config list');
+    await yarn.cliCommand(cwd, 'config', ['list']);
   } catch (err) {
     throw new BoltError(err);
   }
