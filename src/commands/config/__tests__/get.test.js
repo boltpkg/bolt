@@ -1,4 +1,17 @@
 // @flow
 import { configGet, toConfigGetOptions } from '../get';
+import * as yarn from '../../../utils/yarn';
+import { BoltError } from '../../../utils/errors';
 
-test('bolt config get');
+jest.mock('../../../utils/yarn');
+
+const dummyPath = '/dummyPattern/dummyPath';
+test('bolt config get', async () => {
+  const config = await configGet(
+    toConfigGetOptions(['user-agent'], { cwd: dummyPath })
+  );
+  expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'config', [
+    'get',
+    'user-agent'
+  ]);
+});
