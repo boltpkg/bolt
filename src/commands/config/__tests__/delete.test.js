@@ -6,7 +6,7 @@ import { BoltError } from '../../../utils/errors';
 jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
-test('bolt config get', async () => {
+test('bolt config delete', async () => {
   const config = await configDelete(
     toConfigDeleteOptions(['user-agent'], { cwd: dummyPath })
   );
