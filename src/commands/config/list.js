@@ -2,7 +2,6 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
-import { DEPENDENCY_TYPE_FLAGS_MAP } from '../../constants';
 
 export type ConfigListOptions = {
   cwd?: string
