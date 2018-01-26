@@ -19,6 +19,7 @@ const commandMap = {
   CACHE_LIST: { list: true, ls: true },
   CHECK: { check: true },
   CONFIG: { config: true },
+  CONFIG_CURRENT: { current: true },
   CONFIG_DELETE: { delete: true },
   CONFIG_GET: { get: true },
   CONFIG_LIST: { list: true, ls: true },
@@ -146,6 +147,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     } else if (commandMap.CONFIG_SET[subCommand]) {
       return commands.configSet(
         commands.toConfigSetOptions(subCommandArgs, flags)
+      );
+    } else if (commandMap.CONFIG_CURRENT[subCommand]) {
+      return commands.configCurrent(
+        commands.toConfigCurrentOptions(subCommandArgs, flags)
       );
     }
   } else if (commandMap.CREATE[command]) {
