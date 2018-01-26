@@ -21,8 +21,9 @@
     "build:legacy": "BABEL_ENV=legacy babel src -d dist/legacy",
     "build:modern": "BABEL_ENV=modern babel src -d dist/modern",
     "build": "yarn run clean && yarn build:legacy && yarn build:modern",
+    "precommit": "lint-staged",
     "prepublish": "yarn build",
-    "precommit": "lint-staged"
+    "prepush": "yarn flow && yarn format && yarn test"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
