@@ -1,4 +1,17 @@
 // @flow
 import { teamDestroy, toTeamDestroyOptions } from '../destroy';
+import * as npm from '../../../utils/npm';
+import { BoltError } from '../../../utils/errors';
 
-test('bolt team destroy');
+jest.mock('../../../utils/npm');
+
+const dummyPath = '/dummyPattern/dummyPath';
+test('bolt team destroy', async () => {
+  const team = await teamDestroy(
+    toTeamDestroyOptions(['test-tag'], { cwd: dummyPath })
+  );
+  expect(npm.cliCommand).toHaveBeenCalledWith(dummyPath, 'team', [
+    'destroy',
+    'test-tag'
+  ]);
+});

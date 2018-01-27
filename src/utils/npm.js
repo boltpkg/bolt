@@ -113,9 +113,7 @@ export async function cliCommand(
   command: string = '',
   spawnArgs: Array<string> = []
 ) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-
-  return await processes.spawn(localYarn, [command, ...spawnArgs], {
+  return await processes.spawn('npm', [command, ...spawnArgs], {
     cwd,
     tty: true
   });
