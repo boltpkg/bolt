@@ -1,4 +1,17 @@
 // @flow
 import { teamCreate, toTeamCreateOptions } from '../create';
+import * as npm from '../../../utils/npm';
+import { BoltError } from '../../../utils/errors';
 
-test('bolt team create');
+jest.mock('../../../utils/npm');
+
+const dummyPath = '/dummyPattern/dummyPath';
+test('bolt team create', async () => {
+  const team = await teamCreate(
+    toTeamCreateOptions(['test-tag'], { cwd: dummyPath })
+  );
+  expect(npm.cliCommand).toHaveBeenCalledWith(dummyPath, 'team', [
+    'create',
+    'test-tag'
+  ]);
+});
