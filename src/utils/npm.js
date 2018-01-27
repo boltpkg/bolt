@@ -107,3 +107,16 @@ export async function logout(cwd: string) {
     tty: true
   });
 }
+
+export async function cliCommand(
+  cwd: string,
+  command: string = '',
+  spawnArgs: Array<string> = []
+) {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+
+  return await processes.spawn(localYarn, [command, ...spawnArgs], {
+    cwd,
+    tty: true
+  });
+}
