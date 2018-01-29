@@ -16,12 +16,13 @@ export default async function validateProject(project: Project) {
   const { graph: depGraph } = await project.getDependencyGraph(workspaces);
 
   let projectIsValid = true;
+  let invalidMessages = [];
 
   // If the project has an engines.bolt field we must respect it
   const boltConfigVersion = projectConfig.getBoltConfigVersion();
   if (boltConfigVersion) {
     if (!semver.satisfies(BOLT_VERSION, boltConfigVersion)) {
-      logger.error(
+      invalidMessages.push(
         messages.invalidBoltVersion(BOLT_VERSION, boltConfigVersion)
       );
       projectIsValid = false;
@@ -32,7 +33,7 @@ export default async function validateProject(project: Project) {
   for (let workspace of workspaces) {
     const depName = workspace.pkg.config.getName();
     if (projectDependencies.has(depName)) {
-      logger.error(messages.projectCannotDependOnWorkspace(depName));
+      invalidMessages.push(messages.projectCannotDependOnWorkspace(depName));
       projectIsValid = false;
     }
   }
@@ -41,5 +42,8 @@ export default async function validateProject(project: Project) {
    *     <More Project checks here>
    */
 
-  return projectIsValid;
+  return {
+    invalidMessages,
+    projectIsValid
+  };
 }
