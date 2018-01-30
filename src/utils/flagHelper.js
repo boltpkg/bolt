@@ -1,8 +1,9 @@
 // @flow
+import * as options from './options';
 
-const IS_BOOLEAN_FLAGS = {
+const BOOLEAN_FLAGS = {
   '--dev': true,
-  '--peerdev': true
+  '--peer': true
 };
 
 function isFlagWithValue(flag) {
@@ -14,28 +15,26 @@ function isFlag(maybeFlag) {
 }
 
 export function identifyFlags(args: Array<string> = []) {
-  let flags = [];
+  let flagsWithArgs = [];
   args.forEach((arg, index) => {
     if (isFlag(arg)) {
-      if (IS_BOOLEAN_FLAGS[arg]) {
-        flags.push(arg);
+      if (BOOLEAN_FLAGS[arg]) {
+        flagsWithArgs.push(arg);
       } else {
-        if (isFlagWithValue(arg)) {
-          flags.push(arg);
-        } else {
-          flags.push(arg, args[++index]);
-        }
+        index < args.length - 1
+          ? flagsWithArgs.push(`${arg}=${arg[++index]}`)
+          : flagsWithArgs.push(args);
       }
     }
   });
-  return flags;
+  return flagsWithArgs;
 }
 
-export function extractPossibleArgs(flags = {}) {
+export function extractPossibleArgs(flags: options.Flags = {}) {
   let additionalArgs = [];
   let updatedFlags = Object.assign({}, flags);
   Object.keys(updatedFlags).forEach(flag => {
-    if (IS_BOOLEAN_FLAGS['--' + flag]) {
+    if (BOOLEAN_FLAGS['--' + flag]) {
       additionalArgs.push(updatedFlags[flag]);
       updatedFlags[flag] = true;
     }

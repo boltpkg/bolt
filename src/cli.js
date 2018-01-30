@@ -8,7 +8,7 @@ import { BoltError } from './utils/errors';
 import cleanStack from 'clean-stack';
 import * as commands from './commands';
 import * as options from './utils/options';
-import * as flagHelpers from './functions/flagHelper';
+import * as flagHelpers from './utils/flagHelper';
 
 const commandMap = {
   ADD: { add: true },
@@ -101,7 +101,6 @@ const commandMap = {
 };
 
 function runCommandFromCli(args: options.Args, flags: options.Flags, pureArgs) {
-  console.log(flags);
   let flagsArgs = flagHelpers.identifyFlags(pureArgs);
   let { additionalArgs, updatedFlags } = flagHelpers.extractPossibleArgs(flags);
 
