@@ -31,6 +31,4 @@ export async function validate(opts: ValidateType) {
   } else {
     logger.success(messages.projectIsValid(project.pkg.config.getName()));
   }
-
-  return validationResult.projectIsValid;
 }

@@ -26,7 +26,8 @@ describe('utils/validateProject', () => {
     let project = await Project.init(cwd);
     let valid = await validateProject(project);
 
-    expect(valid).toBe(true);
+    expect(valid.projectIsValid).toBe(true);
+    expect(valid.invalidMessages.length).toBe(0);
   });
 
   test('should return false if project has a dependency on a workspace', async () => {
@@ -34,7 +35,8 @@ describe('utils/validateProject', () => {
     let project = await Project.init(cwd);
     let valid = await validateProject(project);
 
-    expect(valid).toBe(false);
+    expect(valid.projectIsValid).toBe(false);
+    expect(valid.invalidMessages.length).toBe(1);
   });
 
   describe('bolt.version field', () => {
@@ -46,7 +48,8 @@ describe('utils/validateProject', () => {
       Constants.BOLT_VERSION = '0.14.6';
       let valid = await validateProject(project);
 
-      expect(valid).toBe(true);
+      expect(valid.projectIsValid).toBe(true);
+      expect(valid.invalidMessages.length).toBe(0);
     });
 
     test('should return false if bolt version doesnt match engines field', async () => {
@@ -57,7 +60,8 @@ describe('utils/validateProject', () => {
       Constants.BOLT_VERSION = '0.13.0';
       let valid = await validateProject(project);
 
-      expect(valid).toBe(false);
+      expect(valid.projectIsValid).toBe(false);
+      expect(valid.invalidMessages.length).toBe(1);
     });
   });
 });
