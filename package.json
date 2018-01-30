@@ -23,7 +23,7 @@
     "build": "yarn run clean && yarn build:legacy && yarn build:modern",
     "precommit": "lint-staged",
     "prepublish": "yarn build",
-    "prepush": "yarn flow && yarn format && yarn test"
+    "test:complete": "yarn flow && yarn format && yarn test"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
