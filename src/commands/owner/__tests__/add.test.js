@@ -1,4 +1,18 @@
 // @flow
 import { ownerAdd, toOwnerAddOptions } from '../add';
+import * as yarn from '../../../utils/yarn';
+import { BoltError } from '../../../utils/errors';
 
-test('bolt owner add');
+jest.mock('../../../utils/yarn');
+
+const dummyPath = '/dummyPattern/dummyPath';
+test('bolt owner add', async () => {
+  const tag = await ownerAdd(
+    toOwnerAddOptions(['test-owner@1.0.0', 'stable'], { cwd: dummyPath })
+  );
+  expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'owner', [
+    'add',
+    'test-owner@1.0.0',
+    'stable'
+  ]);
+});
