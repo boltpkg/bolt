@@ -155,3 +155,17 @@ export async function info(cwd: string, spawnArgs: Array<string> = []) {
     tty: true
   });
 }
+
+export async function userAgent() {
+  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+
+  const { stdout: yarnUserAgent } = await processes.spawn(
+    localYarn,
+    ['config', 'get', 'user-agent'],
+    {
+      tty: false
+    }
+  );
+
+  return yarnUserAgent.replace(/\n/g, '');
+}

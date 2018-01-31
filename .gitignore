@@ -4,3 +4,4 @@ dist
 coverage/
 !**/__fixtures__/**/node_modules/
 example-2
+.vscode/

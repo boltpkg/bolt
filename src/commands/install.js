@@ -11,6 +11,7 @@ import symlinkPackageDependencies from '../utils/symlinkPackageDependencies';
 import * as yarn from '../utils/yarn';
 import pathIsInside from 'path-is-inside';
 import { BoltError } from '../utils/errors';
+import { BOLT_VERSION } from '../constants';
 
 export type InstallOptions = {|
   cwd?: string,
@@ -47,9 +48,13 @@ export async function install(opts: InstallOptions) {
     prefix: false
   });
 
+  const yarnUserAgent = await yarn.userAgent();
+  const boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
+
   await processes.spawn('yarn', ['install', ...installFlags], {
     cwd: project.pkg.dir,
-    tty: true
+    tty: true,
+    env: { ...process.env, npm_config_user_agent: boltUserAgent }
   });
 
   logger.info(messages.linkingWorkspaceDependencies(), {
