@@ -1,7 +1,6 @@
 // @flow
 import { ownerAdd, toOwnerAddOptions } from '../add';
 import * as yarn from '../../../utils/yarn';
-import { BoltError } from '../../../utils/errors';
 
 jest.mock('../../../utils/yarn');
 
