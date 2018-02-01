@@ -6,7 +6,7 @@ jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt owner remove', async () => {
-  const tag = await ownerRemove(
+  await ownerRemove(
     toOwnerRemoveOptions(['test-owner', 'stable'], { cwd: dummyPath })
   );
   expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'owner', [
