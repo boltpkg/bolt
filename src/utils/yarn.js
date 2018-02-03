@@ -155,3 +155,23 @@ export async function info(cwd: string, spawnArgs: Array<string> = []) {
     tty: true
   });
 }
+
+export async function globalCli(
+  command: string = '',
+  dependencies: Array<Dependency>
+) {
+  const spawnArgs = ['global', command];
+  if (!dependencies.length) return;
+
+  dependencies.forEach(dep => {
+    if (dep.version) {
+      spawnArgs.push(`${dep.name}@${dep.version}`);
+    } else {
+      spawnArgs.push(dep.name);
+    }
+  });
+
+  await processes.spawn('yarn', spawnArgs, {
+    tty: true
+  });
+}
