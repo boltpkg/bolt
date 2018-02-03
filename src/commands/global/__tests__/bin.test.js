@@ -1,4 +1,12 @@
 // @flow
 import { globalBin, toGlobalBinOptions } from '../bin';
+import * as yarn from '../../../utils/yarn';
+import { BoltError } from '../../../utils/errors';
 
-test('bolt global bin');
+jest.mock('../../../utils/yarn');
+
+const dummyPath = '/dummyPattern/dummyPath';
+test('bolt global bin', async () => {
+  const tag = await globalBin(toGlobalBinOptions([], { cwd: dummyPath }));
+  expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'global', ['bin']);
+});
