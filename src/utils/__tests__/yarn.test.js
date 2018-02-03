@@ -82,4 +82,16 @@ describe('utils/yarn', () => {
       assertSpawnCalls(localYarn, ['test'], 'dummyPattern/dummyPath');
     });
   });
+
+  describe('userAgent()', () => {
+    it('should strip empty lines from the spawned yarn process stdout', async () => {
+      const expectedUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+      const stdout = `
+
+${expectedUserAgent}
+`;
+      unsafeProcesses.spawn.mockReturnValueOnce(Promise.resolve({ stdout }));
+      expect(await yarn.userAgent()).toBe(expectedUserAgent);
+    });
+  });
 });

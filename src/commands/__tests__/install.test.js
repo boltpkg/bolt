@@ -7,6 +7,7 @@ import * as fs from '../../utils/fs';
 import Project from '../../Project';
 import Workspace from '../../Workspace';
 import fixtures from 'fixturez';
+import * as constants from '../../constants';
 
 const f = fixtures(__dirname);
 
@@ -17,6 +18,8 @@ jest.unmock('../install');
 
 const unsafeProcesses: any & typeof processes = processes;
 const unsafeYarn: any & typeof yarn = yarn;
+const unsafeConstants: any & typeof constants = constants;
+const unsafeProcess: any & typeof process = process;
 
 async function assertNodeModulesExists(workspace: Workspace) {
   let nodeModulesStat = await fs.stat(workspace.pkg.nodeModules);
@@ -35,12 +38,22 @@ async function assertDependenciesSymlinked(workspace: Workspace) {
 }
 
 describe('install', () => {
+  const yarnUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+  const boltUserAgent = 'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+
+  beforeEach(() => {
+    unsafeProcess.env = { parent_env: 1 };
+    unsafeYarn.userAgent.mockReturnValueOnce(yarnUserAgent);
+    unsafeConstants.BOLT_VERSION = '9.9.9';
+  });
+
   test('simple-package, should run yarn install at the root', async () => {
     let cwd = f.find('simple-package');
     await install(toInstallOptions([], { cwd }));
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith('yarn', ['install'], {
       cwd,
+      env: { parent_env: 1, npm_config_user_agent: boltUserAgent },
       tty: true
     });
   });
@@ -52,6 +65,7 @@ describe('install', () => {
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith('yarn', ['install'], {
       cwd: rootDir,
+      env: { parent_env: 1, npm_config_user_agent: boltUserAgent },
       tty: true
     });
   });
@@ -66,6 +80,7 @@ describe('install', () => {
       ['install', '--pure-lockfile'],
       {
         cwd: rootDir,
+        env: { parent_env: 1, npm_config_user_agent: boltUserAgent },
         tty: true
       }
     );
@@ -82,6 +97,26 @@ describe('install', () => {
       assertNodeModulesExists(workspace);
       assertDependenciesSymlinked(workspace);
     }
+  });
+
+  test('should append the bolt version to yarns npm_config_user_agent string', async () => {
+    const spawnSpy = jest.spyOn(processes, 'spawn');
+    let cwd = f.find('nested-workspaces-with-scoped-package-names');
+
+    await install(toInstallOptions([], { cwd }));
+
+    expect(spawnSpy.mock.calls[0][2].env.npm_config_user_agent).toEqual(
+      'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64'
+    );
+  });
+
+  test('should pass existing environment variables to yarn during install', async () => {
+    const spawnSpy = jest.spyOn(processes, 'spawn');
+    let cwd = f.find('nested-workspaces-with-scoped-package-names');
+
+    await install(toInstallOptions([], { cwd }));
+
+    expect(spawnSpy.mock.calls[0][2].env.parent_env).toEqual(1);
   });
 
   test('should run preinstall, postinstall and prepublish in each ws', async () => {
