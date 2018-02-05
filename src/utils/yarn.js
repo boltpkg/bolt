@@ -79,7 +79,8 @@ export async function upgrade(
 export async function run(
   pkg: Package,
   script: string,
-  args: Array<string> = []
+  args: Array<string> = [],
+  scriptFlags: Array<string> = []
 ) {
   const project = await Project.init(pkg.dir);
   const localYarn = path.join(await getLocalBinPath(), 'yarn');
@@ -88,9 +89,10 @@ export async function run(
   let spawnArgs = ['run', '-s', script];
 
   if (args.length) {
-    spawnArgs = spawnArgs.concat('--', args);
+    spawnArgs = spawnArgs.concat(args);
   }
-  await processes.spawn(localYarnRelative, spawnArgs, {
+
+  await processes.spawn(localYarnRelative, [...spawnArgs, ...scriptFlags], {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true
