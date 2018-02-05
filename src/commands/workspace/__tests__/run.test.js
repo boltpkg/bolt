@@ -56,7 +56,7 @@ describe('bolt workspace run', () => {
     // Ensure the extra '--' gets passed in
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
       expectedRelativeYarnPath,
-      ['run', '-s', 'test', '--', '--first-arg', '--second-arg'],
+      ['run', '-s', 'test', '--first-arg', '--second-arg'],
       expect.objectContaining({ cwd: fooWorkspaceDir })
     );
   });

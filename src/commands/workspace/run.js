@@ -48,5 +48,5 @@ export async function workspaceRun(opts: WorkspaceRunOptions) {
     );
   }
 
-  await yarn.run(workspace.pkg, opts.script, opts.scriptArgs);
+  await yarn.run(workspace.pkg, opts.script, opts.scriptArgs, []);
 }

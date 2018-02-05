@@ -21,6 +21,7 @@ export function getArgsBooleanFlagsScriptFlags(flags: options.Flags = {}) {
   let updatedFlags = Object.assign({}, flags);
 
   scriptFlags = Object.keys(updatedFlags).map(flag => {
+    if (flag === '--') return '';
     if (BOOLEAN_FLAGS[flag]) {
       additionalArgs.push(updatedFlags[flag]);
       updatedFlags[flag] = true;
