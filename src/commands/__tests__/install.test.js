@@ -49,7 +49,7 @@ describe('install', () => {
 
   test('simple-package, should run yarn install at the root', async () => {
     let cwd = f.find('simple-package');
-    await install(toInstallOptions([], { cwd }));
+    await install(toInstallOptions([], { cwd }, []));
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith('yarn', ['install'], {
       cwd,
@@ -61,7 +61,7 @@ describe('install', () => {
   test('should still run yarn install at the root when called from ws', async () => {
     let rootDir = f.find('simple-project');
     let cwd = path.join(path.join(rootDir, 'packages', 'foo'));
-    await install(toInstallOptions([], { cwd }));
+    await install(toInstallOptions([], { cwd }, []));
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith('yarn', ['install'], {
       cwd: rootDir,
@@ -73,7 +73,7 @@ describe('install', () => {
   test('should pass the --pure-lockfile flag correctly', async () => {
     let rootDir = f.find('simple-project');
     let cwd = path.join(path.join(rootDir, 'packages', 'foo'));
-    await install(toInstallOptions([], { cwd, pureLockfile: true }));
+    await install(toInstallOptions([], { cwd }, ['--pure-lockfile']));
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
       'yarn',
@@ -91,7 +91,7 @@ describe('install', () => {
     let project = await Project.init(cwd);
     let workspaces = await project.getWorkspaces();
 
-    await install(toInstallOptions([], { cwd }));
+    await install(toInstallOptions([], { cwd }, []));
 
     for (let workspace of workspaces) {
       assertNodeModulesExists(workspace);
@@ -103,7 +103,7 @@ describe('install', () => {
     const spawnSpy = jest.spyOn(processes, 'spawn');
     let cwd = f.find('nested-workspaces-with-scoped-package-names');
 
-    await install(toInstallOptions([], { cwd }));
+    await install(toInstallOptions([], { cwd }, []));
 
     expect(spawnSpy.mock.calls[0][2].env.npm_config_user_agent).toEqual(
       'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64'
@@ -114,7 +114,7 @@ describe('install', () => {
     const spawnSpy = jest.spyOn(processes, 'spawn');
     let cwd = f.find('nested-workspaces-with-scoped-package-names');
 
-    await install(toInstallOptions([], { cwd }));
+    await install(toInstallOptions([], { cwd }, []));
 
     expect(spawnSpy.mock.calls[0][2].env.parent_env).toEqual(1);
   });
@@ -124,7 +124,7 @@ describe('install', () => {
     let project = await Project.init(cwd);
     let workspaces = await project.getWorkspaces();
 
-    await install(toInstallOptions([], { cwd }));
+    await install(toInstallOptions([], { cwd }, []));
 
     for (let workspace of workspaces) {
       let runFn = unsafeYarn.runIfExists;
@@ -140,7 +140,7 @@ describe('install', () => {
     const project = await Project.init(cwd);
     const workspaces = await project.getWorkspaces();
 
-    await install(toInstallOptions([], { cwd }));
+    await install(toInstallOptions([], { cwd }, []));
 
     for (let workspace of workspaces) {
       assertNodeModulesExists(workspace);
@@ -153,8 +153,8 @@ describe('install', () => {
     let cwd = f.copy('invalid-project-root-dependency-on-ws');
     let project = await Project.init(cwd);
 
-    await expect(install(toInstallOptions([], { cwd }))).rejects.toBeInstanceOf(
-      Error
-    );
+    await expect(
+      install(toInstallOptions([], { cwd }, []))
+    ).rejects.toBeInstanceOf(Error);
   });
 });

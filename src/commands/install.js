@@ -15,16 +15,17 @@ import { BOLT_VERSION } from '../constants';
 
 export type InstallOptions = {|
   cwd?: string,
-  pureLockfile: boolean
+  scriptFlags: Array<string>
 |};
 
 export function toInstallOptions(
   args: options.Args,
-  flags: options.Flags
+  flags: options.Flags,
+  scriptFlags: Array<string>
 ): InstallOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    pureLockfile: options.boolean(flags.pureLockfile, 'pure-lockfile') || false
+    scriptFlags
   };
 }
 
@@ -32,9 +33,6 @@ export async function install(opts: InstallOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
-  let installFlags = [];
-
-  if (opts.pureLockfile) installFlags.push('--pure-lockfile');
 
   logger.info(messages.validatingProject(), { emoji: '🔎', prefix: false });
 
@@ -51,7 +49,7 @@ export async function install(opts: InstallOptions) {
   const yarnUserAgent = await yarn.userAgent();
   const boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
 
-  await processes.spawn('yarn', ['install', ...installFlags], {
+  await processes.spawn('yarn', ['install', ...opts.scriptFlags], {
     cwd: project.pkg.dir,
     tty: true,
     env: { ...process.env, npm_config_user_agent: boltUserAgent }

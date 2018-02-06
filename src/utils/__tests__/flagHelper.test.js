@@ -18,8 +18,8 @@ test('getting args, boolean flags and script flags', () => {
 
   expect(scriptFlags).toEqual([
     '',
-    '--dev true',
-    '--coverage true',
+    '--dev',
+    '--coverage',
     '--camel-case-flag flagValue'
   ]);
 

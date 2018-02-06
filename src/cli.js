@@ -216,7 +216,9 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
   } else if (commandMap.INIT[command]) {
     return commands.init(commands.toInitOptions(commandArgs, flags));
   } else if (commandMap.INSTALL[command] || typeof command === 'undefined') {
-    return commands.install(commands.toInstallOptions(commandArgs, flags));
+    return commands.install(
+      commands.toInstallOptions(commandArgs, flags, scriptFlags)
+    );
   } else if (commandMap.LICENSES[command]) {
     if (commandMap.LICENSES_GENERATE_DISCLAIMER[subCommand]) {
       return commands.licensesGenerateDisclaimer(
