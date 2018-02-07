@@ -80,6 +80,7 @@ const commandMap = {
   UNLINK: { unlink: true },
   UPGRADE: { upgrade: true, up: true },
   UPGRADE_INTERACTIVE: { 'upgrade-interactive': true },
+  VALIDATE: { validate: true },
   VERSION: { version: true },
   VERSIONS: { versions: true },
   WHY: { why: true },
@@ -330,6 +331,8 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.upgradeInteractive(
       commands.toUpgradeInteractiveOptions(commandArgs, flags)
     );
+  } else if (commandMap.VALIDATE[command]) {
+    return commands.validate(commands.toValidateOptions(commandArgs, flags));
   } else if (commandMap.VERSION[command]) {
     return commands.version(commands.toVersionOptions(commandArgs, flags));
   } else if (commandMap.VERSIONS[command]) {

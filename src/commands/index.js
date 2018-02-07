@@ -40,6 +40,7 @@ module.exports = {
   ...require('./unlink'),
   ...require('./upgrade'),
   ...require('./upgradeInteractive'),
+  ...require('./validate'),
   ...require('./version'),
   ...require('./versions'),
   ...require('./why'),

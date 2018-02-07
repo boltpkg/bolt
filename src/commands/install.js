@@ -38,8 +38,12 @@ export async function install(opts: InstallOptions) {
 
   logger.info(messages.validatingProject(), { emoji: '🔎', prefix: false });
 
-  let projectIsValid = await validateProject(project);
-  if (!projectIsValid) {
+  let validationResult = await validateProject(project);
+
+  if (!validationResult.projectIsValid) {
+    validationResult.invalidMessages.forEach(message => {
+      logger.error(message);
+    });
     throw new BoltError(messages.unableToInstall());
   }
 

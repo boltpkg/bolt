@@ -362,3 +362,7 @@ export function errorWorkspacesUpgrade(filterOpts: Array<string>): Message {
 export function noNeedToSymlinkInternalDependency(): Message {
   return `Internal packages are symlinked, there is no need update them`;
 }
+
+export function projectIsValid(projectName: string): Message {
+  return `Project ${projectName} is valid!`;
+}
