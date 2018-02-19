@@ -49,8 +49,16 @@ function _symlink(src: string, dest: string, type: string) {
   return promisify(cb => fs.symlink(src, dest, type, cb));
 }
 
-function cmdShim(src: string, dest: string) {
-  return promisify(cb => _cmdShim(src, dest, cb));
+function stripExtension(filePath: string) {
+  return filePath.substr(0, filePath.length - path.extname(filePath).length);
+}
+
+async function cmdShim(src: string, dest: string) {
+  const currentShimTarget = path.resolve(
+    path.dirname(src),
+    await readCmdShim(src)
+  );
+  await promisify(cb => _cmdShim(currentShimTarget, stripExtension(dest), cb));
 }
 
 async function createSymbolicLink(src, dest, type) {
