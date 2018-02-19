@@ -18,8 +18,8 @@
     "flow": "flow status",
     "test": "jest --coverage",
     "format": "prettier --write src/**/*.js",
-    "build:legacy": "BABEL_ENV=legacy babel src -d dist/legacy",
-    "build:modern": "BABEL_ENV=modern babel src -d dist/modern",
+    "build:legacy": "cross-env BABEL_ENV=legacy babel src -d dist/legacy",
+    "build:modern": "cross-env BABEL_ENV=modern babel src -d dist/modern",
     "build": "yarn run clean && yarn build:legacy && yarn build:modern",
     "prepublish": "yarn build",
     "precommit": "lint-staged"
@@ -31,6 +31,7 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
+    "cross-env": "^5.1.3",
     "fixturez": "^1.1.0",
     "flow-bin": "^0.63.1",
     "husky": "^0.14.3",
