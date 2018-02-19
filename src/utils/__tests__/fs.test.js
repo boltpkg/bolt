@@ -127,11 +127,11 @@ describe('fs', () => {
 
       it('should create a command shim to an executable file', async () => {
         let tempDir = f.temp();
-        let src = path.join(f.find('symlinks'), 'executable.sh');
-        let dest = path.resolve(tempDir, 'executable.sh');
+        let src = path.join(f.find('symlinks'), 'shim.cmd');
+        let dest = path.resolve(tempDir, 'unshimmed.cmd');
         await fs.symlink(src, dest, 'exec');
         let files = await fs.readdir(tempDir);
-        expect(files).toEqual(['executable.sh', 'executable.sh.cmd']);
+        expect(files).toEqual(['unshimmed', 'unshimmed.cmd']);
       });
 
       it('should always use absolute paths when creating symlinks', async () => {
