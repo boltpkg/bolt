@@ -157,4 +157,23 @@ describe('install', () => {
       Error
     );
   });
+
+  test('workspaces with bins', async () => {
+    let cwd = f.copy('workspace-with-bin');
+    let project = await Project.init(cwd);
+
+    await install(toInstallOptions([], { cwd }));
+
+    let binPath = path.join(
+      cwd,
+      'packages',
+      'foo',
+      'node_modules',
+      '.bin',
+      'bar'
+    );
+    let stat = await fs.stat(binPath);
+
+    expect(stat.isFile()).toBe(true);
+  });
 });
