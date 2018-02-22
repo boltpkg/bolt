@@ -158,4 +158,25 @@ export default class Package {
   getVersion() {
     return this.config.getVersion();
   }
+
+  getBins(): Array<{ name: string, filePath: string }> {
+    let bin = this.config.getBin();
+    if (typeof bin === 'undefined') {
+      return [];
+    } else if (typeof bin === 'string') {
+      return [
+        {
+          name: this.config.getName(),
+          filePath: path.join(this.dir, bin)
+        }
+      ];
+    } else {
+      return Object.keys(bin).map(key => {
+        return {
+          name: key,
+          filePath: path.join(this.dir, bin[key])
+        };
+      });
+    }
+  }
 }
