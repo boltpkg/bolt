@@ -15,7 +15,7 @@ export type WorkspaceAddOptions = {
   type: configDependencyType
 };
 
-function toWorkspaceAddOptions(
+export function toWorkspaceAddOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceAddOptions {

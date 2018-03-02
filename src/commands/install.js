@@ -13,12 +13,12 @@ import pathIsInside from 'path-is-inside';
 import { BoltError } from '../utils/errors';
 import { BOLT_VERSION } from '../constants';
 
-type InstallOptions = {|
+export type InstallOptions = {|
   cwd?: string,
   pureLockfile: boolean
 |};
 
-function toInstallOptions(
+export function toInstallOptions(
   args: options.Args,
   flags: options.Flags
 ): InstallOptions {

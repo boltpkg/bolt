@@ -14,7 +14,10 @@ export type AddOptions = {
   type: configDependencyType
 };
 
-function toAddOptions(args: options.Args, flags: options.Flags): AddOptions {
+export function toAddOptions(
+  args: options.Args,
+  flags: options.Flags
+): AddOptions {
   const depsArgs = [];
   let type = 'dependencies';
 
