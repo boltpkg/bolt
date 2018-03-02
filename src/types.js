@@ -1,5 +1,9 @@
 // @flow
 
+export type CommandType = ?string;
+
+export type CommandArgsType = ?Array<string>;
+
 export type DependencySet = {
   [key: string]: string
 };

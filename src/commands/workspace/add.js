@@ -15,7 +15,7 @@ export type WorkspaceAddOptions = {
   type: configDependencyType
 };
 
-export function toWorkspaceAddOptions(
+function toWorkspaceAddOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceAddOptions {
@@ -41,7 +41,8 @@ export function toWorkspaceAddOptions(
   };
 }
 
-export async function workspaceAdd(opts: WorkspaceAddOptions) {
+export async function add(flags: options.Flags, subCommandArgs: Array<string>) {
+  const opts = toWorkspaceAddOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

@@ -13,12 +13,12 @@ import pathIsInside from 'path-is-inside';
 import { BoltError } from '../utils/errors';
 import { BOLT_VERSION } from '../constants';
 
-export type InstallOptions = {|
+type InstallOptions = {|
   cwd?: string,
   pureLockfile: boolean
 |};
 
-export function toInstallOptions(
+function toInstallOptions(
   args: options.Args,
   flags: options.Flags
 ): InstallOptions {
@@ -28,7 +28,11 @@ export function toInstallOptions(
   };
 }
 
-export async function install(opts: InstallOptions) {
+export async function install(
+  flags: options.Flags,
+  commandArgs: Array<string>
+) {
+  let opts = toInstallOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
