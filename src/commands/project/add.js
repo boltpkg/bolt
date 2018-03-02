@@ -5,7 +5,7 @@ import * as options from '../../utils/options';
 import * as logger from '../../utils/logger';
 import type { Dependency, configDependencyType } from '../../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../../constants';
-import { add } from '../add';
+import { add as add_ } from '../add';
 
 type ProjectAddOptions = {};
 
@@ -17,5 +17,5 @@ function toProjectAddOptions(
 }
 
 export async function add(flags: options.Flags, args: options.Args) {
-  await add(flags, args);
+  await add_(flags, args);
 }

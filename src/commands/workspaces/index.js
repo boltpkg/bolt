@@ -25,5 +25,5 @@ async function workspaces(
  */
 module.exports = {
   workspaces,
-  w: workspaces
+  ws: workspaces
 };

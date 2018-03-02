@@ -1,9 +1,9 @@
 // @flow
-import * as unlink from '../unlink';
 import Project from '../../Project';
 import * as yarn from '../../utils/yarn';
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
+import * as messages from '../../utils/messages';
 
 type WorkspaceUnlinkOptions = {|
   cwd?: string,
@@ -47,8 +47,14 @@ export async function unlink(
   // If there are packages to link then we can link then in the Project
   // as dependencies are symlinked
   if (packagesToUnlink && packagesToUnlink.length) {
-    await unlink.unlink(
-      await unlink.toUnlinkOptions(packagesToUnlink, { '--': [] })
+    await Promise.all(
+      packagesToUnlink.map(async packageToUnlink => {
+        if (workspaceMap.has(packageToUnlink)) {
+          logger.warn(messages.unlinkInternalPackage(packageToUnlink));
+        } else {
+          await yarn.cliCommand(cwd, 'unlink', [packageToUnlink]);
+        }
+      })
     );
   } else {
     await yarn.cliCommand(workspace.pkg.dir, 'unlink');

@@ -1,9 +1,9 @@
 // @flow
-import * as link from '../link';
 import Project from '../../Project';
 import * as yarn from '../../utils/yarn';
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
+import * as messages from '../../utils/messages';
 
 type WorkspaceLinkOptions = {|
   cwd?: string,
@@ -33,6 +33,7 @@ export async function link(
   let workspaceName = opts.workspaceName;
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
+  let workspaceMap = getWorkspaceMap(workspaces);
   let workspace = await project.getWorkspaceByName(
     workspaces,
     opts.workspaceName
@@ -44,10 +45,16 @@ export async function link(
     );
   }
 
-  // If there are packages to link then we can link then in the Project
-  // as dependencies are symlinked
   if (packagesToLink && packagesToLink.length) {
-    await link.link(await link.toLinkOptions(packagesToLink, { '--': [] }));
+    await Promise.all(
+      packagesToLink.map(async packageToLink => {
+        if (workspaceMap.has(packageToLink)) {
+          logger.warn(messages.linkInternalPackage(packageToLink));
+        } else {
+          await yarn.cliCommand(cwd, 'link', [packageToLink]);
+        }
+      })
+    );
   } else {
     await yarn.cliCommand(workspace.pkg.dir, 'link');
   }
