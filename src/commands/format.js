@@ -3,12 +3,12 @@ import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import { run } from './run';
 
-export type FormatOptions = {|
+type FormatOptions = {|
   cwd?: string,
   args: options.Args
 |};
 
-export function toFormatOptions(
+function toFormatOptions(
   args: options.Args,
   flags: options.Flags
 ): FormatOptions {
@@ -18,7 +18,8 @@ export function toFormatOptions(
   };
 }
 
-export async function format(opts: FormatOptions) {
+export async function format(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toFormatOptions(commandArgs, flags);
   await run({
     cwd: opts.cwd,
     script: 'format',

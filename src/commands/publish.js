@@ -8,12 +8,12 @@ import * as locks from '../utils/locks';
 import * as npm from '../utils/npm';
 import Project from '../Project';
 
-export type PublishOptions = {|
+type PublishOptions = {|
   cwd?: string,
   access?: string
 |};
 
-export function toPublishOptions(
+function toPublishOptions(
   args: options.Args,
   flags: options.Flags
 ): PublishOptions {
@@ -72,7 +72,11 @@ async function getUnpublishedPackages(packages) {
   });
 }
 
-export async function publish(opts: PublishOptions) {
+export async function publish(
+  flags: options.Flags,
+  commandArgs: Array<string>
+) {
+  const opts = toPublishOptions(commandArgs, flags);
   const cwd = opts.cwd || process.cwd();
   const project = await Project.init(cwd);
   const workspaces = await project.getWorkspaces();

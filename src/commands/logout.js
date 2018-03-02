@@ -16,7 +16,8 @@ export function toLogoutOptions(
   };
 }
 
-export async function logout(opts: LogoutOptions) {
+export async function logout(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toLogoutOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await npm.logout(cwd);

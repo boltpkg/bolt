@@ -3,19 +3,20 @@ import * as options from '../../utils/options';
 import * as npm from '../../utils/npm';
 import { BoltError } from '../../utils/errors';
 
-export type TeamDestroyOptions = {
+type TeamDestroyOptions = {
   cwd?: string,
   args: Array<string>
 };
 
-export function toTeamDestroyOptions(
+function toTeamDestroyOptions(
   args: options.Args,
   flags: options.Flags
 ): TeamDestroyOptions {
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function teamDestroy(opts: TeamDestroyOptions) {
+export async function destroy(flags: options.Flags, args: options.Args) {
+  let opts = toTeamDestroyOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await npm.cliCommand(cwd, 'team', ['destroy', ...opts.args]);

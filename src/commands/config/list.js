@@ -17,7 +17,8 @@ export function toConfigListOptions(
   return { cwd: options.string(flags.cwd, 'cwd') };
 }
 
-export async function configList(opts: ConfigListOptions) {
+export async function list(flags: options.Flags, args: options.Args) {
+  let opts = toConfigListOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await yarn.cliCommand(cwd, 'config', ['list']);

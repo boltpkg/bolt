@@ -5,13 +5,13 @@ import * as yarn from '../../utils/yarn';
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 
-export type WorkspaceUnlinkOptions = {|
+type WorkspaceUnlinkOptions = {|
   cwd?: string,
   workspaceName: string,
   packagesToUnlink?: Array<string>
 |};
 
-export function toWorkspaceUnlinkOptions(
+function toWorkspaceUnlinkOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceUnlinkOptions {
@@ -23,7 +23,11 @@ export function toWorkspaceUnlinkOptions(
   };
 }
 
-export async function workspaceUnlink(opts: WorkspaceUnlinkOptions) {
+export async function unlink(
+  flags: options.Flags,
+  subCommandArgs: Array<string>
+) {
+  let opts = toWorkspaceUnlinkOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let packagesToUnlink = opts.packagesToUnlink;
   let workspaceName = opts.workspaceName;

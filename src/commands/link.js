@@ -16,22 +16,20 @@ function getWorkspaceMap(workspaces) {
   return workspaceMap;
 }
 
-export type LinkOptions = {|
+type LinkOptions = {|
   cwd?: string,
   packagesToLink: ?Array<string>
 |};
 
-export function toLinkOptions(
-  args: options.Args,
-  flags: options.Flags
-): LinkOptions {
+function toLinkOptions(args: options.Args, flags: options.Flags): LinkOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     packagesToLink: args
   };
 }
 
-export async function link(opts: LinkOptions) {
+export async function link(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toLinkOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let packagesToLink = opts.packagesToLink;
   let project = await Project.init(cwd);

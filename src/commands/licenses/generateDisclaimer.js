@@ -3,11 +3,11 @@ import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
 
-export type LicensesGenerateDisclaimerOptions = {
+type LicensesGenerateDisclaimerOptions = {
   cwd?: string
 };
 
-export function toLicensesGenerateDisclaimerOptions(
+function toLicensesGenerateDisclaimerOptions(
   args: options.Args,
   flags: options.Flags
 ): LicensesGenerateDisclaimerOptions {
@@ -16,9 +16,11 @@ export function toLicensesGenerateDisclaimerOptions(
   };
 }
 
-export async function licensesGenerateDisclaimer(
-  opts: LicensesGenerateDisclaimerOptions
+export async function generateDisclaimer(
+  args: options.Args,
+  flags: options.Flags
 ) {
+  let opts = toLicensesGenerateDisclaimerOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await yarn.cliCommand(cwd, 'licenses', ['generate-disclaimer']);

@@ -3,11 +3,11 @@ import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
 
-export type AutocleanOptions = {
+type AutocleanOptions = {
   cwd?: string
 };
 
-export function toAutocleanOptions(
+function toAutocleanOptions(
   args: options.Args,
   flags: options.Flags
 ): AutocleanOptions {
@@ -16,7 +16,11 @@ export function toAutocleanOptions(
   };
 }
 
-export async function autoclean(opts: AutocleanOptions) {
+export async function autoclean(
+  flags: options.Flags,
+  commandArgs: Array<string>
+) {
+  let opts = toAutocleanOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {

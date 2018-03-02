@@ -22,13 +22,13 @@ function toScriptFlags(flags: options.Flags) {
   return scriptFlags;
 }
 
-export type UpgradeOptions = {
+type UpgradeOptions = {
   cwd?: string,
   deps: Array<Dependency>,
   flags: Array<string>
 };
 
-export function toUpgradeOptions(
+function toUpgradeOptions(
   args: options.Args,
   flags: options.Flags
 ): UpgradeOptions {
@@ -45,7 +45,11 @@ export function toUpgradeOptions(
   };
 }
 
-export async function upgrade(opts: UpgradeOptions) {
+export async function upgrade(
+  flags: options.Flags,
+  commandArgs: Array<string>
+) {
+  let opts = toUpgradeOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);

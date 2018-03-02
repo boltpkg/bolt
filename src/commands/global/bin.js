@@ -3,18 +3,19 @@ import * as options from '../../utils/options';
 import * as yarn from '../../utils/yarn';
 import { BoltError } from '../../utils/errors';
 
-export type GlobalBinOptions = {
+type GlobalBinOptions = {
   cwd?: string
 };
 
-export function toGlobalBinOptions(
+function toGlobalBinOptions(
   args: options.Args,
   flags: options.Flags
 ): GlobalBinOptions {
   return { cwd: options.string(flags.cwd, 'cwd') };
 }
 
-export async function globalBin(opts: GlobalBinOptions) {
+export async function bin(flags: options.Flags, args: options.Args) {
+  let opts = toGlobalBinOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await yarn.cliCommand(cwd, 'global', ['bin']);

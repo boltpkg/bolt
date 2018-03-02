@@ -15,13 +15,14 @@ async function runCommandFromCli(args: options.Args, flags: options.Flags) {
 
   if (!command) return await commands['install'](flags, commandArgs);
 
-  if (command && commands[command])
+  if (command && commands[command]) {
     return await commands[command](
       flags,
       commandArgs,
       subCommand,
       subCommandArgs
     );
+  }
 
   throw new BoltError(`You must specify a valid command`);
 }

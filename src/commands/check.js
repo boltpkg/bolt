@@ -3,12 +3,12 @@ import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import { run } from './run';
 
-export type CheckOptions = {|
+type CheckOptions = {|
   cwd?: string,
   args: options.Args
 |};
 
-export function toCheckOptions(
+function toCheckOptions(
   args: options.Args,
   flags: options.Flags
 ): CheckOptions {
@@ -18,7 +18,8 @@ export function toCheckOptions(
   };
 }
 
-export async function check(opts: CheckOptions) {
+export async function check(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toCheckOptions(commandArgs, flags);
   await run({
     cwd: opts.cwd,
     script: 'check',

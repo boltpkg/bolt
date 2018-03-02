@@ -1,8 +1,17 @@
 // @flow
 import * as options from '../../utils/options';
 
+/**
+ * { add: [function], ... }
+ */
 const commands = {
-  ...require('./add')
+  ...require('./add'),
+  ...require('./exec'),
+  ...require('./link'),
+  ...require('./remove'),
+  ...require('./run'),
+  ...require('./unlink'),
+  ...require('./upgrade')
 };
 
 async function workspace(
@@ -13,10 +22,13 @@ async function workspace(
 ) {
   let [workspaceCommand, ...rest] = subCommandArgs;
   let workspaceArgs = [subCommand, ...rest];
-  await commands[workspaceCommand](flags, workspaceArgs);
+  return await commands[workspaceCommand](flags, workspaceArgs);
 }
 
+/**
+ * Alias for workspace, can use workspace or ws
+ */
 module.exports = {
   workspace,
-  ws: workspace
+  w: workspace
 };

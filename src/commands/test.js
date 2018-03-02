@@ -3,22 +3,20 @@ import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import { run } from './run';
 
-export type TestOptions = {|
+type TestOptions = {|
   cwd?: string,
   args: options.Args
 |};
 
-export function toTestOptions(
-  args: options.Args,
-  flags: options.Flags
-): TestOptions {
+function toTestOptions(args: options.Args, flags: options.Flags): TestOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     args: args
   };
 }
 
-export async function test(opts: TestOptions) {
+export async function test(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toTestOptions(commandArgs, flags);
   await run({
     cwd: opts.cwd,
     script: 'test',

@@ -3,12 +3,12 @@ import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import { run } from './run';
 
-export type BuildOptions = {|
+type BuildOptions = {|
   cwd?: string,
   args: options.Args
 |};
 
-export function toBuildOptions(
+function toBuildOptions(
   args: options.Args,
   flags: options.Flags
 ): BuildOptions {
@@ -18,7 +18,8 @@ export function toBuildOptions(
   };
 }
 
-export async function build(opts: BuildOptions) {
+export async function build(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toBuildOptions(commandArgs, flags);
   await run({
     cwd: opts.cwd,
     script: 'build',

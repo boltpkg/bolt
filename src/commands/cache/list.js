@@ -3,12 +3,12 @@ import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
 
-export type CacheListOptions = {
+type CacheListOptions = {
   cwd?: string,
   pattern?: string
 };
 
-export function toCacheListOptions(
+function toCacheListOptions(
   args: options.Args,
   flags: options.Flags
 ): CacheListOptions {
@@ -18,7 +18,8 @@ export function toCacheListOptions(
   };
 }
 
-export async function cacheList(opts: CacheListOptions) {
+export async function list(flags: options.Flags, commandArgs: options.Args) {
+  let opts = toCacheListOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let args = ['list'];
   if (opts.pattern) {

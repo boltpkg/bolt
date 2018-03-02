@@ -21,13 +21,13 @@ function toScriptFlags(flags: options.Flags) {
   return scriptFlags;
 }
 
-export type ProjectUpgradeOptions = {
+type ProjectUpgradeOptions = {
   cwd?: string,
   deps: Array<Dependency>,
   flags: Array<string>
 };
 
-export function toProjectUpgradeOptions(
+function toProjectUpgradeOptions(
   args: options.Args,
   flags: options.Flags
 ): ProjectUpgradeOptions {
@@ -44,12 +44,18 @@ export function toProjectUpgradeOptions(
   };
 }
 
-export async function projectUpgrade(opts: ProjectUpgradeOptions) {
+export async function upgrade(flags: options.Flags, args: options.Args) {
+  let opts = toProjectUpgradeOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
 
   try {
-    await upgradeDependenciesInPackage(project, project.pkg, opts.deps, opts.flags);
+    await upgradeDependenciesInPackage(
+      project,
+      project.pkg,
+      opts.deps,
+      opts.flags
+    );
   } catch (err) {
     throw new BoltError(`upgrading dependencies failed due to ${err}`);
   }

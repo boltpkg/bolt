@@ -16,12 +16,12 @@ function getWorkspaceMap(workspaces) {
   return workspaceMap;
 }
 
-export type UnlinkOptions = {
+type UnlinkOptions = {
   cwd?: string,
   packagesToUnlink: ?Array<string>
 };
 
-export function toUnlinkOptions(
+function toUnlinkOptions(
   args: options.Args,
   flags: options.Flags
 ): UnlinkOptions {
@@ -31,7 +31,8 @@ export function toUnlinkOptions(
   };
 }
 
-export async function unlink(opts: UnlinkOptions) {
+export async function unlink(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toUnlinkOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let packagesToUnlink = opts.packagesToUnlink;
   let project = await Project.init(cwd);

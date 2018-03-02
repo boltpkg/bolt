@@ -15,7 +15,8 @@ export function toTeamRemoveOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function teamRemove(opts: TeamRemoveOptions) {
+export async function remove(flags: options.Flags, args: options.Args) {
+  let opts = toTeamRemoveOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await npm.cliCommand(cwd, 'team', ['rm', ...opts.args]);

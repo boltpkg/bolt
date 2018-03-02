@@ -2,15 +2,18 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 
-export type GenerateOptions = {};
+type GenerateOptions = {};
 
-export function toGenerateOptions(
+function toGenerateOptions(
   args: options.Args,
   flags: options.Flags
 ): GenerateOptions {
   return {};
 }
 
-export async function generate(opts: GenerateOptions) {
+export async function generate(
+  flags: options.Flags,
+  commandArgs: Array<string>
+) {
   throw new BoltError('Unimplemented command "generate"');
 }

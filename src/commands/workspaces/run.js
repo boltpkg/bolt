@@ -4,14 +4,14 @@ import * as options from '../../utils/options';
 import Project from '../../Project';
 import * as yarn from '../../utils/yarn';
 
-export type WorkspacesRunOptions = {
+type WorkspacesRunOptions = {
   cwd?: string,
   script: string,
   scriptArgs: options.Args,
   filterOpts: FilterOpts
 };
 
-export function toWorkspacesRunOptions(
+function toWorkspacesRunOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspacesRunOptions {
@@ -24,7 +24,8 @@ export function toWorkspacesRunOptions(
   };
 }
 
-export async function workspacesRun(opts: WorkspacesRunOptions) {
+export async function run(flags: options.Flags, args: options.Args) {
+  let opts = toWorkspacesRunOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

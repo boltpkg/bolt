@@ -5,13 +5,13 @@ import * as yarn from '../../utils/yarn';
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 
-export type WorkspaceLinkOptions = {|
+type WorkspaceLinkOptions = {|
   cwd?: string,
   workspaceName: string,
   packagesToLink?: Array<string>
 |};
 
-export function toWorkspacelinkOptions(
+function toWorkspacelinkOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceLinkOptions {
@@ -23,7 +23,11 @@ export function toWorkspacelinkOptions(
   };
 }
 
-export async function workspacelink(opts: WorkspaceLinkOptions) {
+export async function link(
+  flags: options.Flags,
+  subCommandArgs: Array<string>
+) {
+  let opts = toWorkspacelinkOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let packagesToLink = opts.packagesToLink;
   let workspaceName = opts.workspaceName;

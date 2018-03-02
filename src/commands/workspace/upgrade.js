@@ -17,6 +17,9 @@ export function toWorkspaceUpgradeOptions(
   };
 }
 
-export async function workspaceUpgrade(opts: WorkspaceUpgradeOptions) {
+export async function upgrade(
+  flags: options.Flags,
+  subCommandArgs: Array<string>
+) {
   throw new BoltError(messages.errorWorkspaceUpgrade());
 }

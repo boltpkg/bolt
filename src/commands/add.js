@@ -8,16 +8,13 @@ import type { Dependency, configDependencyType } from '../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
 import type { ProjectAddOptions } from './project/add';
 
-export type AddOptions = {
+type AddOptions = {
   cwd?: string,
   deps: Array<Dependency>,
   type: configDependencyType
 };
 
-export function toAddOptions(
-  args: options.Args,
-  flags: options.Flags
-): AddOptions {
+function toAddOptions(args: options.Args, flags: options.Flags): AddOptions {
   const depsArgs = [];
   let type = 'dependencies';
 

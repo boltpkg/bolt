@@ -7,41 +7,15 @@ import type { Dependency, configDependencyType } from '../../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../../constants';
 import { add } from '../add';
 
-export type ProjectAddOptions = {
-  cwd?: string,
-  deps: Array<Dependency>,
-  type: configDependencyType
-};
+type ProjectAddOptions = {};
 
-export function toProjectAddOptions(
+function toProjectAddOptions(
   args: options.Args,
   flags: options.Flags
 ): ProjectAddOptions {
-  const depsArgs = [];
-  let type = 'dependencies';
-
-  // args is each of our dependencies we are adding which may have "@version" parts to them
-  args.forEach(dep => {
-    depsArgs.push(options.toDependency(dep));
-  });
-
-  Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).forEach(depTypeFlag => {
-    if (flags[depTypeFlag]) {
-      type = DEPENDENCY_TYPE_FLAGS_MAP[depTypeFlag];
-      // check if value of dependency flag is a package name and then push to dependency arguments
-      if (typeof flags[depTypeFlag] === 'string') {
-        depsArgs.push(options.toDependency(flags[depTypeFlag]));
-      }
-    }
-  });
-
-  return {
-    cwd: options.string(flags.cwd, 'cwd'),
-    deps: depsArgs,
-    type
-  };
+  return {};
 }
 
-export async function projectAdd(opts: ProjectAddOptions) {
-  await add(opts);
+export async function add(flags: options.Flags, args: options.Args) {
+  await add(flags, args);
 }

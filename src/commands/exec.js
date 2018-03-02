@@ -4,16 +4,13 @@ import Package from '../Package';
 import * as options from '../utils/options';
 import execCommand from '../utils/execCommand';
 
-export type ExecOptions = {|
+type ExecOptions = {|
   cwd?: string,
   command: string,
   commandArgs: options.Args
 |};
 
-export function toExecOptions(
-  args: options.Args,
-  flags: options.Flags
-): ExecOptions {
+function toExecOptions(args: options.Args, flags: options.Flags): ExecOptions {
   let [command, ...commandArgs] = flags['--'] || [];
   return {
     cwd: options.string(flags.cwd, 'cwd'),
@@ -22,7 +19,8 @@ export function toExecOptions(
   };
 }
 
-export async function exec(opts: ExecOptions) {
+export async function exec(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toExecOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);

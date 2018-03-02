@@ -4,11 +4,11 @@ import * as yarn from '../../utils/yarn';
 import type { Dependency } from '../../types';
 import { BoltError } from '../../utils/errors';
 
-export type GlobalAddOptions = {
+type GlobalAddOptions = {
   deps: Array<Dependency>
 };
 
-export function toGlobalAddOptions(
+function toGlobalAddOptions(
   args: options.Args,
   flags: options.Flags
 ): GlobalAddOptions {
@@ -24,7 +24,8 @@ export function toGlobalAddOptions(
   };
 }
 
-export async function globalAdd(opts: GlobalAddOptions) {
+export async function add(flags: options.Flags, args: options.Args) {
+  let opts = toGlobalAddOptions(args, flags);
   try {
     await yarn.globalCli('add', opts.deps);
   } catch (err) {

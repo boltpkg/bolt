@@ -3,15 +3,12 @@ import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
 
-export type PackOptions = {
+type PackOptions = {
   cwd?: string,
   fileName?: string
 };
 
-export function toPackOptions(
-  args: options.Args,
-  flags: options.Flags
-): PackOptions {
+function toPackOptions(args: options.Args, flags: options.Flags): PackOptions {
   let fileName =
     options.string(flags.filename, 'filename') || options.string(flags.f, 'f');
   return {
@@ -20,7 +17,8 @@ export function toPackOptions(
   };
 }
 
-export async function pack(opts: PackOptions) {
+export async function pack(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toPackOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let fileName = opts.fileName ? [`--filename=${opts.fileName}`] : [];
 

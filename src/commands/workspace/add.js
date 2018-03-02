@@ -8,16 +8,16 @@ import { BoltError } from '../../utils/errors';
 import type { Dependency, configDependencyType } from '../../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../../constants';
 
-export type WorkspaceAddOptions = {
+type WorkspaceAddOptions = {
   cwd?: string,
   workspaceName: string,
   deps: Array<Dependency>,
   type: configDependencyType
 };
 
-export function toWorkspaceAddOptions(
-  args: options.Args,
-  flags: options.Flags
+function toWorkspaceAddOptions(
+  flags: options.Flags,
+  args: options.Args
 ): WorkspaceAddOptions {
   let [workspaceName, ...deps] = args;
   const depsArgs = [];
@@ -42,7 +42,7 @@ export function toWorkspaceAddOptions(
 }
 
 export async function add(flags: options.Flags, subCommandArgs: Array<string>) {
-  const opts = toWorkspaceAddOptions(subCommandArgs, flags);
+  const opts = toWorkspaceAddOptions(flags, subCommandArgs);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

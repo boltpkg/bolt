@@ -4,14 +4,14 @@ import * as options from '../../utils/options';
 import * as yarn from '../../utils/yarn';
 import { BoltError } from '../../utils/errors';
 
-export type WorkspaceRunOptions = {
+type WorkspaceRunOptions = {
   cwd?: string,
   workspaceName: string,
   script: string,
   scriptArgs: options.Args
 };
 
-export function toWorkspaceRunOptions(
+function toWorkspaceRunOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceRunOptions {
@@ -24,7 +24,8 @@ export function toWorkspaceRunOptions(
   };
 }
 
-export async function workspaceRun(opts: WorkspaceRunOptions) {
+export async function run(flags: options.Flags, subCommandArgs: Array<string>) {
+  let opts = toWorkspaceRunOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

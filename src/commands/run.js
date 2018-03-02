@@ -5,16 +5,13 @@ import * as yarn from '../utils/yarn';
 import * as logger from '../utils/logger';
 import { BoltError } from '../utils/errors';
 
-export type RunOptions = {|
+type RunOptions = {|
   cwd?: string,
   script: string,
   scriptArgs: options.Args
 |};
 
-export function toRunOptions(
-  args: options.Args,
-  flags: options.Flags
-): RunOptions {
+function toRunOptions(args: options.Args, flags: options.Flags): RunOptions {
   let [script, ...scriptArgs] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
@@ -23,7 +20,8 @@ export function toRunOptions(
   };
 }
 
-export async function run(opts: RunOptions) {
+export async function run(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toRunOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let pkg = await Package.closest(cwd);
   let script = await yarn.getScript(pkg, opts.script);

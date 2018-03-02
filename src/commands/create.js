@@ -3,12 +3,12 @@ import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
 
-export type CreateOptions = {
+type CreateOptions = {
   cwd?: string,
   args?: Array<string>
 };
 
-export function toCreateOptions(
+function toCreateOptions(
   args: options.Args,
   flags: options.Flags
 ): CreateOptions {
@@ -18,7 +18,8 @@ export function toCreateOptions(
   };
 }
 
-export async function create(opts: CreateOptions) {
+export async function create(flags: options.Flags, commandArgs: Array<string>) {
+  let opts = toCreateOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {

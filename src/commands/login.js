@@ -3,11 +3,11 @@ import * as options from '../utils/options';
 import * as npm from '../utils/npm';
 import { BoltError } from '../utils/errors';
 
-export type LoginOptions = {|
+type LoginOptions = {|
   cwd?: string
 |};
 
-export function toLoginOptions(
+function toLoginOptions(
   args: options.Args,
   flags: options.Flags
 ): LoginOptions {
@@ -16,7 +16,8 @@ export function toLoginOptions(
   };
 }
 
-export async function login(opts: LoginOptions) {
+export async function login(flags: options.Flags, commandArgs: Array<string>) {
+  const opts = toLoginOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await npm.login(cwd);

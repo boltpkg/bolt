@@ -5,12 +5,12 @@ import * as options from '../../utils/options';
 import * as logger from '../../utils/logger';
 import removeDependenciesFromPackages from '../../utils/removeDependenciesFromPackages';
 
-export type ProjectRemoveOptions = {|
+type ProjectRemoveOptions = {|
   cwd?: string,
   deps: Array<string>
 |};
 
-export function toProjectRemoveOptions(
+function toProjectRemoveOptions(
   args: options.Args,
   flags: options.Flags
 ): ProjectRemoveOptions {
@@ -20,7 +20,8 @@ export function toProjectRemoveOptions(
   };
 }
 
-export async function projectRemove(opts: ProjectRemoveOptions) {
+export async function remove(flags: options.Flags, args: options.Args) {
+  let opts = toProjectRemoveOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

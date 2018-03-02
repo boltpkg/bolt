@@ -2,15 +2,18 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 
-export type VersionsOptions = {};
+type VersionsOptions = {};
 
-export function toVersionsOptions(
+function toVersionsOptions(
   args: options.Args,
   flags: options.Flags
 ): VersionsOptions {
   return {};
 }
 
-export async function versions(opts: VersionsOptions) {
+export async function versions(
+  flags: options.Flags,
+  commandArgs: Array<string>
+) {
   throw new BoltError('Unimplemented command "versions"');
 }

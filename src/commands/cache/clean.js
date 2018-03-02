@@ -3,12 +3,12 @@ import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
 
-export type CacheCleanOptions = {
+type CacheCleanOptions = {
   cwd?: string,
   args: Array<string>
 };
 
-export function toCacheCleanOptions(
+function toCacheCleanOptions(
   args: options.Args,
   flags: options.Flags
 ): CacheCleanOptions {
@@ -18,7 +18,8 @@ export function toCacheCleanOptions(
   };
 }
 
-export async function cacheClean(opts: CacheCleanOptions) {
+export async function clean(flags: options.Flags, commandArgs: options.Args) {
+  let opts = toCacheCleanOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let args = ['clean'];
 

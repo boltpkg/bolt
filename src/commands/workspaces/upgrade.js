@@ -5,14 +5,14 @@ import * as messages from '../../utils/messages';
 import { BoltError } from '../../utils/errors';
 import * as Upgrade from '../upgrade';
 
-export type WorkspacesUpgradeOptions = {
+type WorkspacesUpgradeOptions = {
   cwd?: string,
   deps: Array<string>,
   filterOpts: FilterOpts,
   flags: options.Flags
 };
 
-export function toWorkspacesUpgradeOptions(
+function toWorkspacesUpgradeOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspacesUpgradeOptions {
@@ -23,7 +23,8 @@ export function toWorkspacesUpgradeOptions(
   };
 }
 
-export async function workspacesUpgrade(opts: WorkspacesUpgradeOptions) {
+export async function upgrade(flags: options.Flags, args: options.Args) {
+  let opts = toWorkspacesUpgradeOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let filterOpts = Object.keys(opts.filterOpts);
 
