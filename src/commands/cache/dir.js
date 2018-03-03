@@ -16,7 +16,7 @@ function toCacheDirOptions(
   };
 }
 
-export async function dir(flags: options.Flags, args: options.Args) {
+export async function cacheDir(flags: options.Flags, args: options.Args) {
   let opts = toCacheDirOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
 

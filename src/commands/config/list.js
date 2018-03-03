@@ -3,11 +3,11 @@ import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
 
-export type ConfigListOptions = {
+type ConfigListOptions = {
   cwd?: string
 };
 
-export function toConfigListOptions(
+function toConfigListOptions(
   args: options.Args,
   flags: options.Flags
 ): ConfigListOptions {
@@ -17,7 +17,7 @@ export function toConfigListOptions(
   return { cwd: options.string(flags.cwd, 'cwd') };
 }
 
-export async function list(flags: options.Flags, args: options.Args) {
+export async function configList(flags: options.Flags, args: options.Args) {
   let opts = toConfigListOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

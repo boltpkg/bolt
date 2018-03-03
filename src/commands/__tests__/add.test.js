@@ -1,5 +1,5 @@
 // @flow
-import { add, toAddOptions } from '../add';
+import { add } from '../add';
 import * as path from 'path';
 import * as processes from '../../utils/processes';
 import * as yarn from '../../utils/yarn';

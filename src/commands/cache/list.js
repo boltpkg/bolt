@@ -18,7 +18,10 @@ function toCacheListOptions(
   };
 }
 
-export async function list(flags: options.Flags, commandArgs: options.Args) {
+export async function cacheList(
+  flags: options.Flags,
+  commandArgs: options.Args
+) {
   let opts = toCacheListOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let args = ['list'];

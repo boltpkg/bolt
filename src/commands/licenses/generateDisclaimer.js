@@ -16,9 +16,9 @@ function toLicensesGenerateDisclaimerOptions(
   };
 }
 
-export async function generateDisclaimer(
-  args: options.Args,
-  flags: options.Flags
+export async function licensesGenerateDisclaimer(
+  flags: options.Flags,
+  args: options.Args
 ) {
   let opts = toLicensesGenerateDisclaimerOptions(args, flags);
   let cwd = opts.cwd || process.cwd();

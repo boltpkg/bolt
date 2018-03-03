@@ -15,7 +15,7 @@ function toConfigDeleteOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function delete_(flags: options.Flags, args: options.Args) {
+export async function configDelete(flags: options.Flags, args: options.Args) {
   let opts = toConfigDeleteOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

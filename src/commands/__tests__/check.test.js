@@ -1,4 +1,4 @@
 // @flow
-import { check, toCheckOptions } from '../check';
+import { check } from '../check';
 
 test('bolt check');

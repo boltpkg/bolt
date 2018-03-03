@@ -24,7 +24,7 @@ function toGlobalRemoveOptions(
   };
 }
 
-export async function remove(flags: options.Flags, args: options.Args) {
+export async function globalRemove(flags: options.Flags, args: options.Args) {
   let opts = await toGlobalRemoveOptions(args, flags);
   try {
     await yarn.globalCli('remove', opts.deps);

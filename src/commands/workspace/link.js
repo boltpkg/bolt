@@ -4,6 +4,7 @@ import * as yarn from '../../utils/yarn';
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as messages from '../../utils/messages';
+import * as logger from '../../utils/logger';
 
 function getWorkspaceMap(workspaces) {
   let workspaceMap = new Map();

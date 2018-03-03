@@ -15,7 +15,7 @@ function toConfigGetOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function get(flags: options.Flags, args: options.Args) {
+export async function configGet(flags: options.Flags, args: options.Args) {
   let opts = toConfigGetOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

@@ -2,11 +2,11 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 const commands = {
-  ...require('./add'),
-  ...require('./bin'),
-  ...require('./list'),
-  ...require('./remove'),
-  ...require('./upgrade')
+  add: require('./add').globalAdd,
+  bin: require('./bin').globalBin,
+  list: require('./list').globalList,
+  remove: require('./remove').globalRemove,
+  upgrade: require('./upgrade').globalUpgrade
 };
 
 export async function global(

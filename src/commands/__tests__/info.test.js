@@ -1,5 +1,5 @@
 // @flow
-import { info, toInfoOptions } from '../info';
+import { info } from '../info';
 
 import * as yarn from '../../utils/yarn';
 

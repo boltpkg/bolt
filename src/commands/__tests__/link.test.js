@@ -1,5 +1,5 @@
 // @flow
-import { link, toLinkOptions } from '../link';
+import { link } from '../link';
 import * as yarn from '../../utils/yarn';
 import * as logger from '../../utils/logger';
 import fixtures from 'fixturez';

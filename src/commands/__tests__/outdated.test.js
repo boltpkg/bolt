@@ -1,5 +1,5 @@
 // @flow
-import { outdated, toOutdatedOptions } from '../outdated';
+import { outdated } from '../outdated';
 import * as yarn from '../../utils/yarn';
 
 jest.mock('../../utils/yarn');

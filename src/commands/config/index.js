@@ -2,11 +2,11 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 const commands = {
-  ...require('./current'),
-  ...require('./get'),
-  ...require('./list'),
-  ...require('./set'),
-  delete: require('./delete').delete_
+  current: require('./current').configCurrent,
+  delete: require('./delete').configDelete,
+  get: require('./get').configGet,
+  list: require('./list').configList,
+  set: require('./set').configSet
 };
 
 export async function config(

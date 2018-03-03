@@ -4,6 +4,17 @@ import * as yarn from '../../utils/yarn';
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as messages from '../../utils/messages';
+import * as logger from '../../utils/logger';
+
+function getWorkspaceMap(workspaces) {
+  let workspaceMap = new Map();
+
+  for (let workspace of workspaces) {
+    workspaceMap.set(workspace.pkg.config.getName(), workspace);
+  }
+
+  return workspaceMap;
+}
 
 type WorkspaceUnlinkOptions = {|
   cwd?: string,
@@ -33,6 +44,7 @@ export async function workspaceUnlink(
   let workspaceName = opts.workspaceName;
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
+  let workspaceMap = getWorkspaceMap(workspaces);
   let workspace = await project.getWorkspaceByName(
     workspaces,
     opts.workspaceName

@@ -14,7 +14,7 @@ function toGlobalBinOptions(
   return { cwd: options.string(flags.cwd, 'cwd') };
 }
 
-export async function bin(flags: options.Flags, args: options.Args) {
+export async function globalBin(flags: options.Flags, args: options.Args) {
   let opts = toGlobalBinOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

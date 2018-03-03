@@ -1,4 +1,4 @@
 // @flow
-import { doc, toDocOptions } from '../doc';
+import { doc } from '../doc';
 
 test('bolt doc');

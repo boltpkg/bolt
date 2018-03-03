@@ -6,7 +6,6 @@ import * as logger from '../utils/logger';
 import addDependenciesToPackage from '../utils/addDependenciesToPackages';
 import type { Dependency, configDependencyType } from '../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
-import type { ProjectAddOptions } from './project/add';
 
 type AddOptions = {
   cwd?: string,

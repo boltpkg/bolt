@@ -1,5 +1,5 @@
 // @flow
-import { cacheClean, toCacheCleanOptions } from '../clean';
+import { cacheClean } from '../clean';
 import * as yarn from '../../../utils/yarn';
 
 jest.mock('../../../utils/yarn');
@@ -7,9 +7,10 @@ jest.mock('../../../utils/yarn');
 describe('bolt cache clean', () => {
   it('should handle situation where no arguments are passed', async () => {
     await cacheClean(
-      toCacheCleanOptions([], {
+      {
         cwd: 'dummyPattern/dummyPath'
-      })
+      },
+      []
     );
     expect(
       yarn.cliCommand
@@ -18,9 +19,10 @@ describe('bolt cache clean', () => {
 
   it('should handle passing the arguments down to yarn clean', async () => {
     await cacheClean(
-      toCacheCleanOptions(['jest'], {
+      {
         cwd: 'dummyPattern/dummyPath'
-      })
+      },
+      ['jest']
     );
     expect(
       yarn.cliCommand

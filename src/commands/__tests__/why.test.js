@@ -1,5 +1,5 @@
 // @flow
-import { why, toWhyOptions } from '../why';
+import { why } from '../why';
 import * as yarn from '../../utils/yarn';
 
 jest.mock('../../utils/yarn');

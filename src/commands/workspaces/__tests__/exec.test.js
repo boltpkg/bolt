@@ -34,10 +34,13 @@ describe('bolt workspaces exec', () => {
     let fooBinDir = path.join(fooWorkspaceDir, binDir);
     let barBinDir = path.join(barWorkspaceDir, binDir);
 
-    await workspacesExec({
-      cwd: projectDir,
-      '--': ['dep-with-bin']
-    });
+    await workspacesExec(
+      {
+        cwd: projectDir,
+        '--': ['dep-with-bin']
+      },
+      []
+    );
 
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(2);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
@@ -70,10 +73,13 @@ describe('bolt workspaces exec', () => {
     let fooBinDir = path.join(fooWorkspaceDir, binDir);
     let barBinDir = path.join(barWorkspaceDir, binDir);
 
-    await workspacesExec({
-      cwd: fooWorkspaceDir,
-      '--': ['dep-with-bin']
-    });
+    await workspacesExec(
+      {
+        cwd: fooWorkspaceDir,
+        '--': ['dep-with-bin']
+      },
+      []
+    );
 
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(2);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
@@ -106,10 +112,13 @@ describe('bolt workspaces exec', () => {
     let fooBinDir = path.join(fooWorkspaceDir, binDir);
     let barBinDir = path.join(barWorkspaceDir, binDir);
 
-    await workspacesExec({
-      cwd: barWorkspaceDir,
-      '--': ['dep-with-bin']
-    });
+    await workspacesExec(
+      {
+        cwd: barWorkspaceDir,
+        '--': ['dep-with-bin']
+      },
+      []
+    );
 
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(2);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith(

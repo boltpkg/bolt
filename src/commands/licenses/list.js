@@ -16,7 +16,7 @@ function toLicensesListOptions(
   };
 }
 
-export async function list(args: options.Args, flags: options.Flags) {
+export async function licensesList(flags: options.Flags, args: options.Args) {
   let opts = toLicensesListOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
 

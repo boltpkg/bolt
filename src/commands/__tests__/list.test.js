@@ -1,4 +1,4 @@
 // @flow
-import { list, toListOptions } from '../list';
+import { list } from '../list';
 
 test('bolt list');

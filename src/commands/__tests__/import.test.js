@@ -1,5 +1,5 @@
 // @flow
-import { import_, toImportOptions } from '../import';
+import { import_ } from '../import';
 import * as yarn from '../../utils/yarn';
 
 jest.mock('../../utils/yarn');

@@ -1,6 +1,6 @@
 // @flow
 
-import { toAutocleanOptions, autoclean } from '../autoclean';
+import { autoclean } from '../autoclean';
 import * as yarn from '../../utils/yarn';
 
 jest.mock('../../utils/yarn');

@@ -1,5 +1,5 @@
 // @flow
-import { remove, toRemoveOptions } from '../remove';
+import { remove } from '../remove';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yarn from '../../utils/yarn';

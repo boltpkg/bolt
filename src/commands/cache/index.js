@@ -2,9 +2,9 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 const commands = {
-  ...require('./clean'),
-  ...require('./dir'),
-  ...require('./list')
+  clean: require('./clean').cacheClean,
+  dir: require('./dir').cacheDir,
+  list: require('./list').cacheList
 };
 
 export async function cache(

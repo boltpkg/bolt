@@ -15,7 +15,7 @@ function toGlobalListOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function list(flags: options.Flags, args: options.Args) {
+export async function globalList(flags: options.Flags, args: options.Args) {
   let opts = toGlobalListOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

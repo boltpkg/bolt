@@ -1,6 +1,8 @@
 // @flow
+import * as options from '../../utils/options';
+
 const command = {
-  add: require('./add').add,
+  add: require('./add').workspacesAdd,
   exec: require('./exec').workspacesExec,
   remove: require('./remove').workspacesRemove,
   run: require('./run').workspacesRun,

@@ -1,4 +1,4 @@
 // @flow
-import { test as test_, toTestOptions } from '../test';
+import { test as test_ } from '../test';
 
 test('bolt test');

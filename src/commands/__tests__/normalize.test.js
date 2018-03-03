@@ -1,4 +1,4 @@
 // @flow
-import { normalize, toNormalizeOptions } from '../normalize';
+import { normalize } from '../normalize';
 
 test('bolt normalize');

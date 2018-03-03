@@ -24,7 +24,7 @@ function toGlobalAddOptions(
   };
 }
 
-export async function add(flags: options.Flags, args: options.Args) {
+export async function globalAdd(flags: options.Flags, args: options.Args) {
   let opts = toGlobalAddOptions(args, flags);
   try {
     await yarn.globalCli('add', opts.deps);

@@ -18,16 +18,12 @@ function toCacheCleanOptions(
   };
 }
 
-export async function clean(flags: options.Flags, commandArgs: options.Args) {
-  let opts = toCacheCleanOptions(commandArgs, flags);
+export async function cacheClean(flags: options.Flags, args: options.Args) {
+  let opts = toCacheCleanOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
-  let args = ['clean'];
 
-  if (opts.args.length) {
-    args = args.concat(opts.args);
-  }
   try {
-    await yarn.cliCommand(cwd, 'cache', args);
+    await yarn.cliCommand(cwd, 'cache', ['clean', ...opts.args]);
   } catch (err) {
     throw new BoltError(err);
   }

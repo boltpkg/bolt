@@ -1,5 +1,5 @@
 // @flow
-import { exec, toExecOptions } from '../exec';
+import { exec } from '../exec';
 import * as path from 'path';
 import * as processes from '../../utils/processes';
 import containDeep from 'jest-expect-contain-deep';

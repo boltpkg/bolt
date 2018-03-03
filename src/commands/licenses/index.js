@@ -3,8 +3,9 @@ import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 
 const commands = {
-  ...require('./generateDisclaimer'),
-  ...require('./list')
+  'generate-disclaimer': require('./generateDisclaimer')
+    .licensesGenerateDisclaimer,
+  list: require('./list').licensesList
 };
 
 export async function licenses(

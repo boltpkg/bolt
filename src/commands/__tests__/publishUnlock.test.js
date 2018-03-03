@@ -1,4 +1,4 @@
 // @flow
-import { publishUnlock, toPublishUnlockOptions } from '../publishUnlock';
+import { publishUnlock } from '../publishUnlock';
 
 test('bolt publish-unlock');

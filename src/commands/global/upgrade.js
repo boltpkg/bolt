@@ -24,7 +24,7 @@ function toGlobalUpgradeOptions(
   };
 }
 
-export async function upgrade(flags: options.Flags, args: options.Args) {
+export async function globalUpgrade(flags: options.Flags, args: options.Args) {
   let opts = toGlobalUpgradeOptions(args, flags);
   try {
     await yarn.globalCli('upgrade', opts.deps);

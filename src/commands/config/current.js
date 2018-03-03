@@ -14,7 +14,7 @@ function toConfigCurrentOptions(
   return { cwd: options.string(flags.cwd, 'cwd') };
 }
 
-export async function current(flags: options.Flags, args: options.Args) {
+export async function configCurrent(flags: options.Flags, args: options.Args) {
   let opts = toConfigCurrentOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
