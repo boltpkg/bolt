@@ -40,8 +40,8 @@ function toAddOptions(args: options.Args, flags: options.Flags): AddOptions {
   };
 }
 
-export async function add(flags: options.Flags, commandArgs: Array<string>) {
-  const opts = toAddOptions(commandArgs, flags);
+export async function add(flags: options.Flags, args: Array<string>) {
+  const opts = toAddOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);
