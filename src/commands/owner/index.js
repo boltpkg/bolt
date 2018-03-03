@@ -2,9 +2,9 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 const commands = {
-  ...require('./add'),
-  ...require('./list'),
-  ...require('./remove')
+  add: require('./add').ownerAdd,
+  list: require('./list').ownerList,
+  remove: require('./remove').ownerRemove
 };
 
 async function owner(

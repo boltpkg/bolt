@@ -3,19 +3,19 @@ import * as options from '../../utils/options';
 import * as npm from '../../utils/npm';
 import { BoltError } from '../../utils/errors';
 
-export type TeamRemoveOptions = {
+type TeamRemoveOptions = {
   cwd?: string,
   args: Array<string>
 };
 
-export function toTeamRemoveOptions(
+function toTeamRemoveOptions(
   args: options.Args,
   flags: options.Flags
 ): TeamRemoveOptions {
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function remove(flags: options.Flags, args: options.Args) {
+export async function teamRemove(flags: options.Flags, args: options.Args) {
   let opts = toTeamRemoveOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

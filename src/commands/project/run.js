@@ -22,7 +22,7 @@ function toProjectRunOptions(
   };
 }
 
-export async function run(flags: options.Flags, args: options.Args) {
+export async function projectRun(flags: options.Flags, args: options.Args) {
   let opts = toProjectRunOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);

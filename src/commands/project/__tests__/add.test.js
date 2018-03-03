@@ -1,5 +1,5 @@
 // @flow
-import { add } from '../add';
+import { projectAdd } from '../add';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yarn from '../../../utils/yarn';
@@ -14,7 +14,7 @@ describe('bolt project add', () => {
   test('adding a project dependency only used by the project', async () => {
     let tempDir = f.copy('package-with-external-deps-installed');
 
-    await add({ cwd: tempDir }, ['project-new-dep']);
+    await projectAdd({ cwd: tempDir }, ['project-new-dep']);
 
     expect(addDependenciesToPackage).toHaveBeenCalledTimes(1);
   });

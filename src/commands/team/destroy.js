@@ -15,7 +15,7 @@ function toTeamDestroyOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function destroy(flags: options.Flags, args: options.Args) {
+export async function teamDestroy(flags: options.Flags, args: options.Args) {
   let opts = toTeamDestroyOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

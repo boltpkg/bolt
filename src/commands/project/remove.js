@@ -20,7 +20,7 @@ function toProjectRemoveOptions(
   };
 }
 
-export async function remove(flags: options.Flags, args: options.Args) {
+export async function projectRemove(flags: options.Flags, args: options.Args) {
   let opts = toProjectRemoveOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);

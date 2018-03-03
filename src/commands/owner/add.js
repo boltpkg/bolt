@@ -15,7 +15,7 @@ function toOwnerAddOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function add(args: options.Args, flags: options.Flags) {
+export async function ownerAdd(flags: options.Flags, args: options.Args) {
   let opts = toOwnerAddOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

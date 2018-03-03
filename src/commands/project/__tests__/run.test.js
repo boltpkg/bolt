@@ -1,4 +1,4 @@
 // @flow
-import { projectRun, toProjectRunOptions } from '../run';
+import { projectRun } from '../run';
 
 test('bolt project run');

@@ -2,9 +2,9 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 const commands = {
-  ...require('./add'),
-  ...require('./list'),
-  ...require('./remove')
+  add: require('./add').tagAdd,
+  list: require('./list').tagList,
+  remove: require('./remove').tagRemove
 };
 
 export async function tag(

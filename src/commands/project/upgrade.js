@@ -44,7 +44,7 @@ function toProjectUpgradeOptions(
   };
 }
 
-export async function upgrade(flags: options.Flags, args: options.Args) {
+export async function projectUpgrade(flags: options.Flags, args: options.Args) {
   let opts = toProjectUpgradeOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);

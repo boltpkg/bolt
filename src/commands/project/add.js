@@ -42,7 +42,7 @@ function toProjectAddOptions(
   };
 }
 
-export async function add(flags: options.Flags, args: options.Args) {
+export async function projectAdd(flags: options.Flags, args: options.Args) {
   const opts = toProjectAddOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);

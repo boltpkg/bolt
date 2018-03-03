@@ -15,7 +15,7 @@ function toTagRemoveOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function remove(flags: options.Flags, args: options.Args) {
+export async function tagRemove(flags: options.Flags, args: options.Args) {
   let opts = toTagRemoveOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

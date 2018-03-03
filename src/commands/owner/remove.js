@@ -15,7 +15,7 @@ function toOwnerRemoveOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function remove(args: options.Args, flags: options.Flags) {
+export async function ownerRemove(flags: options.Flags, args: options.Args) {
   let opts = toOwnerRemoveOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

@@ -2,11 +2,11 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 const commands = {
-  ...require('./add'),
-  ...require('./exec'),
-  ...require('./remove'),
-  ...require('./run'),
-  ...require('./upgrade')
+  add: require('./add').projectAdd,
+  exec: require('./exec').projectExec,
+  remove: require('./remove').projectRemove,
+  run: require('./run').projectRun,
+  upgrade: require('./upgrade').projectUpgrade
 };
 
 async function project(

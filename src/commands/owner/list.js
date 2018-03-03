@@ -15,7 +15,7 @@ function toOwnerListOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function list(args: options.Args, flags: options.Flags) {
+export async function ownerList(flags: options.Flags, args: options.Args) {
   let opts = toOwnerListOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
 

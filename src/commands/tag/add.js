@@ -15,7 +15,7 @@ function toTagAddOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function add(flags: options.Flags, args: options.Args) {
+export async function tagAdd(flags: options.Flags, args: options.Args) {
   let opts = toTagAddOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

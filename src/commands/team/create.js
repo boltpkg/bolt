@@ -15,7 +15,7 @@ function toTeamCreateOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function create(flags: options.Flags, args: options.Args) {
+export async function teamCreate(flags: options.Flags, args: options.Args) {
   let opts = toTeamCreateOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {

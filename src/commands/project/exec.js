@@ -21,7 +21,7 @@ function toProjectExecOptions(
   };
 }
 
-export async function exec(flags: options.Flags, args: options.Args) {
+export async function projectExec(flags: options.Flags, args: options.Args) {
   let opts = toProjectExecOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);

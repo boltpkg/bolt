@@ -15,7 +15,7 @@ function toTeamAddOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function add(flags: options.Flags, args: options.Args) {
+export async function teamAdd(flags: options.Flags, args: options.Args) {
   let opts = toTeamAddOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
