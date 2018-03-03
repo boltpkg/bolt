@@ -21,7 +21,10 @@ function toWorkspacesRemoveOptions(
   };
 }
 
-export async function remove(flags: options.Flags, args: options.Args) {
+export async function workspacesRemove(
+  flags: options.Flags,
+  args: options.Args
+) {
   let opts = toWorkspacesRemoveOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);

@@ -24,7 +24,7 @@ function toWorkspacesExecOptions(
   };
 }
 
-export async function exec(flags: options.Flags, args: options.Args) {
+export async function workspacesExec(flags: options.Flags, args: options.Args) {
   let opts = toWorkspacesExecOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);

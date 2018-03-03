@@ -15,6 +15,6 @@ function toWorkspacesAddOptions(
   };
 }
 
-export async function add(flags: options.Flags, args: options.Args) {
+export async function workspacesAdd(flags: options.Flags, args: options.Args) {
   throw new BoltError('Unimplemented command "workspaces add"');
 }

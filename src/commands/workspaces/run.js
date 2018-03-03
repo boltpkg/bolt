@@ -24,7 +24,7 @@ function toWorkspacesRunOptions(
   };
 }
 
-export async function run(flags: options.Flags, args: options.Args) {
+export async function workspacesRun(flags: options.Flags, args: options.Args) {
   let opts = toWorkspacesRunOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);

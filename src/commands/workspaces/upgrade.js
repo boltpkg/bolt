@@ -23,7 +23,10 @@ function toWorkspacesUpgradeOptions(
   };
 }
 
-export async function upgrade(flags: options.Flags, args: options.Args) {
+export async function workspacesUpgrade(
+  flags: options.Flags,
+  args: options.Args
+) {
   let opts = toWorkspacesUpgradeOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let filterOpts = Object.keys(opts.filterOpts);

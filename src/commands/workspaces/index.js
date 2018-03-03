@@ -1,10 +1,10 @@
 // @flow
 const command = {
-  ...require('./add'),
-  ...require('./exec'),
-  ...require('./remove'),
-  ...require('./run'),
-  ...require('./upgrade')
+  add: require('./add').add,
+  exec: require('./exec').workspacesExec,
+  remove: require('./remove').workspacesRemove,
+  run: require('./run').workspacesRun,
+  upgrade: require('./upgrade').workspacesUpgrade
 };
 
 async function workspaces(
@@ -21,7 +21,7 @@ async function workspaces(
 }
 
 /**
- * Alias for workspace, can use workspace or ws
+ * Alias for workspaces, can use workspaces or ws
  */
 module.exports = {
   workspaces,
