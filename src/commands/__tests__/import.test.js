@@ -8,7 +8,7 @@ const projectDirMock = 'dummyPattern/dummyPath';
 
 describe('bolt import', () => {
   it('should call yarn cliCommand with autoClean and path to project', async () => {
-    await import_(toImportOptions([], { cwd: projectDirMock }));
+    await import_({ cwd: projectDirMock }, []);
     expect(yarn.cliCommand).toHaveBeenCalledWith(projectDirMock, 'import');
   });
 });

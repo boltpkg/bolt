@@ -13,8 +13,8 @@ function toBinOptions(args: options.Args, flags: options.Flags): BinOptions {
   };
 }
 
-export async function bin(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toBinOptions(commandArgs, flags);
+export async function bin(flags: options.Flags, args: Array<string>) {
+  let opts = toBinOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {

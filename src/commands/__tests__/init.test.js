@@ -10,7 +10,7 @@ jest.mock('../../utils/prompts');
 const dummyPath = '/dummyPattern/dummyPath';
 describe('bolt init', () => {
   it('should be able to pass yes to yarn when y flag is passed', async () => {
-    await init(toInitOptions([], { cwd: dummyPath, y: true }));
+    await init({ cwd: dummyPath, y: true });
     expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'init', [
       '-s',
       '-y'
@@ -18,7 +18,7 @@ describe('bolt init', () => {
   });
 
   it('should be able to pass yes to yarn when yes flag is passes', async () => {
-    await init(toInitOptions([], { cwd: dummyPath, yes: true }));
+    await init({ cwd: dummyPath, yes: true });
     expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'init', [
       '-s',
       '-y'
@@ -26,7 +26,7 @@ describe('bolt init', () => {
   });
 
   it('should be able to pass private to yarn when p flag is passed', async () => {
-    await init(toInitOptions([], { cwd: dummyPath, p: true }));
+    await init({ cwd: dummyPath, p: true });
     expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'init', [
       '-s',
       '-p'
@@ -34,7 +34,7 @@ describe('bolt init', () => {
   });
 
   it('should be able to pass private to yarn when private flag is passes', async () => {
-    await init(toInitOptions([], { cwd: dummyPath, private: true }));
+    await init({ cwd: dummyPath, private: true });
     expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'init', [
       '-s',
       '-p'
@@ -42,7 +42,7 @@ describe('bolt init', () => {
   });
 
   it('should be able to pass yes and private to yarn when private and yes flag is passes', async () => {
-    await init(toInitOptions([], { cwd: dummyPath, private: true, yes: true }));
+    await init({ cwd: dummyPath, private: true, yes: true });
     expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'init', [
       '-s',
       '-p',
@@ -51,7 +51,7 @@ describe('bolt init', () => {
   });
 
   it('should be able to add workspaces', async () => {
-    await init(toInitOptions([], { cwd: dummyPath }));
+    await init({ cwd: dummyPath });
     expect(prompts.isWorkspaceNeeded).toHaveBeenCalledTimes(1);
   });
 });

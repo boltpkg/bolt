@@ -72,11 +72,8 @@ async function getUnpublishedPackages(packages) {
   });
 }
 
-export async function publish(
-  flags: options.Flags,
-  commandArgs: Array<string>
-) {
-  const opts = toPublishOptions(commandArgs, flags);
+export async function publish(flags: options.Flags, args: Array<string>) {
+  const opts = toPublishOptions(args, flags);
   const cwd = opts.cwd || process.cwd();
   const project = await Project.init(cwd);
   const workspaces = await project.getWorkspaces();

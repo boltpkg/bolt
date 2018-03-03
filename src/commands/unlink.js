@@ -31,8 +31,8 @@ function toUnlinkOptions(
   };
 }
 
-export async function unlink(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toUnlinkOptions(commandArgs, flags);
+export async function unlink(flags: options.Flags, args: Array<string>) {
+  let opts = toUnlinkOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let packagesToUnlink = opts.packagesToUnlink;
   let project = await Project.init(cwd);

@@ -15,7 +15,7 @@ describe('bolt remove', () => {
   test('removing a project dependency only used by the project', async () => {
     let tempDir = f.copy('package-with-external-deps-installed');
 
-    await remove(toRemoveOptions(['project-only-dep'], { cwd: tempDir }));
+    await remove({ cwd: tempDir }, ['project-only-dep']);
 
     expect(yarn.remove).toHaveBeenCalledTimes(1);
     expect(yarn.remove).toHaveBeenCalledWith(['project-only-dep'], tempDir);
@@ -25,7 +25,7 @@ describe('bolt remove', () => {
     let tempDir = f.copy('package-with-external-deps-installed');
     let workspaceDir = path.join(tempDir, 'packages', 'foo');
 
-    await remove(toRemoveOptions(['foo-dep'], { cwd: workspaceDir }));
+    await remove({ cwd: workspaceDir }, ['foo-dep']);
 
     expect(yarn.remove).toHaveBeenCalledTimes(0);
     expect(
@@ -43,7 +43,7 @@ describe('bolt remove', () => {
     let tempDir = f.copy('package-with-external-deps-installed');
 
     await expect(
-      remove(toRemoveOptions(['nonexistent-dep'], { cwd: tempDir }))
+      remove({ cwd: tempDir }, ['nonexistent-dep'])
     ).rejects.toBeInstanceOf(Error);
   });
 
@@ -51,7 +51,7 @@ describe('bolt remove', () => {
     let tempDir = f.copy('package-with-external-deps-installed');
 
     await expect(
-      remove(toRemoveOptions(['global-dep'], { cwd: tempDir }))
+      remove({ cwd: tempDir }, ['global-dep'])
     ).rejects.toBeInstanceOf(Error);
 
     expect(

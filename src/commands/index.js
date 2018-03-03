@@ -49,6 +49,7 @@ const commands = {
   versions: require('./versions').versions,
   why: require('./why').why
 };
+
 module.exports = {
   ...commands,
   ...subCommands

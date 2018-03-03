@@ -8,6 +8,6 @@ function toHelpOptions(args: options.Args, flags: options.Flags): HelpOptions {
   return {};
 }
 
-export async function help(flags: options.Flags, commandArgs: Array<string>) {
+export async function help(flags: options.Flags, args: Array<string>) {
   throw new BoltError('Unimplemented command "help"');
 }

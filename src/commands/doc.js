@@ -15,8 +15,8 @@ function toDocOptions(args: options.Args, flags: options.Flags): DocOptions {
   };
 }
 
-export async function doc(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toDocOptions(commandArgs, flags);
+export async function doc(flags: options.Flags, args: Array<string>) {
+  let opts = toDocOptions(args, flags);
   await run({
     cwd: opts.cwd,
     script: 'doc',

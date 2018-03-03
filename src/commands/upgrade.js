@@ -45,11 +45,8 @@ function toUpgradeOptions(
   };
 }
 
-export async function upgrade(
-  flags: options.Flags,
-  commandArgs: Array<string>
-) {
-  let opts = toUpgradeOptions(commandArgs, flags);
+export async function upgrade(flags: options.Flags, args: Array<string>) {
+  let opts = toUpgradeOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);

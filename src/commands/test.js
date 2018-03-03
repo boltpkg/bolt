@@ -9,6 +9,6 @@ function toTestOptions(args: options.Args, flags: options.Flags): TestOptions {
   return {};
 }
 
-export async function test(flags: options.Flags, commandArgs: Array<string>) {
-  return await run(flags, ['test', ...commandArgs]);
+export async function test(flags: options.Flags, args: Array<string>) {
+  return await run(flags, ['test', ...args]);
 }

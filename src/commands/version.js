@@ -11,9 +11,6 @@ function toVersionOptions(
   return {};
 }
 
-export async function version(
-  flags: options.Flags,
-  commandArgs: Array<string>
-) {
+export async function version(flags: options.Flags, args: Array<string>) {
   throw new BoltError('Unimplemented command "version"');
 }

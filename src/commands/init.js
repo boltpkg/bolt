@@ -21,8 +21,8 @@ function toInitOptions(args: options.Args, flags: options.Flags): InitOptions {
   };
 }
 
-export async function init(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toInitOptions(commandArgs, flags);
+export async function init(flags: options.Flags, args: Array<string>) {
+  let opts = toInitOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let spawnArgs = ['-s'];
 

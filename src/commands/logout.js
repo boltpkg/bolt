@@ -3,11 +3,11 @@ import * as options from '../utils/options';
 import * as npm from '../utils/npm';
 import { BoltError } from '../utils/errors';
 
-export type LogoutOptions = {|
+type LogoutOptions = {|
   cwd?: string
 |};
 
-export function toLogoutOptions(
+function toLogoutOptions(
   args: options.Args,
   flags: options.Flags
 ): LogoutOptions {
@@ -16,8 +16,8 @@ export function toLogoutOptions(
   };
 }
 
-export async function logout(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toLogoutOptions(commandArgs, flags);
+export async function logout(flags: options.Flags, args: Array<string>) {
+  let opts = toLogoutOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await npm.logout(cwd);

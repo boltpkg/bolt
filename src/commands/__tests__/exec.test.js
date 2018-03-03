@@ -17,10 +17,11 @@ describe('bolt exec', () => {
     let projectBinDir = path.join(projectDir, binDir);
 
     await exec(
-      toExecOptions([], {
+      {
         cwd: projectDir,
         '--': ['dep-with-bin']
-      })
+      },
+      []
     );
 
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
@@ -43,10 +44,11 @@ describe('bolt exec', () => {
     let fooBinDir = path.join(fooWorkspaceDir, binDir);
 
     await exec(
-      toExecOptions([], {
+      {
         cwd: fooWorkspaceDir,
         '--': ['dep-with-bin']
-      })
+      },
+      []
     );
 
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);

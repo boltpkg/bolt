@@ -20,8 +20,8 @@ function toRunOptions(args: options.Args, flags: options.Flags): RunOptions {
   };
 }
 
-export async function run(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toRunOptions(commandArgs, flags);
+export async function run(flags: options.Flags, args: Array<string>) {
+  let opts = toRunOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let pkg = await Package.closest(cwd);
   let script = await yarn.getScript(pkg, opts.script);

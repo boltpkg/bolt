@@ -28,8 +28,8 @@ function toLinkOptions(args: options.Args, flags: options.Flags): LinkOptions {
   };
 }
 
-export async function link(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toLinkOptions(commandArgs, flags);
+export async function link(flags: options.Flags, args: Array<string>) {
+  let opts = toLinkOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let packagesToLink = opts.packagesToLink;
   let project = await Project.init(cwd);

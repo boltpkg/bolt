@@ -17,15 +17,15 @@ function toListOptions(args: options.Args, flags: options.Flags): ListOptions {
   };
 }
 
-export async function list(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toListOptions(commandArgs, flags);
+export async function list(flags: options.Flags, args: Array<string>) {
+  let opts = toListOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
-  let args = opts.pattern ? [`--pattern=${opts.pattern}`] : [];
+  let spawnArgs = opts.pattern ? [`--pattern=${opts.pattern}`] : [];
   if (opts.depth) {
-    args = args.concat([`--depth=${opts.depth}`]);
+    spawnArgs = spawnArgs.concat([`--depth=${opts.depth}`]);
   }
   try {
-    yarn.cliCommand(cwd, 'list', args);
+    yarn.cliCommand(cwd, 'list', spawnArgs);
   } catch (err) {
     throw new BoltError(err);
   }

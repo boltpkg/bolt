@@ -18,11 +18,8 @@ function toOutdatedOptions(
   };
 }
 
-export async function outdated(
-  flags: options.Flags,
-  commandArgs: Array<string>
-) {
-  let opts = toOutdatedOptions(commandArgs, flags);
+export async function outdated(flags: options.Flags, args: Array<string>) {
+  let opts = toOutdatedOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await yarn.cliCommand(cwd, 'outdated', opts.args);

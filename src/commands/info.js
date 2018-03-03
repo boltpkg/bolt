@@ -17,8 +17,8 @@ function toInfoOptions(args: options.Args, flags: options.Flags): InfoOptions {
   };
 }
 
-export async function info(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toInfoOptions(commandArgs, flags);
+export async function info(flags: options.Flags, args: Array<string>) {
+  let opts = toInfoOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   const spawnArgs = Array.prototype.concat([], opts.args);
   if (opts.flags && opts.flags.json) {

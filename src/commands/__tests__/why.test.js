@@ -7,9 +7,10 @@ jest.mock('../../utils/yarn');
 describe('bolt why', () => {
   it('should be able to handle arguments', async () => {
     await why(
-      toWhyOptions(['jest'], {
+      {
         cwd: 'dummyPattern/dummyPath'
-      })
+      },
+      ['jest']
     );
     expect(
       yarn.cliCommand

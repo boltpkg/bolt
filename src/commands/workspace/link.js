@@ -5,6 +5,16 @@ import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as messages from '../../utils/messages';
 
+function getWorkspaceMap(workspaces) {
+  let workspaceMap = new Map();
+
+  for (let workspace of workspaces) {
+    workspaceMap.set(workspace.pkg.config.getName(), workspace);
+  }
+
+  return workspaceMap;
+}
+
 type WorkspaceLinkOptions = {|
   cwd?: string,
   workspaceName: string,

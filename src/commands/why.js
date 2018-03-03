@@ -15,8 +15,8 @@ function toWhyOptions(args: options.Args, flags: options.Flags): WhyOptions {
   };
 }
 
-export async function why(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toWhyOptions(commandArgs, flags);
+export async function why(flags: options.Flags, args: Array<string>) {
+  let opts = toWhyOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await yarn.cliCommand(cwd, 'why', opts.args);

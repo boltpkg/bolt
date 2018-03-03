@@ -16,11 +16,8 @@ function toPublishUnlockOptions(
   };
 }
 
-export async function publishUnlock(
-  flags: options.Flags,
-  commandArgs: Array<string>
-) {
-  let opts = toPublishUnlockOptions(commandArgs, flags);
+export async function publishUnlock(flags: options.Flags, args: Array<string>) {
+  let opts = toPublishUnlockOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

@@ -12,6 +12,6 @@ function toBuildOptions(
   return {};
 }
 
-export async function build(flags: options.Flags, commandArgs: Array<string>) {
-  return await run(flags, ['build', ...commandArgs]);
+export async function build(flags: options.Flags, args: Array<string>) {
+  return await run(flags, ['build', ...args]);
 }

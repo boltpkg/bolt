@@ -11,23 +11,8 @@ const flags = { cwd, json: true };
 const opt = { flags, args };
 
 describe('bolt info', () => {
-  test('should return the expected cwd', () => {
-    const result = toInfoOptions(args, flags);
-    expect(result.cwd).toBe(cwd);
-  });
-
-  test('should return the expected argument', () => {
-    const result = toInfoOptions(args, flags);
-    expect(result.args).toBe(args);
-  });
-
-  test('should return the expected flags', () => {
-    const result = toInfoOptions(args, flags);
-    expect(result.flags).toBe(flags);
-  });
-
   test('should call npm login once', async () => {
-    await info(opt);
+    await info(flags, args);
     expect(yarn.info).toHaveBeenCalledTimes(1);
   });
 });

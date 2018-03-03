@@ -17,27 +17,22 @@ describe('bolt link', () => {
   });
 
   it('should show warning on linking internal dependency', async () => {
-    await link(toLinkOptions(['foo'], { cwd: projectDir }));
+    await link({ cwd: projectDir }, ['foo']);
     expect(logger.warn).toHaveBeenCalled();
   });
 
   it('should call yarn link for extenal package', async () => {
-    await link(toLinkOptions(['some-external-package'], { cwd: projectDir }));
+    await link({ cwd: projectDir }, ['some-external-package']);
     expect(yarn.cliCommand).toHaveBeenCalled();
   });
 
   it('should call yarn link for all extenal package and show warning for all internal dependency', async () => {
-    await link(
-      toLinkOptions(
-        [
-          'some-external-package',
-          'foo',
-          'bar',
-          'someother-external-dependency'
-        ],
-        { cwd: projectDir }
-      )
-    );
+    await link({ cwd: projectDir }, [
+      'some-external-package',
+      'foo',
+      'bar',
+      'someother-external-dependency'
+    ]);
     expect(yarn.cliCommand).toHaveBeenCalledTimes(2);
     expect(logger.warn).toHaveBeenCalledTimes(2);
   });

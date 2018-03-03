@@ -1,5 +1,5 @@
 // @flow
-import { upgrade, toUpgradeOptions } from '../upgrade';
+import { upgrade } from '../upgrade';
 import fixtures from 'fixturez';
 import * as path from 'path';
 import * as processes from '../../utils/processes';
@@ -63,9 +63,10 @@ describe.only('bolt upgrade', () => {
     let currentVersion = await getDependencyVersion(projectDir, 'foo-dep');
     expect(currentVersion).toEqual('1.0.0');
     await upgrade(
-      toUpgradeOptions(['foo-dep'], {
+      {
         cwd: projectDir
-      })
+      },
+      ['foo-dep']
     );
     expect(yarn.upgrade).toHaveBeenCalled();
     expect(await getDependencyVersion(projectDir, 'foo-dep')).toEqual('1.1.0');
@@ -83,9 +84,10 @@ describe.only('bolt upgrade', () => {
     expect(currentVersionFooDep).toEqual('1.0.0');
     expect(currentVersionGlobalDep).toEqual('1.0.0');
     await upgrade(
-      toUpgradeOptions(['foo-dep', 'global-dep'], {
+      {
         cwd: projectDir
-      })
+      },
+      ['foo-dep', 'global-dep']
     );
     expect(yarn.upgrade).toHaveBeenCalled();
     expect(await getDependencyVersion(projectDir, 'foo-dep')).toEqual('1.1.0');
@@ -95,8 +97,8 @@ describe.only('bolt upgrade', () => {
   });
 
   it('should not upgrade an internal package', async () => {
-    await expect(
-      upgrade(toUpgradeOptions(['bar'], { cwd: projectDir }))
-    ).rejects.toBeInstanceOf(Error);
+    await expect(upgrade({ cwd: projectDir }, ['bar'])).rejects.toBeInstanceOf(
+      Error
+    );
   });
 });

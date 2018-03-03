@@ -16,11 +16,8 @@ function toPublishLockOptions(
   };
 }
 
-export async function publishLock(
-  flags: options.Flags,
-  commandArgs: Array<string>
-) {
-  let opts = toPublishLockOptions(commandArgs, flags);
+export async function publishLock(flags: options.Flags, args: Array<string>) {
+  let opts = toPublishLockOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

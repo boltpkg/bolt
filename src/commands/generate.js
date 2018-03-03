@@ -11,9 +11,6 @@ function toGenerateOptions(
   return {};
 }
 
-export async function generate(
-  flags: options.Flags,
-  commandArgs: Array<string>
-) {
+export async function generate(flags: options.Flags, args: Array<string>) {
   throw new BoltError('Unimplemented command "generate"');
 }

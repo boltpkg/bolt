@@ -17,8 +17,8 @@ function toPackOptions(args: options.Args, flags: options.Flags): PackOptions {
   };
 }
 
-export async function pack(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toPackOptions(commandArgs, flags);
+export async function pack(flags: options.Flags, args: Array<string>) {
+  let opts = toPackOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let fileName = opts.fileName ? [`--filename=${opts.fileName}`] : [];
 

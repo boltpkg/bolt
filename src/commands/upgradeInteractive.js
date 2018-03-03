@@ -13,7 +13,7 @@ function toUpgradeInteractiveOptions(
 
 export async function upgradeInteractive(
   flags: options.Flags,
-  commandArgs: Array<string>
+  args: Array<string>
 ) {
   throw new BoltError('Unimplemented command "upgrade-interactive"');
 }

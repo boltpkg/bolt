@@ -16,8 +16,8 @@ function toLoginOptions(
   };
 }
 
-export async function login(flags: options.Flags, commandArgs: Array<string>) {
-  const opts = toLoginOptions(commandArgs, flags);
+export async function login(flags: options.Flags, args: Array<string>) {
+  const opts = toLoginOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await npm.login(cwd);

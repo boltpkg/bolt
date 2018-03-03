@@ -7,9 +7,10 @@ jest.mock('../../utils/yarn');
 describe('bolt outdated', () => {
   it('should be able to pass arguments to yarn outdated', async () => {
     await outdated(
-      toOutdatedOptions(['jest'], {
+      {
         cwd: 'dummyPattern/dummyPath'
-      })
+      },
+      ['jest']
     );
     expect(
       yarn.cliCommand

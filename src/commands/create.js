@@ -18,8 +18,8 @@ function toCreateOptions(
   };
 }
 
-export async function create(flags: options.Flags, commandArgs: Array<string>) {
-  let opts = toCreateOptions(commandArgs, flags);
+export async function create(flags: options.Flags, args: Array<string>) {
+  let opts = toCreateOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {

@@ -100,11 +100,8 @@ function getMaxPackageNameLength(pkgNames) {
   }, 0);
 }
 
-export async function normalize(
-  flags: options.Flags,
-  commandArgs: Array<string>
-) {
-  let opts = toNormalizeOptions(commandArgs, flags);
+export async function normalize(flags: options.Flags, args: Array<string>) {
+  let opts = toNormalizeOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
