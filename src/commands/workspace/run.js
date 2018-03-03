@@ -24,7 +24,10 @@ function toWorkspaceRunOptions(
   };
 }
 
-export async function run(flags: options.Flags, subCommandArgs: Array<string>) {
+export async function workspaceRun(
+  flags: options.Flags,
+  subCommandArgs: Array<string>
+) {
   let opts = toWorkspaceRunOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);

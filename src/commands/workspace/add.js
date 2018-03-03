@@ -41,7 +41,10 @@ function toWorkspaceAddOptions(
   };
 }
 
-export async function add(flags: options.Flags, subCommandArgs: Array<string>) {
+export async function workspaceAdd(
+  flags: options.Flags,
+  subCommandArgs: Array<string>
+) {
   const opts = toWorkspaceAddOptions(flags, subCommandArgs);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);

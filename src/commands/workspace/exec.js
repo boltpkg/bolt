@@ -25,7 +25,7 @@ function toWorkspaceExecOptions(
   };
 }
 
-export async function exec(
+export async function workspaceExec(
   flags: options.Flags,
   subCommandArgs: Array<string>
 ) {

@@ -23,7 +23,7 @@ function toWorkspaceUnlinkOptions(
   };
 }
 
-export async function unlink(
+export async function workspaceUnlink(
   flags: options.Flags,
   subCommandArgs: Array<string>
 ) {

@@ -3,12 +3,12 @@ import * as options from '../../utils/options';
 import * as messages from '../../utils/messages';
 import { BoltError } from '../../utils/errors';
 
-export type WorkspaceUpgradeOptions = {
+type WorkspaceUpgradeOptions = {
   cwd?: string,
   args?: Array<string>
 };
 
-export function toWorkspaceUpgradeOptions(
+function toWorkspaceUpgradeOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceUpgradeOptions {
@@ -17,7 +17,7 @@ export function toWorkspaceUpgradeOptions(
   };
 }
 
-export async function upgrade(
+export async function workspaceUpgrade(
   flags: options.Flags,
   subCommandArgs: Array<string>
 ) {

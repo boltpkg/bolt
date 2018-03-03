@@ -1,5 +1,5 @@
 // @flow
-import { unlink } from '../unlink';
+import { workspaceUnlink } from '../unlink';
 import * as path from 'path';
 import * as yarn from '../../../utils/yarn';
 import * as PackageUnlink from '../../unlink';
@@ -19,7 +19,7 @@ describe('workspace unlink', () => {
 
   it('should unlink the package if there are no packages to unlink in args', async () => {
     let pathToFooWorksapce = path.join(projectDir, 'packages', 'foo');
-    await unlink({ cwd: projectDir }, ['foo']);
+    await workspaceUnlink({ cwd: projectDir }, ['foo']);
     expect(yarn.cliCommand).toHaveBeenCalledWith(pathToFooWorksapce, 'unlink');
   });
 });

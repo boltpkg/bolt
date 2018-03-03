@@ -24,7 +24,7 @@ function toWorkspaceRemoveOptions(
   };
 }
 
-export async function remove(
+export async function workspaceRemove(
   flags: options.Flags,
   subCommandArgs: Array<string>
 ) {

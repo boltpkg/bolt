@@ -33,7 +33,7 @@ function toWorkspacelinkOptions(
   };
 }
 
-export async function link(
+export async function workspaceLink(
   flags: options.Flags,
   subCommandArgs: Array<string>
 ) {

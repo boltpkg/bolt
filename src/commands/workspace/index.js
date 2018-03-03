@@ -1,17 +1,14 @@
 // @flow
 import * as options from '../../utils/options';
 
-/**
- * { add: [function], ... }
- */
 const commands = {
-  ...require('./add'),
-  ...require('./exec'),
-  ...require('./link'),
-  ...require('./remove'),
-  ...require('./run'),
-  ...require('./unlink'),
-  ...require('./upgrade')
+  add: require('./add').workspaceAdd,
+  exec: require('./exec').workspaceExec,
+  link: require('./link').workspaceLink,
+  remove: require('./remove').workspaceRemove,
+  run: require('./run').workspaceRun,
+  unlink: require('./unlink').workspaceUnlink,
+  upgrade: require('./upgrade').workspaceUpgrade
 };
 
 async function workspace(
