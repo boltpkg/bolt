@@ -2,6 +2,7 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
+import type { SubCommandArgsType } from '../../types';
 
 type ConfigDeleteOptions = {
   cwd?: string,
@@ -15,8 +16,11 @@ function toConfigDeleteOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function configDelete(flags: options.Flags, args: options.Args) {
-  let opts = toConfigDeleteOptions(args, flags);
+export async function configDelete({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toConfigDeleteOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await yarn.cliCommand(cwd, 'config', ['delete', ...opts.args]);

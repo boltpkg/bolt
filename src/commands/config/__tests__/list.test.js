@@ -7,6 +7,9 @@ jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt config list', async () => {
-  let config = await configList({ cwd: dummyPath }, []);
+  let config = await configList({
+    flags: { cwd: dummyPath },
+    subCommandArgs: []
+  });
   expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'config', ['list']);
 });
