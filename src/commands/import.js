@@ -2,6 +2,7 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
+import type { CommandArgsType } from '../types';
 
 type ImportOptions = {
   cwd?: string
@@ -16,8 +17,8 @@ function toImportOptions(
   };
 }
 
-export async function import_(flags: options.Flags, args: Array<string>) {
-  let opts = toImportOptions(args, flags);
+export async function import_({ commandArgs, flags }: CommandArgsType) {
+  let opts = toImportOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {

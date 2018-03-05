@@ -2,6 +2,7 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
+import type { CommandArgsType } from '../types';
 
 type InfoOptions = {|
   cwd?: string,
@@ -17,8 +18,8 @@ function toInfoOptions(args: options.Args, flags: options.Flags): InfoOptions {
   };
 }
 
-export async function info(flags: options.Flags, args: Array<string>) {
-  let opts = toInfoOptions(args, flags);
+export async function info({ commandArgs, flags }: CommandArgsType) {
+  let opts = toInfoOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   const spawnArgs = Array.prototype.concat([], opts.args);
   if (opts.flags && opts.flags.json) {
