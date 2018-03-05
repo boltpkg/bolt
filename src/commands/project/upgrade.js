@@ -4,6 +4,7 @@ import { BoltError } from '../../utils/errors';
 import Project from '../../Project';
 import type { Dependency } from '../../types';
 import upgradeDependenciesInPackage from '../../utils/upgradeDependenciesInPackages';
+import type { SubCommandArgsType } from '../../types';
 
 // TODO: pass flags individially, upgrade has many flags this is here for testing
 function toScriptFlags(flags: options.Flags) {
@@ -44,8 +45,11 @@ function toProjectUpgradeOptions(
   };
 }
 
-export async function projectUpgrade(flags: options.Flags, args: options.Args) {
-  let opts = toProjectUpgradeOptions(args, flags);
+export async function projectUpgrade({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toProjectUpgradeOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
 

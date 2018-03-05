@@ -3,6 +3,7 @@ import Project from '../../Project';
 import * as options from '../../utils/options';
 import * as yarn from '../../utils/yarn';
 import { BoltError } from '../../utils/errors';
+import type { SubCommandArgsType } from '../../types';
 
 type ProjectRunOptions = {
   cwd?: string,
@@ -22,8 +23,11 @@ function toProjectRunOptions(
   };
 }
 
-export async function projectRun(flags: options.Flags, args: options.Args) {
-  let opts = toProjectRunOptions(args, flags);
+export async function projectRun({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toProjectRunOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let validScript = await yarn.run(project.pkg, opts.script, opts.scriptArgs);

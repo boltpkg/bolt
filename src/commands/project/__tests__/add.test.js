@@ -14,7 +14,10 @@ describe('bolt project add', () => {
   test('adding a project dependency only used by the project', async () => {
     let tempDir = f.copy('package-with-external-deps-installed');
 
-    await projectAdd({ cwd: tempDir }, ['project-new-dep']);
+    await projectAdd({
+      flags: { cwd: tempDir },
+      subCommandArgs: ['project-new-dep']
+    });
 
     expect(addDependenciesToPackage).toHaveBeenCalledTimes(1);
   });

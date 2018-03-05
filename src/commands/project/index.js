@@ -9,12 +9,7 @@ const commands = {
   upgrade: require('./upgrade').projectUpgrade
 };
 
-async function project(
-  flags: options.Flags,
-  commandArgs: Array<string>,
-  subCommand: string,
-  subCommandArgs: Array<string>
-) {
+async function project({ flags, subCommand, subCommandArgs }) {
   if (commands[subCommand]) {
     return await commands[subCommand](flags, subCommandArgs);
   }

@@ -6,6 +6,7 @@ import * as options from '../../utils/options';
 import * as logger from '../../utils/logger';
 import type { Dependency, configDependencyType } from '../../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../../constants';
+import type { SubCommandArgsType } from '../../types';
 
 type ProjectAddOptions = {
   cwd?: string,
@@ -42,8 +43,11 @@ function toProjectAddOptions(
   };
 }
 
-export async function projectAdd(flags: options.Flags, args: options.Args) {
-  const opts = toProjectAddOptions(args, flags);
+export async function projectAdd({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  const opts = toProjectAddOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);

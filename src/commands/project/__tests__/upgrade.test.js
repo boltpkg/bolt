@@ -13,7 +13,10 @@ describe('bolt project add', () => {
   test('upgrading a project dependency only used by the project', async () => {
     let tempDir = f.copy('package-with-external-deps-installed');
 
-    await projectUpgrade({ cwd: tempDir }, ['project-new-dep']);
+    await projectUpgrade({
+      flags: { cwd: tempDir },
+      subCommandArgs: ['project-new-dep']
+    });
 
     expect(upgradeDependenciesInPackage).toHaveBeenCalledTimes(1);
   });

@@ -14,7 +14,10 @@ describe('bolt project remove', () => {
   test('removing a project dependency only used by the project', async () => {
     let tempDir = f.copy('package-with-external-deps-installed');
 
-    await projectRemove({ cwd: tempDir }, ['project-only-dep']);
+    await projectRemove({
+      flags: { cwd: tempDir },
+      subCommandArgs: ['project-only-dep']
+    });
 
     expect(yarn.remove).toHaveBeenCalledTimes(1);
     expect(yarn.remove).toHaveBeenCalledWith(['project-only-dep'], tempDir);

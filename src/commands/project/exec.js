@@ -2,6 +2,7 @@
 import Project from '../../Project';
 import * as options from '../../utils/options';
 import execCommand from '../../utils/execCommand';
+import type { SubCommandArgsType } from '../../types';
 
 type ProjectExecOptions = {
   cwd?: string,
@@ -21,8 +22,11 @@ function toProjectExecOptions(
   };
 }
 
-export async function projectExec(flags: options.Flags, args: options.Args) {
-  let opts = toProjectExecOptions(args, flags);
+export async function projectExec({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toProjectExecOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   await execCommand(project, project.pkg, opts.command, opts.commandArgs);
