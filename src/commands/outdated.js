@@ -2,6 +2,7 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
+import type { CommandArgsType } from '../types';
 
 type OutdatedOptions = {
   cwd?: string,
@@ -18,8 +19,8 @@ function toOutdatedOptions(
   };
 }
 
-export async function outdated(flags: options.Flags, args: Array<string>) {
-  let opts = toOutdatedOptions(args, flags);
+export async function outdated({ commandArgs, flags }: CommandArgsType) {
+  let opts = toOutdatedOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await yarn.cliCommand(cwd, 'outdated', opts.args);

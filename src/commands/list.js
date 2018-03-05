@@ -2,6 +2,7 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
+import type { CommandArgsType } from '../types';
 
 type ListOptions = {
   cwd?: string,
@@ -17,8 +18,8 @@ function toListOptions(args: options.Args, flags: options.Flags): ListOptions {
   };
 }
 
-export async function list(flags: options.Flags, args: Array<string>) {
-  let opts = toListOptions(args, flags);
+export async function list({ commandArgs, flags }: CommandArgsType) {
+  let opts = toListOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let spawnArgs = opts.pattern ? [`--pattern=${opts.pattern}`] : [];
   if (opts.depth) {

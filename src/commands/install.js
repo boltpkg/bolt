@@ -30,7 +30,7 @@ function toInstallOptions(
 }
 
 export async function install({ flags, commandArgs }: CommandArgsType) {
-  let opts = toInstallOptions(args, flags);
+  let opts = toInstallOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();
