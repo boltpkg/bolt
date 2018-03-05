@@ -6,7 +6,10 @@ jest.mock('../../../utils/yarn');
 
 describe('bolt licenses generate-disclaimer', () => {
   it('calls yarn licenses with generate-disclaimer script', async () => {
-    await licensesGenerateDisclaimer({ cwd: 'dummyPattern/dummyPath' }, []);
+    await licensesGenerateDisclaimer({
+      flags: { cwd: 'dummyPattern/dummyPath' },
+      subCommandArgs: []
+    });
 
     expect(
       yarn.cliCommand
