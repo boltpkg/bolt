@@ -7,12 +7,7 @@ const commands = {
   remove: require('./remove').tagRemove
 };
 
-export async function tag(
-  flags: options.Flags,
-  commandArgs: Array<string>,
-  subCommand: string,
-  subCommandArgs: Array<string>
-) {
+export async function tag({ flags, subCommand, subCommandArgs }) {
   if (commands[subCommand]) {
     return await commands[subCommand](flags, subCommandArgs);
   }

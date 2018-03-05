@@ -7,7 +7,10 @@ jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt tag add', async () => {
-  const tag = await tagAdd({ cwd: dummyPath }, ['test-tag@1.0.0', 'stable']);
+  const tag = await tagAdd({
+    flags: { cwd: dummyPath },
+    subCommandArgs: ['test-tag@1.0.0', 'stable']
+  });
   expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'tag', [
     'add',
     'test-tag@1.0.0',

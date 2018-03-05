@@ -2,6 +2,7 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
+import type { SubCommandArgsType } from '../../types';
 
 type TagListOptions = {
   cwd?: string,
@@ -15,8 +16,8 @@ function toTagListOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function tagList(flags: options.Flags, args: options.Args) {
-  let opts = toTagListOptions(args, flags);
+export async function tagList({ flags, subCommandArgs }: SubCommandArgsType) {
+  let opts = toTagListOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {
