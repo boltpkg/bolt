@@ -4,17 +4,13 @@ import { BoltError } from '../../utils/errors';
 const commands = {
   clean: require('./clean').cacheClean,
   dir: require('./dir').cacheDir,
-  list: require('./list').cacheList
+  list: require('./list').cacheList,
+  ls: require('./list').cacheList
 };
 
-export async function cache(
-  flags: options.Flags,
-  commandArgs: Array<string>,
-  subCommand: string,
-  subCommandArgs: Array<string>
-) {
+export async function cache({ flags, subCommand, subCommandArgs }) {
   if (commands[subCommand]) {
-    return await commands[subCommand](flags, subCommandArgs);
+    return await commands[subCommand]({ flags, subCommandArgs });
   }
 
   throw new BoltError(`Invalid subcommand. Try "ls, list, dir, clean"`);

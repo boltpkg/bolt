@@ -6,24 +6,24 @@ jest.mock('../../../utils/yarn');
 
 describe('bolt cache clean', () => {
   it('should handle situation where no arguments are passed', async () => {
-    await cacheClean(
-      {
+    await cacheClean({
+      flags: {
         cwd: 'dummyPattern/dummyPath'
       },
-      []
-    );
+      subCommandArgs: []
+    });
     expect(
       yarn.cliCommand
     ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'cache', ['clean']);
   });
 
   it('should handle passing the arguments down to yarn clean', async () => {
-    await cacheClean(
-      {
+    await cacheClean({
+      flags: {
         cwd: 'dummyPattern/dummyPath'
       },
-      ['jest']
-    );
+      subCommandArgs: ['jest']
+    });
     expect(
       yarn.cliCommand
     ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'cache', [

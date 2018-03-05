@@ -2,6 +2,7 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
+import type { SubCommandArgsType } from '../../types';
 
 type CacheCleanOptions = {
   cwd?: string,
@@ -18,8 +19,11 @@ function toCacheCleanOptions(
   };
 }
 
-export async function cacheClean(flags: options.Flags, args: options.Args) {
-  let opts = toCacheCleanOptions(args, flags);
+export async function cacheClean({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toCacheCleanOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {

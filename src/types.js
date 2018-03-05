@@ -8,6 +8,14 @@ export type CommandArgsType = {
   }
 };
 
+export type SubCommandArgsType = {
+  subCommandArgs: Array<string>,
+  flags: {
+    '--'?: Array<string>,
+    [key: string]: boolean | string
+  }
+};
+
 export type DependencySet = {
   [key: string]: string
 };
