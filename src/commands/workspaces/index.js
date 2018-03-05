@@ -9,12 +9,7 @@ const command = {
   upgrade: require('./upgrade').workspacesUpgrade
 };
 
-async function workspaces(
-  flags: options.Flags,
-  commandArgs: Array<string>,
-  subCommand: string,
-  subCommandArgs: Array<string>
-) {
+async function workspaces({ flags, subCommand, subCommandArgs }) {
   if (command[subCommand]) {
     return command[subCommand](flags, subCommandArgs);
   }

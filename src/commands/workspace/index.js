@@ -11,12 +11,7 @@ const commands = {
   upgrade: require('./upgrade').workspaceUpgrade
 };
 
-async function workspace(
-  flags: options.Flags,
-  commandArgs: Array<string>,
-  subCommand: string,
-  subCommandArgs: Array<string>
-) {
+async function workspace({ flags, subCommand, subCommandArgs }) {
   let [workspaceCommand, ...rest] = subCommandArgs;
   let workspaceArgs = [subCommand, ...rest];
   return await commands[workspaceCommand](flags, workspaceArgs);
