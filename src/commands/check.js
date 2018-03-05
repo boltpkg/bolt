@@ -2,6 +2,7 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import { run } from './run';
+import type { CommandArgsType } from '../types';
 
 type CheckOptions = {};
 
@@ -12,6 +13,6 @@ function toCheckOptions(
   return {};
 }
 
-export async function check(flags: options.Flags, args: Array<string>) {
-  return await run(flags, ['check', ...args]);
+export async function check({ commandArgs, flags }: CommandArgsType) {
+  return await run(flags, ['check', ...commandArgs]);
 }

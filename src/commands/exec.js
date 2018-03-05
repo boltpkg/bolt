@@ -3,6 +3,7 @@ import Project from '../Project';
 import Package from '../Package';
 import * as options from '../utils/options';
 import execCommand from '../utils/execCommand';
+import type { CommandArgsType } from '../types';
 
 type ExecOptions = {|
   cwd?: string,
@@ -19,8 +20,8 @@ function toExecOptions(args: options.Args, flags: options.Flags): ExecOptions {
   };
 }
 
-export async function exec(flags: options.Flags, args: Array<string>) {
-  let opts = toExecOptions(args, flags);
+export async function exec({ commandArgs, flags }: CommandArgsType) {
+  let opts = toExecOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);

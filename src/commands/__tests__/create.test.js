@@ -6,12 +6,12 @@ jest.mock('../../utils/yarn');
 
 describe('bolt create', () => {
   it('should be able to pass down arguments down to yarn create', async () => {
-    await create(
-      {
+    await create({
+      flags: {
         cwd: 'dummyPattern/dummyPath'
       },
-      ['react-app', 'my-app']
-    );
+      commandArgs: ['react-app', 'my-app']
+    });
     expect(
       yarn.cliCommand
     ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'create', [

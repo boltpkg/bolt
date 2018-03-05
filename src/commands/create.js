@@ -2,6 +2,7 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
+import type { CommandArgsType } from '../types';
 
 type CreateOptions = {
   cwd?: string,
@@ -18,8 +19,8 @@ function toCreateOptions(
   };
 }
 
-export async function create(flags: options.Flags, args: Array<string>) {
-  let opts = toCreateOptions(args, flags);
+export async function create({ commandArgs, flags }: CommandArgsType) {
+  let opts = toCreateOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {
