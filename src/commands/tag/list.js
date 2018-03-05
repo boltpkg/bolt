@@ -2,25 +2,26 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
+import type { SubCommandArgsType } from '../../types';
 
-export type TagListOptions = {
+type TagListOptions = {
   cwd?: string,
   args: Array<string>
 };
 
-export function toTagListOptions(
+function toTagListOptions(
   args: options.Args,
   flags: options.Flags
 ): TagListOptions {
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function tagList(opts: TagListOptions) {
+export async function tagList({ flags, subCommandArgs }: SubCommandArgsType) {
+  let opts = toTagListOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
-  let args = opts.args || [];
 
   try {
-    await yarn.cliCommand(cwd, 'tag', ['list', ...args]);
+    await yarn.cliCommand(cwd, 'tag', ['list', ...opts.args]);
   } catch (err) {
     throw new BoltError(err);
   }

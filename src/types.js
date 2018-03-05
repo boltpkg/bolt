@@ -1,5 +1,21 @@
 // @flow
 
+export type CommandArgsType = {
+  commandArgs: Array<string>,
+  flags: {
+    '--'?: Array<string>,
+    [key: string]: boolean | string
+  }
+};
+
+export type SubCommandArgsType = {
+  subCommandArgs: Array<string>,
+  flags: {
+    '--'?: Array<string>,
+    [key: string]: boolean | string
+  }
+};
+
 export type DependencySet = {
   [key: string]: string
 };

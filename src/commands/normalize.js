@@ -9,12 +9,13 @@ import * as messages from '../utils/messages';
 import * as semver from 'semver';
 import * as npm from '../utils/npm';
 import chalk from 'chalk';
+import type { CommandArgsType } from '../types';
 
-export type NormalizeOptions = {|
+type NormalizeOptions = {|
   cwd?: string
 |};
 
-export function toNormalizeOptions(
+function toNormalizeOptions(
   args: options.Args,
   flags: options.Flags
 ): NormalizeOptions {
@@ -100,7 +101,8 @@ function getMaxPackageNameLength(pkgNames) {
   }, 0);
 }
 
-export async function normalize(opts: NormalizeOptions) {
+export async function normalize({ commandArgs, flags }: CommandArgsType) {
+  let opts = toNormalizeOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

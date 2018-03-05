@@ -2,13 +2,14 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
+import type { SubCommandArgsType } from '../../types';
 
-export type CacheCleanOptions = {
+type CacheCleanOptions = {
   cwd?: string,
   args: Array<string>
 };
 
-export function toCacheCleanOptions(
+function toCacheCleanOptions(
   args: options.Args,
   flags: options.Flags
 ): CacheCleanOptions {
@@ -18,15 +19,15 @@ export function toCacheCleanOptions(
   };
 }
 
-export async function cacheClean(opts: CacheCleanOptions) {
+export async function cacheClean({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toCacheCleanOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
-  let args = ['clean'];
 
-  if (opts.args.length) {
-    args = args.concat(opts.args);
-  }
   try {
-    await yarn.cliCommand(cwd, 'cache', args);
+    await yarn.cliCommand(cwd, 'cache', ['clean', ...opts.args]);
   } catch (err) {
     throw new BoltError(err);
   }

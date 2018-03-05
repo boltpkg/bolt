@@ -1,5 +1,5 @@
 // @flow
-import { exec, toExecOptions } from '../exec';
+import { exec } from '../exec';
 import * as path from 'path';
 import * as processes from '../../utils/processes';
 import containDeep from 'jest-expect-contain-deep';
@@ -16,12 +16,12 @@ describe('bolt exec', () => {
     let projectDir = f.copy('project-with-bins');
     let projectBinDir = path.join(projectDir, binDir);
 
-    await exec(
-      toExecOptions([], {
+    await exec({
+      flags: {
         cwd: projectDir,
         '--': ['dep-with-bin']
-      })
-    );
+      }
+    });
 
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
@@ -42,12 +42,12 @@ describe('bolt exec', () => {
     let projectBinDir = path.join(projectDir, binDir);
     let fooBinDir = path.join(fooWorkspaceDir, binDir);
 
-    await exec(
-      toExecOptions([], {
+    await exec({
+      flags: {
         cwd: fooWorkspaceDir,
         '--': ['dep-with-bin']
-      })
-    );
+      }
+    });
 
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
     expect(unsafeProcesses.spawn).toHaveBeenCalledWith(

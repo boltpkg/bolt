@@ -2,11 +2,11 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 
-export type WorkspacesAddOptions = {
+type WorkspacesAddOptions = {
   cwd?: string
 };
 
-export function toWorkspacesAddOptions(
+function toWorkspacesAddOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspacesAddOptions {
@@ -15,6 +15,6 @@ export function toWorkspacesAddOptions(
   };
 }
 
-export async function workspacesAdd(opts: WorkspacesAddOptions) {
+export async function workspacesAdd(flags: options.Flags, args: options.Args) {
   throw new BoltError('Unimplemented command "workspaces add"');
 }

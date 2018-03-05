@@ -1,4 +1,4 @@
 // @flow
-import { lint, toLintOptions } from '../lint';
+import { lint } from '../lint';
 
 test('bolt lint');

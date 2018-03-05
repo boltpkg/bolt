@@ -5,8 +5,9 @@ import * as yarn from '../utils/yarn';
 import Package from '../Package';
 import { isWorkspaceNeeded } from '../utils/prompts';
 import addWorkspacesToJson from '../utils/jsonModifier';
+import type { CommandArgsType } from '../types';
 
-export type InitOptions = {|
+type InitOptions = {|
   cwd?: string,
   args: {
     private?: boolean,
@@ -14,17 +15,15 @@ export type InitOptions = {|
   }
 |};
 
-export function toInitOptions(
-  args: options.Args,
-  flags: options.Flags
-): InitOptions {
+function toInitOptions(args: options.Args, flags: options.Flags): InitOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     args: options.toYarnInit(flags)
   };
 }
 
-export async function init(opts: InitOptions) {
+export async function init({ commandArgs, flags }: CommandArgsType) {
+  let opts = toInitOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let spawnArgs = ['-s'];
 

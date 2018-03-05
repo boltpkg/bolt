@@ -1,4 +1,4 @@
 // @flow
-import { build, toBuildOptions } from '../build';
+import { build } from '../build';
 
 test('bolt build');

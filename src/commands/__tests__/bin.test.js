@@ -1,4 +1,4 @@
 // @flow
-import { bin, toBinOptions } from '../bin';
+import { bin } from '../bin';
 
 test('bolt bin');

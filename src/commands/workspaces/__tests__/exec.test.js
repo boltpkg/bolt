@@ -1,5 +1,5 @@
 // @flow
-import { workspacesExec, toWorkspacesExecOptions } from '../exec';
+import { workspacesExec } from '../exec';
 import * as path from 'path';
 import * as processes from '../../../utils/processes';
 import containDeep from 'jest-expect-contain-deep';
@@ -35,10 +35,11 @@ describe('bolt workspaces exec', () => {
     let barBinDir = path.join(barWorkspaceDir, binDir);
 
     await workspacesExec(
-      toWorkspacesExecOptions([], {
+      {
         cwd: projectDir,
         '--': ['dep-with-bin']
-      })
+      },
+      []
     );
 
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(2);
@@ -73,10 +74,11 @@ describe('bolt workspaces exec', () => {
     let barBinDir = path.join(barWorkspaceDir, binDir);
 
     await workspacesExec(
-      toWorkspacesExecOptions([], {
+      {
         cwd: fooWorkspaceDir,
         '--': ['dep-with-bin']
-      })
+      },
+      []
     );
 
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(2);
@@ -111,10 +113,11 @@ describe('bolt workspaces exec', () => {
     let barBinDir = path.join(barWorkspaceDir, binDir);
 
     await workspacesExec(
-      toWorkspacesExecOptions([], {
+      {
         cwd: barWorkspaceDir,
         '--': ['dep-with-bin']
-      })
+      },
+      []
     );
 
     expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(2);

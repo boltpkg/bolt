@@ -4,14 +4,14 @@ import Project from '../../Project';
 import * as options from '../../utils/options';
 import execCommand from '../../utils/execCommand';
 
-export type WorkspacesExecOptions = {|
+type WorkspacesExecOptions = {|
   cwd?: string,
   command: string,
   commandArgs: options.Args,
   filterOpts: FilterOpts
 |};
 
-export function toWorkspacesExecOptions(
+function toWorkspacesExecOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspacesExecOptions {
@@ -24,7 +24,8 @@ export function toWorkspacesExecOptions(
   };
 }
 
-export async function workspacesExec(opts: WorkspacesExecOptions) {
+export async function workspacesExec(flags: options.Flags, args: options.Args) {
+  let opts = toWorkspacesExecOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

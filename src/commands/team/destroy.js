@@ -2,20 +2,25 @@
 import * as options from '../../utils/options';
 import * as npm from '../../utils/npm';
 import { BoltError } from '../../utils/errors';
+import type { SubCommandArgsType } from '../../types';
 
-export type TeamDestroyOptions = {
+type TeamDestroyOptions = {
   cwd?: string,
   args: Array<string>
 };
 
-export function toTeamDestroyOptions(
+function toTeamDestroyOptions(
   args: options.Args,
   flags: options.Flags
 ): TeamDestroyOptions {
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function teamDestroy(opts: TeamDestroyOptions) {
+export async function teamDestroy({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toTeamDestroyOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await npm.cliCommand(cwd, 'team', ['destroy', ...opts.args]);

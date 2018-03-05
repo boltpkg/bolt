@@ -5,6 +5,7 @@ import Project from '../Project';
 import Package from '../Package';
 import type { Dependency } from '../types';
 import upgradeDependenciesInPackage from '../utils/upgradeDependenciesInPackages';
+import type { CommandArgsType } from '../types';
 
 // TODO: pass flags individially, upgrade has many flags this is here for testing
 function toScriptFlags(flags: options.Flags) {
@@ -22,13 +23,13 @@ function toScriptFlags(flags: options.Flags) {
   return scriptFlags;
 }
 
-export type UpgradeOptions = {
+type UpgradeOptions = {
   cwd?: string,
   deps: Array<Dependency>,
   flags: Array<string>
 };
 
-export function toUpgradeOptions(
+function toUpgradeOptions(
   args: options.Args,
   flags: options.Flags
 ): UpgradeOptions {
@@ -45,7 +46,8 @@ export function toUpgradeOptions(
   };
 }
 
-export async function upgrade(opts: UpgradeOptions) {
+export async function upgrade({ commandArgs, flags }: CommandArgsType) {
+  let opts = toUpgradeOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);

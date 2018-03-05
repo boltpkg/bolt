@@ -3,12 +3,13 @@ import * as options from '../../utils/options';
 import * as yarn from '../../utils/yarn';
 import type { Dependency } from '../../types';
 import { BoltError } from '../../utils/errors';
+import type { SubCommandArgsType } from '../../types';
 
-export type GlobalRemoveOptions = {
+type GlobalRemoveOptions = {
   deps: Array<Dependency>
 };
 
-export function toGlobalRemoveOptions(
+function toGlobalRemoveOptions(
   args: options.Args,
   flags: options.Flags
 ): GlobalRemoveOptions {
@@ -24,7 +25,11 @@ export function toGlobalRemoveOptions(
   };
 }
 
-export async function globalRemove(opts: GlobalRemoveOptions) {
+export async function globalRemove({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = await toGlobalRemoveOptions(subCommandArgs, flags);
   try {
     await yarn.globalCli('remove', opts.deps);
   } catch (err) {

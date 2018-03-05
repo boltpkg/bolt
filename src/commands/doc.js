@@ -2,26 +2,14 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import { run } from './run';
+import type { CommandArgsType } from '../types';
 
-export type DocOptions = {|
-  cwd?: string,
-  args: options.Args
-|};
+type DocOptions = {};
 
-export function toDocOptions(
-  args: options.Args,
-  flags: options.Flags
-): DocOptions {
-  return {
-    cwd: options.string(flags.cwd, 'cwd'),
-    args: args
-  };
+function toDocOptions(args: options.Args, flags: options.Flags): DocOptions {
+  return {};
 }
 
-export async function doc(opts: DocOptions) {
-  await run({
-    cwd: opts.cwd,
-    script: 'doc',
-    scriptArgs: opts.args
-  });
+export async function doc({ commandArgs, flags }: CommandArgsType) {
+  await run(flags, ['doc', ...commandArgs]);
 }

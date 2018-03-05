@@ -3,12 +3,13 @@ import * as options from '../../utils/options';
 import * as yarn from '../../utils/yarn';
 import type { Dependency } from '../../types';
 import { BoltError } from '../../utils/errors';
+import type { SubCommandArgsType } from '../../types';
 
-export type GlobalAddOptions = {
+type GlobalAddOptions = {
   deps: Array<Dependency>
 };
 
-export function toGlobalAddOptions(
+function toGlobalAddOptions(
   args: options.Args,
   flags: options.Flags
 ): GlobalAddOptions {
@@ -24,7 +25,8 @@ export function toGlobalAddOptions(
   };
 }
 
-export async function globalAdd(opts: GlobalAddOptions) {
+export async function globalAdd({ flags, subCommandArgs }: SubCommandArgsType) {
+  let opts = toGlobalAddOptions(subCommandArgs, flags);
   try {
     await yarn.globalCli('add', opts.deps);
   } catch (err) {

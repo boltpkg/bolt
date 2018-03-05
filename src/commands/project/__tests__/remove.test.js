@@ -1,5 +1,5 @@
 // @flow
-import { projectRemove, toProjectRemoveOptions } from '../remove';
+import { projectRemove } from '../remove';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yarn from '../../../utils/yarn';
@@ -14,9 +14,10 @@ describe('bolt project remove', () => {
   test('removing a project dependency only used by the project', async () => {
     let tempDir = f.copy('package-with-external-deps-installed');
 
-    await projectRemove(
-      toProjectRemoveOptions(['project-only-dep'], { cwd: tempDir })
-    );
+    await projectRemove({
+      flags: { cwd: tempDir },
+      subCommandArgs: ['project-only-dep']
+    });
 
     expect(yarn.remove).toHaveBeenCalledTimes(1);
     expect(yarn.remove).toHaveBeenCalledWith(['project-only-dep'], tempDir);

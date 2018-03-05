@@ -2,12 +2,13 @@
 import Project from '../Project';
 import * as options from '../utils/options';
 import * as locks from '../utils/locks';
+import type { CommandArgsType } from '../types';
 
-export type PublishLockOptions = {|
+type PublishLockOptions = {|
   cwd?: string
 |};
 
-export function toPublishLockOptions(
+function toPublishLockOptions(
   args: options.Args,
   flags: options.Flags
 ): PublishLockOptions {
@@ -16,7 +17,8 @@ export function toPublishLockOptions(
   };
 }
 
-export async function publishLock(opts: PublishLockOptions) {
+export async function publishLock({ commandArgs, flags }: CommandArgsType) {
+  let opts = toPublishLockOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

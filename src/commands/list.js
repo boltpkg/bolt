@@ -2,17 +2,15 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
+import type { CommandArgsType } from '../types';
 
-export type ListOptions = {
+type ListOptions = {
   cwd?: string,
   pattern?: string,
   depth?: number | string
 };
 
-export function toListOptions(
-  args: options.Args,
-  flags: options.Flags
-): ListOptions {
+function toListOptions(args: options.Args, flags: options.Flags): ListOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     pattern: options.string(flags.pattern, 'pattern') || '',
@@ -20,14 +18,15 @@ export function toListOptions(
   };
 }
 
-export async function list(opts: ListOptions) {
+export async function list({ commandArgs, flags }: CommandArgsType) {
+  let opts = toListOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
-  let args = opts.pattern ? [`--pattern=${opts.pattern}`] : [];
+  let spawnArgs = opts.pattern ? [`--pattern=${opts.pattern}`] : [];
   if (opts.depth) {
-    args = args.concat([`--depth=${opts.depth}`]);
+    spawnArgs = spawnArgs.concat([`--depth=${opts.depth}`]);
   }
   try {
-    yarn.cliCommand(cwd, 'list', args);
+    yarn.cliCommand(cwd, 'list', spawnArgs);
   } catch (err) {
     throw new BoltError(err);
   }

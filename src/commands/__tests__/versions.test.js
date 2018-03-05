@@ -1,4 +1,4 @@
 // @flow
-import { versions, toVersionsOptions } from '../versions';
+import { versions } from '../versions';
 
 test('bolt versions');

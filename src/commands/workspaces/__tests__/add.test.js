@@ -1,4 +1,4 @@
 // @flow
-import { workspacesAdd, toWorkspacesAddOptions } from '../add';
+import { workspacesAdd } from '../add';
 
 test('bolt workspaces add');

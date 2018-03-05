@@ -1,5 +1,5 @@
 // @flow
-import { workspaceRun, toWorkspaceRunOptions } from '../run';
+import { workspaceRun } from '../run';
 import projectBinPath from 'project-bin-path';
 import * as path from 'path';
 import * as processes from '../../../utils/processes';
@@ -32,9 +32,10 @@ describe('bolt workspace run', () => {
 
   test('running script that exists', async () => {
     await workspaceRun(
-      toWorkspaceRunOptions(['foo', 'test'], {
+      {
         cwd: projectDir
-      })
+      },
+      ['foo', 'test']
     );
     const expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
 
@@ -47,9 +48,10 @@ describe('bolt workspace run', () => {
 
   test('passing of script args', async () => {
     await workspaceRun(
-      toWorkspaceRunOptions(['foo', 'test', '--first-arg', '--second-arg'], {
+      {
         cwd: projectDir
-      })
+      },
+      ['foo', 'test', '--first-arg', '--second-arg']
     );
     const expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
 
@@ -63,9 +65,10 @@ describe('bolt workspace run', () => {
 
   test('running from workspace that isnt the one we execute in', async () => {
     await workspaceRun(
-      toWorkspaceRunOptions(['foo', 'test'], {
+      {
         cwd: barWorkspaceDir
-      })
+      },
+      ['foo', 'test']
     );
     const expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
 
@@ -79,9 +82,10 @@ describe('bolt workspace run', () => {
   test('running script that doesnt exist should throw', async () => {
     await expect(
       workspaceRun(
-        toWorkspaceRunOptions(['foo', 'explode'], {
+        {
           cwd: projectDir
-        })
+        },
+        ['foo', 'explode']
       )
     ).rejects.toBeInstanceOf(Error);
   });

@@ -1,19 +1,20 @@
 // @flow
 import addDependenciesToPackage from '../../utils/addDependenciesToPackages';
 import Project from '../../Project';
+import Package from '../../Package';
 import * as options from '../../utils/options';
 import * as logger from '../../utils/logger';
 import type { Dependency, configDependencyType } from '../../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../../constants';
-import { add } from '../add';
+import type { SubCommandArgsType } from '../../types';
 
-export type ProjectAddOptions = {
+type ProjectAddOptions = {
   cwd?: string,
   deps: Array<Dependency>,
   type: configDependencyType
 };
 
-export function toProjectAddOptions(
+function toProjectAddOptions(
   args: options.Args,
   flags: options.Flags
 ): ProjectAddOptions {
@@ -42,6 +43,13 @@ export function toProjectAddOptions(
   };
 }
 
-export async function projectAdd(opts: ProjectAddOptions) {
-  await add(opts);
+export async function projectAdd({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  const opts = toProjectAddOptions(subCommandArgs, flags);
+  let cwd = opts.cwd || process.cwd();
+  let project = await Project.init(cwd);
+  let pkg = await Package.closest(cwd);
+  await addDependenciesToPackage(project, pkg, opts.deps, opts.type);
 }

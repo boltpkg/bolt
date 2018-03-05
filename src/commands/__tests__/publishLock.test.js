@@ -1,4 +1,4 @@
 // @flow
-import { publishLock, toPublishLockOptions } from '../publishLock';
+import { publishLock } from '../publishLock';
 
 test('bolt publish-lock');

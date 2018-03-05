@@ -1,8 +1,25 @@
 // @flow
+import * as options from '../../utils/options';
+import { BoltError } from '../../utils/errors';
+const commands = {
+  add: require('./add').projectAdd,
+  exec: require('./exec').projectExec,
+  remove: require('./remove').projectRemove,
+  run: require('./run').projectRun,
+  upgrade: require('./upgrade').projectUpgrade
+};
+
+async function project({ flags, subCommand, subCommandArgs }) {
+  if (commands[subCommand]) {
+    return await commands[subCommand](flags, subCommandArgs);
+  }
+
+  throw new BoltError(
+    `Invalid subcommand. Try "add, exec, remove, run or upgrade"`
+  );
+}
+
 module.exports = {
-  ...require('./add'),
-  ...require('./exec'),
-  ...require('./remove'),
-  ...require('./run'),
-  ...require('./upgrade')
+  project,
+  p: project
 };

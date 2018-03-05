@@ -2,13 +2,14 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
+import type { SubCommandArgsType } from '../../types';
 
-export type CacheListOptions = {
+type CacheListOptions = {
   cwd?: string,
   pattern?: string
 };
 
-export function toCacheListOptions(
+function toCacheListOptions(
   args: options.Args,
   flags: options.Flags
 ): CacheListOptions {
@@ -18,7 +19,8 @@ export function toCacheListOptions(
   };
 }
 
-export async function cacheList(opts: CacheListOptions) {
+export async function cacheList({ flags, subCommandArgs }: SubCommandArgsType) {
+  let opts = toCacheListOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let args = ['list'];
   if (opts.pattern) {

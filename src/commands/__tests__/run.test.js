@@ -1,4 +1,4 @@
 // @flow
-import { run, toRunOptions } from '../run';
+import { run } from '../run';
 
 test('bolt run');

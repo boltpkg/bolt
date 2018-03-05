@@ -1,4 +1,4 @@
 // @flow
-import { workspacesRun, toWorkspacesRunOptions } from '../run';
+import { workspacesRun } from '../run';
 
 test('bolt workspaces run');

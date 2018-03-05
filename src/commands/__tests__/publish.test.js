@@ -1,5 +1,5 @@
 // @flow
-import { publish, toPublishOptions } from '../publish';
+import { publish } from '../publish';
 import * as locks from '../../utils/locks';
 import * as npm from '../../utils/npm';
 import fixtures from 'fixturez';
@@ -49,14 +49,14 @@ describe('bolt publish', () => {
     untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
     let cwd = f.find('simple-project');
 
-    await publish({ cwd });
+    await publish({ flags: { cwd }, commandArgs: [] });
     expect(npmPublishSpy).toHaveBeenCalledTimes(1);
   });
   test('should return publishedPackages', async () => {
     untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
     let cwd = f.find('simple-project');
     untypedNpm.publish.mockReturnValueOnce({ published: true });
-    let published = await publish({ cwd });
+    let published = await publish({ flags: { cwd }, commandArgs: [] });
     expect(untypedNpm.publish).toHaveBeenCalledTimes(1);
 
     expect(published).toEqual([
@@ -67,7 +67,7 @@ describe('bolt publish', () => {
     untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
     let cwd = f.find('simple-project');
     untypedNpm.publish.mockReturnValueOnce({ published: false });
-    let published = await publish({ cwd });
+    let published = await publish({ flags: { cwd }, commandArgs: [] });
     expect(untypedNpm.publish).toHaveBeenCalledTimes(1);
 
     expect(published).toEqual([

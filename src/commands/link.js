@@ -5,6 +5,7 @@ import * as logger from '../utils/logger';
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as messages from '../utils/messages';
+import type { CommandArgsType } from '../types';
 
 function getWorkspaceMap(workspaces) {
   let workspaceMap = new Map();
@@ -16,22 +17,20 @@ function getWorkspaceMap(workspaces) {
   return workspaceMap;
 }
 
-export type LinkOptions = {|
+type LinkOptions = {|
   cwd?: string,
   packagesToLink: ?Array<string>
 |};
 
-export function toLinkOptions(
-  args: options.Args,
-  flags: options.Flags
-): LinkOptions {
+function toLinkOptions(args: options.Args, flags: options.Flags): LinkOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     packagesToLink: args
   };
 }
 
-export async function link(opts: LinkOptions) {
+export async function link({ commandArgs, flags }: CommandArgsType) {
+  let opts = toLinkOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let packagesToLink = opts.packagesToLink;
   let project = await Project.init(cwd);

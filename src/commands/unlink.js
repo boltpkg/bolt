@@ -5,6 +5,7 @@ import * as logger from '../utils/logger';
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as messages from '../utils/messages';
+import type { CommandArgsType } from '../types';
 
 function getWorkspaceMap(workspaces) {
   let workspaceMap = new Map();
@@ -16,12 +17,12 @@ function getWorkspaceMap(workspaces) {
   return workspaceMap;
 }
 
-export type UnlinkOptions = {
+type UnlinkOptions = {
   cwd?: string,
   packagesToUnlink: ?Array<string>
 };
 
-export function toUnlinkOptions(
+function toUnlinkOptions(
   args: options.Args,
   flags: options.Flags
 ): UnlinkOptions {
@@ -31,7 +32,8 @@ export function toUnlinkOptions(
   };
 }
 
-export async function unlink(opts: UnlinkOptions) {
+export async function unlink({ commandArgs, flags }: CommandArgsType) {
+  let opts = toUnlinkOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let packagesToUnlink = opts.packagesToUnlink;
   let project = await Project.init(cwd);

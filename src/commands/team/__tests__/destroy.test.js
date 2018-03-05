@@ -1,5 +1,5 @@
 // @flow
-import { teamDestroy, toTeamDestroyOptions } from '../destroy';
+import { teamDestroy } from '../destroy';
 import * as npm from '../../../utils/npm';
 import { BoltError } from '../../../utils/errors';
 
@@ -7,9 +7,10 @@ jest.mock('../../../utils/npm');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt team destroy', async () => {
-  const team = await teamDestroy(
-    toTeamDestroyOptions(['test-tag'], { cwd: dummyPath })
-  );
+  const team = await teamDestroy({
+    flags: { cwd: dummyPath },
+    subCommandArgs: ['test-tag']
+  });
   expect(npm.cliCommand).toHaveBeenCalledWith(dummyPath, 'team', [
     'destroy',
     'test-tag'

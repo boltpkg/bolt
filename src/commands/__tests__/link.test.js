@@ -1,5 +1,5 @@
 // @flow
-import { link, toLinkOptions } from '../link';
+import { link } from '../link';
 import * as yarn from '../../utils/yarn';
 import * as logger from '../../utils/logger';
 import fixtures from 'fixturez';
@@ -17,27 +17,28 @@ describe('bolt link', () => {
   });
 
   it('should show warning on linking internal dependency', async () => {
-    await link(toLinkOptions(['foo'], { cwd: projectDir }));
+    await link({ flags: { cwd: projectDir }, commandArgs: ['foo'] });
     expect(logger.warn).toHaveBeenCalled();
   });
 
   it('should call yarn link for extenal package', async () => {
-    await link(toLinkOptions(['some-external-package'], { cwd: projectDir }));
+    await link({
+      flags: { cwd: projectDir },
+      commandArgs: ['some-external-package']
+    });
     expect(yarn.cliCommand).toHaveBeenCalled();
   });
 
   it('should call yarn link for all extenal package and show warning for all internal dependency', async () => {
-    await link(
-      toLinkOptions(
-        [
-          'some-external-package',
-          'foo',
-          'bar',
-          'someother-external-dependency'
-        ],
-        { cwd: projectDir }
-      )
-    );
+    await link({
+      flags: { cwd: projectDir },
+      commandArgs: [
+        'some-external-package',
+        'foo',
+        'bar',
+        'someother-external-dependency'
+      ]
+    });
     expect(yarn.cliCommand).toHaveBeenCalledTimes(2);
     expect(logger.warn).toHaveBeenCalledTimes(2);
   });

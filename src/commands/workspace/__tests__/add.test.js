@@ -1,5 +1,5 @@
 // @flow
-import { workspaceAdd, toWorkspaceAddOptions } from '../add';
+import { workspaceAdd } from '../add';
 import * as path from 'path';
 import * as processes from '../../../utils/processes';
 import * as yarn from '../../../utils/yarn';
@@ -64,9 +64,10 @@ describe('bolt workspace add', () => {
         false
       );
       await workspaceAdd(
-        toWorkspaceAddOptions(['foo', 'project-only-dep'], {
+        {
           cwd: projectDir
-        })
+        },
+        ['foo', 'project-only-dep']
       );
       expect(yarn.add).toHaveBeenCalledTimes(0);
       expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
@@ -77,9 +78,10 @@ describe('bolt workspace add', () => {
     test('installing a dependency not in project', async () => {
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
       await workspaceAdd(
-        toWorkspaceAddOptions(['foo', 'new-dep'], {
+        {
           cwd: projectDir
-        })
+        },
+        ['foo', 'new-dep']
       );
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(true);
@@ -90,9 +92,10 @@ describe('bolt workspace add', () => {
         false
       );
       await workspaceAdd(
-        toWorkspaceAddOptions(['foo', '@scope/pkgName'], {
+        {
           cwd: projectDir
-        })
+        },
+        ['foo', '@scope/pkgName']
       );
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(await depIsInstalled(fooWorkspaceDir, '@scope/pkgName')).toEqual(
@@ -105,9 +108,10 @@ describe('bolt workspace add', () => {
         await depIsInstalled(fooWorkspaceDir, '@scope/pkgName@^2.0.0')
       ).toEqual(false);
       await workspaceAdd(
-        toWorkspaceAddOptions(['foo', '@scope/pkgName@^2.0.0'], {
+        {
           cwd: projectDir
-        })
+        },
+        ['foo', '@scope/pkgName@^2.0.0']
       );
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(
@@ -122,9 +126,10 @@ describe('bolt workspace add', () => {
         false
       );
       await workspaceAdd(
-        toWorkspaceAddOptions(['foo', 'project-only-dep'], {
+        {
           cwd: barWorkspaceDir
-        })
+        },
+        ['foo', 'project-only-dep']
       );
       expect(yarn.add).toHaveBeenCalledTimes(0);
       expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
@@ -135,9 +140,10 @@ describe('bolt workspace add', () => {
     test('running from a different workspace, installing dep not in project', async () => {
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
       await workspaceAdd(
-        toWorkspaceAddOptions(['foo', 'new-dep'], {
+        {
           cwd: barWorkspaceDir
-        })
+        },
+        ['foo', 'new-dep']
       );
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(true);
@@ -148,9 +154,10 @@ describe('bolt workspace add', () => {
         false
       );
       await workspaceAdd(
-        toWorkspaceAddOptions(['foo', '@scope/pkgName'], {
+        {
           cwd: barWorkspaceDir
-        })
+        },
+        ['foo', '@scope/pkgName']
       );
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(await depIsInstalled(fooWorkspaceDir, '@scope/pkgName')).toEqual(
@@ -163,9 +170,10 @@ describe('bolt workspace add', () => {
         await depIsInstalled(fooWorkspaceDir, '@scope/pkgName@^2.0.0')
       ).toEqual(false);
       await workspaceAdd(
-        toWorkspaceAddOptions(['foo', '@scope/pkgName@^2.0.0'], {
+        {
           cwd: barWorkspaceDir
-        })
+        },
+        ['foo', '@scope/pkgName@^2.0.0']
       );
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(

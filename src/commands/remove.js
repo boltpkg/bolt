@@ -4,13 +4,14 @@ import Package from '../Package';
 import * as options from '../utils/options';
 import * as logger from '../utils/logger';
 import removeDependenciesFromPackages from '../utils/removeDependenciesFromPackages';
+import type { CommandArgsType } from '../types';
 
-export type RemoveOptions = {|
+type RemoveOptions = {|
   cwd?: string,
   deps: Array<string>
 |};
 
-export function toRemoveOptions(
+function toRemoveOptions(
   args: options.Args,
   flags: options.Flags
 ): RemoveOptions {
@@ -20,7 +21,8 @@ export function toRemoveOptions(
   };
 }
 
-export async function remove(opts: RemoveOptions) {
+export async function remove({ commandArgs, flags }: CommandArgsType) {
+  let opts = toRemoveOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

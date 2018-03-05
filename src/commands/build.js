@@ -2,26 +2,17 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import { run } from './run';
+import type { CommandArgsType } from '../types';
 
-export type BuildOptions = {|
-  cwd?: string,
-  args: options.Args
-|};
+type BuildOptions = {};
 
-export function toBuildOptions(
+function toBuildOptions(
   args: options.Args,
   flags: options.Flags
 ): BuildOptions {
-  return {
-    cwd: options.string(flags.cwd, 'cwd'),
-    args: args
-  };
+  return {};
 }
 
-export async function build(opts: BuildOptions) {
-  await run({
-    cwd: opts.cwd,
-    script: 'build',
-    scriptArgs: opts.args
-  });
+export async function build({ commandArgs, flags }: CommandArgsType) {
+  return await run(flags, ['build', ...commandArgs]);
 }

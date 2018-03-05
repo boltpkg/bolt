@@ -4,16 +4,16 @@ import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import execCommand from '../../utils/execCommand';
 
-export type WorkspaceExecOptions = {
+type WorkspaceExecOptions = {
   cwd?: string,
   workspaceName: string,
   command: string,
   commandArgs: options.Args
 };
 
-export function toWorkspaceExecOptions(
-  args: options.Args,
-  flags: options.Flags
+function toWorkspaceExecOptions(
+  flags: options.Flags,
+  args: options.Args
 ): WorkspaceExecOptions {
   let [workspaceName] = args;
   let [command, ...commandArgs] = flags['--'] || [];
@@ -25,7 +25,11 @@ export function toWorkspaceExecOptions(
   };
 }
 
-export async function workspaceExec(opts: WorkspaceExecOptions) {
+export async function workspaceExec(
+  flags: options.Flags,
+  subCommandArgs: Array<string>
+) {
+  let opts = toWorkspaceExecOptions(flags, subCommandArgs);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

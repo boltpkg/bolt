@@ -1,5 +1,5 @@
 // @flow
-import { upgrade, toUpgradeOptions } from '../upgrade';
+import { upgrade } from '../upgrade';
 import fixtures from 'fixturez';
 import * as path from 'path';
 import * as processes from '../../utils/processes';
@@ -48,7 +48,7 @@ async function fakeYarnUpgrade(pkg: Package, dependencies) {
   }
 }
 
-describe.only('bolt upgrade', () => {
+describe('bolt upgrade', () => {
   let projectDir;
   let fooWorkspaceDir;
   let barWorkspaceDir;
@@ -62,11 +62,12 @@ describe.only('bolt upgrade', () => {
   it('should upgrade the dependency for single package', async () => {
     let currentVersion = await getDependencyVersion(projectDir, 'foo-dep');
     expect(currentVersion).toEqual('1.0.0');
-    await upgrade(
-      toUpgradeOptions(['foo-dep'], {
+    await upgrade({
+      flags: {
         cwd: projectDir
-      })
-    );
+      },
+      commandArgs: ['foo-dep']
+    });
     expect(yarn.upgrade).toHaveBeenCalled();
     expect(await getDependencyVersion(projectDir, 'foo-dep')).toEqual('1.1.0');
   });
@@ -82,11 +83,12 @@ describe.only('bolt upgrade', () => {
     );
     expect(currentVersionFooDep).toEqual('1.0.0');
     expect(currentVersionGlobalDep).toEqual('1.0.0');
-    await upgrade(
-      toUpgradeOptions(['foo-dep', 'global-dep'], {
+    await upgrade({
+      flags: {
         cwd: projectDir
-      })
-    );
+      },
+      commandArgs: ['foo-dep', 'global-dep']
+    });
     expect(yarn.upgrade).toHaveBeenCalled();
     expect(await getDependencyVersion(projectDir, 'foo-dep')).toEqual('1.1.0');
     expect(await getDependencyVersion(projectDir, 'global-dep')).toEqual(
@@ -96,7 +98,7 @@ describe.only('bolt upgrade', () => {
 
   it('should not upgrade an internal package', async () => {
     await expect(
-      upgrade(toUpgradeOptions(['bar'], { cwd: projectDir }))
+      upgrade({ flags: { cwd: projectDir }, commandArgs: ['bar'] })
     ).rejects.toBeInstanceOf(Error);
   });
 });

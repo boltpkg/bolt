@@ -1,7 +1,4 @@
 // @flow
-import {
-  upgradeInteractive,
-  toUpgradeInteractiveOptions
-} from '../upgradeInteractive';
+import { upgradeInteractive } from '../upgradeInteractive';
 
 test('bolt upgrade-interactive');

@@ -2,12 +2,13 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
+import type { SubCommandArgsType } from '../../types';
 
-export type LicensesGenerateDisclaimerOptions = {
+type LicensesGenerateDisclaimerOptions = {
   cwd?: string
 };
 
-export function toLicensesGenerateDisclaimerOptions(
+function toLicensesGenerateDisclaimerOptions(
   args: options.Args,
   flags: options.Flags
 ): LicensesGenerateDisclaimerOptions {
@@ -16,9 +17,11 @@ export function toLicensesGenerateDisclaimerOptions(
   };
 }
 
-export async function licensesGenerateDisclaimer(
-  opts: LicensesGenerateDisclaimerOptions
-) {
+export async function licensesGenerateDisclaimer({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toLicensesGenerateDisclaimerOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await yarn.cliCommand(cwd, 'licenses', ['generate-disclaimer']);

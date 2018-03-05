@@ -6,13 +6,13 @@ import * as logger from '../../utils/logger';
 import removeDependenciesFromPackages from '../../utils/removeDependenciesFromPackages';
 import { BoltError } from '../../utils/errors';
 
-export type WorkspaceRemoveOptions = {
+type WorkspaceRemoveOptions = {
   cwd?: string,
   workspaceName: string,
   deps: Array<string>
 };
 
-export function toWorkspaceRemoveOptions(
+function toWorkspaceRemoveOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceRemoveOptions {
@@ -24,7 +24,11 @@ export function toWorkspaceRemoveOptions(
   };
 }
 
-export async function workspaceRemove(opts: WorkspaceRemoveOptions) {
+export async function workspaceRemove(
+  flags: options.Flags,
+  subCommandArgs: Array<string>
+) {
+  let opts = toWorkspaceRemoveOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

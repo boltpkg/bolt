@@ -4,13 +4,13 @@ import * as options from '../../utils/options';
 import Project from '../../Project';
 import removeDependenciesFromPackages from '../../utils/removeDependenciesFromPackages';
 
-export type WorkspacesRemoveOptions = {
+type WorkspacesRemoveOptions = {
   cwd?: string,
   deps: Array<string>,
   filterOpts: FilterOpts
 };
 
-export function toWorkspacesRemoveOptions(
+function toWorkspacesRemoveOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspacesRemoveOptions {
@@ -21,7 +21,11 @@ export function toWorkspacesRemoveOptions(
   };
 }
 
-export async function workspacesRemove(opts: WorkspacesRemoveOptions) {
+export async function workspacesRemove(
+  flags: options.Flags,
+  args: options.Args
+) {
+  let opts = toWorkspacesRemoveOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

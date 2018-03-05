@@ -1,4 +1,4 @@
 // @flow
-import { workspacesUpgrade, toWorkspacesUpgradeOptions } from '../upgrade';
+import { workspacesUpgrade } from '../upgrade';
 
 test('bolt workspaces upgrade');

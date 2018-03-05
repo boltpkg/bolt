@@ -2,12 +2,13 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
+import type { SubCommandArgsType } from '../../types';
 
-export type LicensesListOptions = {
+type LicensesListOptions = {
   cwd?: string
 };
 
-export function toLicensesListOptions(
+function toLicensesListOptions(
   args: options.Args,
   flags: options.Flags
 ): LicensesListOptions {
@@ -16,7 +17,11 @@ export function toLicensesListOptions(
   };
 }
 
-export async function licensesList(opts: LicensesListOptions) {
+export async function licensesList({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toLicensesListOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {

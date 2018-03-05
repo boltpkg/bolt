@@ -1,17 +1,15 @@
 // @flow
-import {
-  licensesGenerateDisclaimer,
-  toLicensesGenerateDisclaimerOptions
-} from '../generateDisclaimer';
+import { licensesGenerateDisclaimer } from '../generateDisclaimer';
 import * as yarn from '../../../utils/yarn';
 
 jest.mock('../../../utils/yarn');
 
 describe('bolt licenses generate-disclaimer', () => {
   it('calls yarn licenses with generate-disclaimer script', async () => {
-    await licensesGenerateDisclaimer(
-      toLicensesGenerateDisclaimerOptions([], { cwd: 'dummyPattern/dummyPath' })
-    );
+    await licensesGenerateDisclaimer({
+      flags: { cwd: 'dummyPattern/dummyPath' },
+      subCommandArgs: []
+    });
 
     expect(
       yarn.cliCommand

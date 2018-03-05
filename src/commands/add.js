@@ -4,20 +4,20 @@ import Package from '../Package';
 import * as options from '../utils/options';
 import * as logger from '../utils/logger';
 import addDependenciesToPackage from '../utils/addDependenciesToPackages';
-import type { Dependency, configDependencyType } from '../types';
+import type {
+  Dependency,
+  configDependencyType,
+  CommandArgsType
+} from '../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
-import type { ProjectAddOptions } from './project/add';
 
-export type AddOptions = {
+type AddOptions = {
   cwd?: string,
   deps: Array<Dependency>,
   type: configDependencyType
 };
 
-export function toAddOptions(
-  args: options.Args,
-  flags: options.Flags
-): AddOptions {
+function toAddOptions(args: options.Args, flags: options.Flags): AddOptions {
   const depsArgs = [];
   let type = 'dependencies';
 
@@ -43,7 +43,8 @@ export function toAddOptions(
   };
 }
 
-export async function add(opts: AddOptions | ProjectAddOptions) {
+export async function add({ commandArgs, flags }: CommandArgsType) {
+  const opts = toAddOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);

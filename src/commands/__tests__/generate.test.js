@@ -1,4 +1,4 @@
 // @flow
-import { generate, toGenerateOptions } from '../generate';
+import { generate } from '../generate';
 
 test('bolt generate');

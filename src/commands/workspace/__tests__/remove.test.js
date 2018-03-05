@@ -1,5 +1,5 @@
 // @flow
-import { workspaceRemove, toWorkspaceRemoveOptions } from '../remove';
+import { workspaceRemove } from '../remove';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yarn from '../../../utils/yarn';
@@ -16,9 +16,7 @@ describe('bolt workspace remove', () => {
     let tempDir = f.copy('package-with-external-deps-installed');
     let workspaceDir = path.join(tempDir, 'packages', 'foo');
 
-    await workspaceRemove(
-      toWorkspaceRemoveOptions(['foo', 'foo-dep'], { cwd: tempDir })
-    );
+    await workspaceRemove({ cwd: tempDir }, ['foo', 'foo-dep']);
 
     expect(yarn.remove).toHaveBeenCalledTimes(0);
     expect(
@@ -36,9 +34,7 @@ describe('bolt workspace remove', () => {
     let tempDir = f.copy('package-with-external-deps-installed');
 
     await expect(
-      workspaceRemove(
-        toWorkspaceRemoveOptions(['bar', 'foo-dep'], { cwd: tempDir })
-      )
+      workspaceRemove({ cwd: tempDir }, ['bar', 'foo-dep'])
     ).rejects.toBeInstanceOf(Error);
   });
 
@@ -48,9 +44,7 @@ describe('bolt workspace remove', () => {
     let fooWorkspaceDir = path.join(tempDir, 'packages', 'foo');
     let barWorkspaceDir = path.join(tempDir, 'packages', 'bar');
 
-    await workspaceRemove(
-      toWorkspaceRemoveOptions(['foo', 'foo-dep'], { cwd: barWorkspaceDir })
-    );
+    await workspaceRemove({ cwd: barWorkspaceDir }, ['foo', 'foo-dep']);
 
     expect(yarn.remove).toHaveBeenCalledTimes(0);
     expect(

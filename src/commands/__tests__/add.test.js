@@ -1,5 +1,5 @@
 // @flow
-import { add, toAddOptions } from '../add';
+import { add } from '../add';
 import * as path from 'path';
 import * as processes from '../../utils/processes';
 import * as yarn from '../../utils/yarn';
@@ -61,11 +61,12 @@ describe('bolt add', () => {
   describe('from the project pkg', () => {
     test('adding new package', async () => {
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(false);
-      await add(
-        toAddOptions(['new-dep'], {
+      await add({
+        commandArgs: ['new-dep'],
+        flags: {
           cwd: projectDir
-        })
-      );
+        }
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(true);
     });
@@ -74,22 +75,24 @@ describe('bolt add', () => {
       expect(await depIsInstalled(projectDir, 'project-only-dep')).toEqual(
         true
       );
-      await add(
-        toAddOptions(['project-only-dep'], {
+      await add({
+        commandArgs: ['project-only-dep'],
+        flags: {
           cwd: projectDir
-        })
-      );
+        }
+      });
       expect(yarn.add).toHaveBeenCalledTimes(0);
     });
 
     test('adding new dependency with --dev flag', async () => {
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(false);
-      await add(
-        toAddOptions(['new-dep'], {
+      await add({
+        commandArgs: ['new-dep'],
+        flags: {
           dev: true, // equivalent of passing --dev flag
           cwd: projectDir
-        })
-      );
+        }
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(yarn.add).toHaveBeenCalledWith(
         expect.any(Package),
@@ -102,11 +105,12 @@ describe('bolt add', () => {
     test('adding multiple new dependencies', async () => {
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(false);
       expect(await depIsInstalled(projectDir, 'new-dep-2')).toEqual(false);
-      await add(
-        toAddOptions(['new-dep', 'new-dep-2'], {
+      await add({
+        commandArgs: ['new-dep', 'new-dep-2'],
+        flags: {
           cwd: projectDir
-        })
-      );
+        }
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(yarn.add).toHaveBeenCalledWith(
         expect.any(Package),
@@ -119,11 +123,12 @@ describe('bolt add', () => {
 
     test('adding internal dep (should error)', async () => {
       await expect(
-        add(
-          toAddOptions(['bar'], {
+        add({
+          commandArgs: ['bar'],
+          flags: {
             cwd: projectDir
-          })
-        )
+          }
+        })
       ).rejects.toBeInstanceOf(Error);
 
       expect(yarn.add).toHaveBeenCalledTimes(0);
@@ -132,11 +137,12 @@ describe('bolt add', () => {
 
     test('adding new package at version', async () => {
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(false);
-      await add(
-        toAddOptions(['new-dep@^2.0.0'], {
+      await add({
+        commandArgs: ['new-dep@^2.0.0'],
+        flags: {
           cwd: projectDir
-        })
-      );
+        }
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(await depIsInstalled(projectDir, 'new-dep', '^2.0.0')).toEqual(
         true
@@ -145,11 +151,12 @@ describe('bolt add', () => {
 
     test('adding scoped package', async () => {
       expect(await depIsInstalled(projectDir, '@scope/pkgName')).toEqual(false);
-      await add(
-        toAddOptions(['@scope/pkgName'], {
+      await add({
+        commandArgs: ['@scope/pkgName'],
+        flags: {
           cwd: projectDir
-        })
-      );
+        }
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(await depIsInstalled(projectDir, '@scope/pkgName')).toEqual(true);
     });
@@ -158,11 +165,12 @@ describe('bolt add', () => {
       expect(await depIsInstalled(projectDir, '@scope/pkgName@^2.0.0')).toEqual(
         false
       );
-      await add(
-        toAddOptions(['@scope/pkgName@^2.0.0'], {
+      await add({
+        commandArgs: ['@scope/pkgName@^2.0.0'],
+        flags: {
           cwd: projectDir
-        })
-      );
+        }
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(
         await depIsInstalled(projectDir, '@scope/pkgName', '^2.0.0')
@@ -174,11 +182,12 @@ describe('bolt add', () => {
     test('adding new package', async () => {
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(false);
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
-      await add(
-        toAddOptions(['new-dep'], {
+      await add({
+        flags: {
           cwd: fooWorkspaceDir
-        })
-      );
+        },
+        commandArgs: ['new-dep']
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(true);
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(true);
@@ -188,11 +197,12 @@ describe('bolt add', () => {
       expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
         false
       );
-      await add(
-        toAddOptions(['project-only-dep'], {
+      await add({
+        flags: {
           cwd: fooWorkspaceDir
-        })
-      );
+        },
+        commandArgs: ['project-only-dep']
+      });
       expect(yarn.add).toHaveBeenCalledTimes(0);
       expect(await depIsInstalled(fooWorkspaceDir, 'project-only-dep')).toEqual(
         true
@@ -201,12 +211,13 @@ describe('bolt add', () => {
 
     test('adding new dependency with --dev flag', async () => {
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
-      await add(
-        toAddOptions(['new-dep'], {
+      await add({
+        flags: {
           dev: true, // equivalent of passing --dev flag
           cwd: fooWorkspaceDir
-        })
-      );
+        },
+        commandArgs: ['new-dep']
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(yarn.add).toHaveBeenCalledWith(
         expect.any(Package),
@@ -219,11 +230,12 @@ describe('bolt add', () => {
     test('adding multiple new dependencies', async () => {
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep-2')).toEqual(false);
-      await add(
-        toAddOptions(['new-dep', 'new-dep-2'], {
+      await add({
+        flags: {
           cwd: fooWorkspaceDir
-        })
-      );
+        },
+        commandArgs: ['new-dep', 'new-dep-2']
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(yarn.add).toHaveBeenCalledWith(
         expect.any(Package),
@@ -237,11 +249,12 @@ describe('bolt add', () => {
     test('adding internal dep', async () => {
       expect(await depIsInstalled(fooWorkspaceDir, 'bar')).toEqual(false);
 
-      await add(
-        toAddOptions(['bar'], {
+      await add({
+        flags: {
           cwd: fooWorkspaceDir
-        })
-      );
+        },
+        commandArgs: ['bar']
+      });
 
       expect(yarn.add).toHaveBeenCalledTimes(0);
       expect(await depIsInstalled(fooWorkspaceDir, 'bar')).toEqual(true);
@@ -249,11 +262,12 @@ describe('bolt add', () => {
 
     test('adding new package at version', async () => {
       expect(await depIsInstalled(fooWorkspaceDir, 'new-dep')).toEqual(false);
-      await add(
-        toAddOptions(['new-dep@^2.0.0'], {
+      await add({
+        flags: {
           cwd: fooWorkspaceDir
-        })
-      );
+        },
+        commandArgs: ['new-dep@^2.0.0']
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(
         await depIsInstalled(fooWorkspaceDir, 'new-dep', '^2.0.0')
@@ -264,11 +278,12 @@ describe('bolt add', () => {
       expect(await depIsInstalled(fooWorkspaceDir, '@scope/pkgName')).toEqual(
         false
       );
-      await add(
-        toAddOptions(['@scope/pkgName'], {
+      await add({
+        flags: {
           cwd: fooWorkspaceDir
-        })
-      );
+        },
+        commandArgs: ['@scope/pkgName']
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(await depIsInstalled(fooWorkspaceDir, '@scope/pkgName')).toEqual(
         true
@@ -279,11 +294,12 @@ describe('bolt add', () => {
       expect(
         await depIsInstalled(fooWorkspaceDir, '@scope/pkgName@^2.0.0')
       ).toEqual(false);
-      await add(
-        toAddOptions(['@scope/pkgName@^2.0.0'], {
+      await add({
+        flags: {
           cwd: fooWorkspaceDir
-        })
-      );
+        },
+        commandArgs: ['@scope/pkgName@^2.0.0']
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(
         await depIsInstalled(fooWorkspaceDir, '@scope/pkgName', '^2.0.0')

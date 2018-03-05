@@ -2,21 +2,20 @@
 import * as yarn from '../utils/yarn';
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
+import type { CommandArgsType } from '../types';
 
-export type BinOptions = {
+type BinOptions = {
   cwd?: string
 };
 
-export function toBinOptions(
-  args: options.Args,
-  flags: options.Flags
-): BinOptions {
+function toBinOptions(args: options.Args, flags: options.Flags): BinOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd')
   };
 }
 
-export async function bin(opts: BinOptions) {
+export async function bin({ commandArgs, flags }: CommandArgsType) {
+  let opts = toBinOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {

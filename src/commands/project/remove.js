@@ -4,13 +4,14 @@ import Package from '../../Package';
 import * as options from '../../utils/options';
 import * as logger from '../../utils/logger';
 import removeDependenciesFromPackages from '../../utils/removeDependenciesFromPackages';
+import type { SubCommandArgsType } from '../../types';
 
-export type ProjectRemoveOptions = {|
+type ProjectRemoveOptions = {|
   cwd?: string,
   deps: Array<string>
 |};
 
-export function toProjectRemoveOptions(
+function toProjectRemoveOptions(
   args: options.Args,
   flags: options.Flags
 ): ProjectRemoveOptions {
@@ -20,7 +21,11 @@ export function toProjectRemoveOptions(
   };
 }
 
-export async function projectRemove(opts: ProjectRemoveOptions) {
+export async function projectRemove({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toProjectRemoveOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

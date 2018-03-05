@@ -1,4 +1,4 @@
 // @flow
-import { help, toHelpOptions } from '../help';
+import { help } from '../help';
 
 test('bolt help');
