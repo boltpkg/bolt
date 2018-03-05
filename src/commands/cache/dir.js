@@ -2,6 +2,7 @@
 import * as options from '../../utils/options';
 import { BoltError } from '../../utils/errors';
 import * as yarn from '../../utils/yarn';
+import type { SubCommandArgsType } from '../../types';
 
 type CacheDirOptions = {
   cwd?: string
@@ -16,8 +17,8 @@ function toCacheDirOptions(
   };
 }
 
-export async function cacheDir(flags: options.Flags, args: options.Args) {
-  let opts = toCacheDirOptions(args, flags);
+export async function cacheDir({ flags, subCommandArgs }: SubCommandArgsType) {
+  let opts = toCacheDirOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {
