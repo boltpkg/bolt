@@ -6,12 +6,12 @@ jest.mock('../../utils/yarn');
 
 describe('bolt why', () => {
   it('should be able to handle arguments', async () => {
-    await why(
-      {
+    await why({
+      flags: {
         cwd: 'dummyPattern/dummyPath'
       },
-      ['jest']
-    );
+      commandArgs: ['jest']
+    });
     expect(
       yarn.cliCommand
     ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'why', ['jest']);

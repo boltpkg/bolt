@@ -2,6 +2,7 @@
 import Project from '../Project';
 import * as options from '../utils/options';
 import * as locks from '../utils/locks';
+import type { CommandArgsType } from '../types';
 
 type PublishUnlockOptions = {|
   cwd?: string
@@ -16,8 +17,8 @@ function toPublishUnlockOptions(
   };
 }
 
-export async function publishUnlock(flags: options.Flags, args: Array<string>) {
-  let opts = toPublishUnlockOptions(args, flags);
+export async function publishUnlock({ commandArgs, flags }: CommandArgsType) {
+  let opts = toPublishUnlockOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let workspaces = await project.getWorkspaces();

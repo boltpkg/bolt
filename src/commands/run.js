@@ -4,6 +4,7 @@ import * as options from '../utils/options';
 import * as yarn from '../utils/yarn';
 import * as logger from '../utils/logger';
 import { BoltError } from '../utils/errors';
+import type { CommandArgsType } from '../types';
 
 type RunOptions = {|
   cwd?: string,
@@ -20,8 +21,8 @@ function toRunOptions(args: options.Args, flags: options.Flags): RunOptions {
   };
 }
 
-export async function run(flags: options.Flags, args: Array<string>) {
-  let opts = toRunOptions(args, flags);
+export async function run({ commandArgs, flags }: CommandArgsType) {
+  let opts = toRunOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let pkg = await Package.closest(cwd);
   let script = await yarn.getScript(pkg, opts.script);

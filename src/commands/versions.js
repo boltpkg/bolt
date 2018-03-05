@@ -1,6 +1,7 @@
 // @flow
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
+import type { CommandArgsType } from '../types';
 
 type VersionsOptions = {};
 
@@ -11,6 +12,6 @@ function toVersionsOptions(
   return {};
 }
 
-export async function versions(flags: options.Flags, args: Array<string>) {
+export async function versions({ commandArgs, flags }: CommandArgsType) {
   throw new BoltError('Unimplemented command "versions"');
 }

@@ -17,22 +17,28 @@ describe('bolt unlink', () => {
   });
 
   it('should warn if unlink a internal package', async () => {
-    await unlink({ cwd: projectDir }, ['foo']);
+    await unlink({ flags: { cwd: projectDir }, commandArgs: ['foo'] });
     expect(logger.warn).toHaveBeenCalled();
   });
 
   it('should call yarn unlink if unlinking an external internal package', async () => {
-    await unlink({ cwd: projectDir }, ['external-package']);
+    await unlink({
+      flags: { cwd: projectDir },
+      commandArgs: ['external-package']
+    });
     expect(yarn.cliCommand).toHaveBeenCalled();
   });
 
   it('should call yarn unlink for all external packages and warn for internal packages', async () => {
-    await unlink({ cwd: projectDir }, [
-      'external-package',
-      'foo',
-      'bar',
-      'someother-external-package'
-    ]);
+    await unlink({
+      flags: { cwd: projectDir },
+      commandArgs: [
+        'external-package',
+        'foo',
+        'bar',
+        'someother-external-package'
+      ]
+    });
     expect(logger.warn).toHaveBeenCalledTimes(2);
     expect(yarn.cliCommand).toHaveBeenCalledTimes(2);
   });

@@ -7,6 +7,7 @@ import * as messages from '../utils/messages';
 import * as locks from '../utils/locks';
 import * as npm from '../utils/npm';
 import Project from '../Project';
+import type { CommandArgsType } from '../types';
 
 type PublishOptions = {|
   cwd?: string,
@@ -72,8 +73,8 @@ async function getUnpublishedPackages(packages) {
   });
 }
 
-export async function publish(flags: options.Flags, args: Array<string>) {
-  const opts = toPublishOptions(args, flags);
+export async function publish({ commandArgs, flags }: CommandArgsType) {
+  const opts = toPublishOptions(commandArgs, flags);
   const cwd = opts.cwd || process.cwd();
   const project = await Project.init(cwd);
   const workspaces = await project.getWorkspaces();
