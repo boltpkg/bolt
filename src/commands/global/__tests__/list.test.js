@@ -7,7 +7,10 @@ jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt global list', async () => {
-  const tag = await globalList({ cwd: dummyPath }, ['test-tag']);
+  const tag = await globalList({
+    flags: { cwd: dummyPath },
+    subCommandArgs: ['test-tag']
+  });
   expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'global', [
     'list',
     'test-tag'

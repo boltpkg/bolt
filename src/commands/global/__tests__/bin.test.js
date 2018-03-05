@@ -7,6 +7,9 @@ jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt global bin', async () => {
-  const tag = await globalBin({ cwd: dummyPath }, []);
+  const tag = await globalBin({
+    flags: { cwd: dummyPath },
+    subCommandArgs: []
+  });
   expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'global', ['bin']);
 });

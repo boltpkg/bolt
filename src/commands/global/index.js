@@ -9,12 +9,7 @@ const commands = {
   upgrade: require('./upgrade').globalUpgrade
 };
 
-export async function global(
-  flags: options.Flags,
-  commandArgs: Array<string>,
-  subCommand: string,
-  subCommandArgs: Array<string>
-) {
+export async function global({ flags, subCommand, subCommandArgs }) {
   if (commands[subCommand]) {
     return await commands[subCommand](flags, subCommandArgs);
   }

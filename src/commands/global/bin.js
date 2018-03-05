@@ -2,6 +2,7 @@
 import * as options from '../../utils/options';
 import * as yarn from '../../utils/yarn';
 import { BoltError } from '../../utils/errors';
+import type { SubCommandArgsType } from '../../types';
 
 type GlobalBinOptions = {
   cwd?: string
@@ -14,8 +15,8 @@ function toGlobalBinOptions(
   return { cwd: options.string(flags.cwd, 'cwd') };
 }
 
-export async function globalBin(flags: options.Flags, args: options.Args) {
-  let opts = toGlobalBinOptions(args, flags);
+export async function globalBin({ flags, subCommandArgs }: SubCommandArgsType) {
+  let opts = toGlobalBinOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await yarn.cliCommand(cwd, 'global', ['bin']);
