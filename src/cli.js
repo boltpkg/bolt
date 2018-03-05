@@ -13,18 +13,18 @@ async function runCommandFromCli(args: options.Args, flags: options.Flags) {
   let [command, ...commandArgs] = args;
   let [subCommand, ...subCommandArgs] = commandArgs;
 
-  if (!command) return await commands['install'](flags, commandArgs);
+  if (!command) return await commands['install']({ flags, commandArgs });
 
   if (command && commands[command]) {
-    return await commands[command](
+    return await commands[command]({
       flags,
       commandArgs,
       subCommand,
       subCommandArgs
-    );
+    });
   }
 
-  throw new BoltError(`You must specify a valid command`);
+  throw new BoltError(`${command} is not a valid bolt command`);
 }
 
 export default async function cli(argv: Array<string>, exit: boolean = false) {

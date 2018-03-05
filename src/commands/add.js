@@ -4,7 +4,11 @@ import Package from '../Package';
 import * as options from '../utils/options';
 import * as logger from '../utils/logger';
 import addDependenciesToPackage from '../utils/addDependenciesToPackages';
-import type { Dependency, configDependencyType } from '../types';
+import type {
+  Dependency,
+  configDependencyType,
+  CommandArgsType
+} from '../types';
 import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
 
 type AddOptions = {
@@ -39,8 +43,8 @@ function toAddOptions(args: options.Args, flags: options.Flags): AddOptions {
   };
 }
 
-export async function add(flags: options.Flags, args: Array<string>) {
-  const opts = toAddOptions(args, flags);
+export async function add({ commandArgs, flags }: CommandArgsType) {
+  const opts = toAddOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let pkg = await Package.closest(cwd);

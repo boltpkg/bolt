@@ -61,12 +61,12 @@ describe('bolt add', () => {
   describe('from the project pkg', () => {
     test('adding new package', async () => {
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(false);
-      await add(
-        {
+      await add({
+        commandArgs: ['new-dep'],
+        flags: {
           cwd: projectDir
-        },
-        ['new-dep']
-      );
+        }
+      });
       expect(yarn.add).toHaveBeenCalledTimes(1);
       expect(await depIsInstalled(projectDir, 'new-dep')).toEqual(true);
     });

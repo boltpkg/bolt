@@ -1,8 +1,12 @@
 // @flow
 
-export type CommandType = ?string;
-
-export type CommandArgsType = ?Array<string>;
+export type CommandArgsType = {
+  args: Array<string>,
+  flags: {
+    '--'?: Array<string>,
+    [key: string]: boolean | string
+  }
+};
 
 export type DependencySet = {
   [key: string]: string

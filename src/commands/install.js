@@ -12,6 +12,7 @@ import * as yarn from '../utils/yarn';
 import pathIsInside from 'path-is-inside';
 import { BoltError } from '../utils/errors';
 import { BOLT_VERSION } from '../constants';
+import type { CommandArgsType } from '../types';
 
 type InstallOptions = {|
   cwd?: string,
@@ -28,7 +29,7 @@ function toInstallOptions(
   };
 }
 
-export async function install(flags: options.Flags, args: Array<string>) {
+export async function install({ flags, commandArgs }: CommandArgsType) {
   let opts = toInstallOptions(args, flags);
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
