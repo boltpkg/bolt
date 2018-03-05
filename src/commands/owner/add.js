@@ -2,6 +2,7 @@
 import * as options from '../../utils/options';
 import * as yarn from '../../utils/yarn';
 import { BoltError } from '../../utils/errors';
+import type { SubCommandArgsType } from '../../types';
 
 type OwnerAddOptions = {
   cwd?: string,
@@ -15,8 +16,8 @@ function toOwnerAddOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function ownerAdd(flags: options.Flags, args: options.Args) {
-  let opts = toOwnerAddOptions(args, flags);
+export async function ownerAdd({ flags, subCommandArgs }: SubCommandArgsType) {
+  let opts = toOwnerAddOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await yarn.cliCommand(cwd, 'owner', ['add', ...opts.args]);
