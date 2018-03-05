@@ -10,12 +10,7 @@ const commands = {
   remove: require('./remove').teamRemove
 };
 
-export async function team(
-  flags: options.Flags,
-  commandArgs: Array<string>,
-  subCommand: string,
-  subCommandArgs: Array<string>
-) {
+export async function team({ flags, subCommand, subCommandArgs }) {
   if (commands[subCommand]) {
     return await commands[subCommand](flags, subCommandArgs);
   }

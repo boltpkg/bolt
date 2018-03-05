@@ -7,7 +7,10 @@ jest.mock('../../../utils/npm');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt team list', async () => {
-  const team = await teamList({ cwd: dummyPath }, ['test-tag']);
+  const team = await teamList({
+    flags: { cwd: dummyPath },
+    subCommandArgs: ['test-tag']
+  });
   expect(npm.cliCommand).toHaveBeenCalledWith(dummyPath, 'team', [
     'ls',
     'test-tag'

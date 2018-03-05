@@ -2,6 +2,7 @@
 import * as options from '../../utils/options';
 import * as npm from '../../utils/npm';
 import { BoltError } from '../../utils/errors';
+import type { SubCommandArgsType } from '../../types';
 
 type TeamRemoveOptions = {
   cwd?: string,
@@ -15,8 +16,11 @@ function toTeamRemoveOptions(
   return { cwd: options.string(flags.cwd, 'cwd'), args };
 }
 
-export async function teamRemove(flags: options.Flags, args: options.Args) {
-  let opts = toTeamRemoveOptions(args, flags);
+export async function teamRemove({
+  flags,
+  subCommandArgs
+}: SubCommandArgsType) {
+  let opts = toTeamRemoveOptions(subCommandArgs, flags);
   let cwd = opts.cwd || process.cwd();
   try {
     await npm.cliCommand(cwd, 'team', ['rm', ...opts.args]);
