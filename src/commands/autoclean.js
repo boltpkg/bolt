@@ -2,6 +2,7 @@
 import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as yarn from '../utils/yarn';
+import type { CommandArgsType } from '../types';
 
 type AutocleanOptions = {
   cwd?: string
@@ -16,8 +17,8 @@ function toAutocleanOptions(
   };
 }
 
-export async function autoclean(flags: options.Flags, args: Array<string>) {
-  let opts = toAutocleanOptions(args, flags);
+export async function autoclean({ commandArgs, flags }: CommandArgsType) {
+  let opts = toAutocleanOptions(commandArgs, flags);
   let cwd = opts.cwd || process.cwd();
 
   try {

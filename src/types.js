@@ -1,7 +1,7 @@
 // @flow
 
 export type CommandArgsType = {
-  args: Array<string>,
+  commandArgs: Array<string>,
   flags: {
     '--'?: Array<string>,
     [key: string]: boolean | string
