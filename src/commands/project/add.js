@@ -17,7 +17,7 @@ export function toProjectAddOptions(
   args: options.Args,
   flags: options.Flags
 ): ProjectAddOptions {
-  const depsArgs = [];
+  let depsArgs = [];
   let type = 'dependencies';
 
   // args is each of our dependencies we are adding which may have "@version" parts to them

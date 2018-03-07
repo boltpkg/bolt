@@ -19,7 +19,7 @@ export async function lock(packages: Array<Package>) {
     let version = pkg.config.getVersion();
     let promise = npm.infoAllow404(name).then(response => {
       if (response.published) {
-        const pkgInfo = response.pkgInfo || {};
+        let pkgInfo = response.pkgInfo || {};
         if (pkgInfo['dist-tags'][LOCK_DIST_TAG]) {
           throw new BoltError(
             `Unable to get lock as a lock already exists for '${name}'`
@@ -62,7 +62,7 @@ export async function unlock(packages: Array<Package>) {
     let name = pkg.config.getName();
     let promise = npm.infoAllow404(name).then(response => {
       if (response.published) {
-        const pkgInfo = response.pkgInfo || {};
+        let pkgInfo = response.pkgInfo || {};
         if (!pkgInfo['dist-tags'][LOCK_DIST_TAG]) {
           return;
         }

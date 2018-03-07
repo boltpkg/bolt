@@ -38,8 +38,8 @@ async function assertDependenciesSymlinked(workspace: Workspace) {
 }
 
 describe('install', () => {
-  const yarnUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
-  const boltUserAgent = 'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+  let yarnUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+  let boltUserAgent = 'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
 
   beforeEach(() => {
     unsafeProcess.env = { parent_env: 1 };
@@ -100,7 +100,7 @@ describe('install', () => {
   });
 
   test('should append the bolt version to yarns npm_config_user_agent string', async () => {
-    const spawnSpy = jest.spyOn(processes, 'spawn');
+    let spawnSpy = jest.spyOn(processes, 'spawn');
     let cwd = f.find('nested-workspaces-with-scoped-package-names');
 
     await install(toInstallOptions([], { cwd }));
@@ -111,7 +111,7 @@ describe('install', () => {
   });
 
   test('should pass existing environment variables to yarn during install', async () => {
-    const spawnSpy = jest.spyOn(processes, 'spawn');
+    let spawnSpy = jest.spyOn(processes, 'spawn');
     let cwd = f.find('nested-workspaces-with-scoped-package-names');
 
     await install(toInstallOptions([], { cwd }));
@@ -137,8 +137,8 @@ describe('install', () => {
   // This is re-testing symlinkPackageDependencies, but we'd rather be explicit here
   test('should install (symlink) all deps in workspaces', async () => {
     let cwd = f.copy('nested-workspaces-with-root-dependencies-installed');
-    const project = await Project.init(cwd);
-    const workspaces = await project.getWorkspaces();
+    let project = await Project.init(cwd);
+    let workspaces = await project.getWorkspaces();
 
     await install(toInstallOptions([], { cwd }));
 

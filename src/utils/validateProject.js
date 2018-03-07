@@ -10,15 +10,15 @@ import * as logger from './logger';
 import { BOLT_VERSION } from '../constants';
 
 export default async function validateProject(project: Project) {
-  const workspaces = await project.getWorkspaces();
-  const projectDependencies = project.pkg.getAllDependencies();
-  const projectConfig = project.pkg.config;
-  const { graph: depGraph } = await project.getDependencyGraph(workspaces);
+  let workspaces = await project.getWorkspaces();
+  let projectDependencies = project.pkg.getAllDependencies();
+  let projectConfig = project.pkg.config;
+  let { graph: depGraph } = await project.getDependencyGraph(workspaces);
 
   let projectIsValid = true;
 
   // If the project has an engines.bolt field we must respect it
-  const boltConfigVersion = projectConfig.getBoltConfigVersion();
+  let boltConfigVersion = projectConfig.getBoltConfigVersion();
   if (boltConfigVersion) {
     if (!semver.satisfies(BOLT_VERSION, boltConfigVersion)) {
       logger.error(
@@ -30,7 +30,7 @@ export default async function validateProject(project: Project) {
 
   // Workspaces should never appear as dependencies in the Project config
   for (let workspace of workspaces) {
-    const depName = workspace.pkg.config.getName();
+    let depName = workspace.pkg.config.getName();
     if (projectDependencies.has(depName)) {
       logger.error(messages.projectCannotDependOnWorkspace(depName));
       projectIsValid = false;

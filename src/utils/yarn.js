@@ -15,7 +15,7 @@ async function getLocalBinPath(): Promise<string> {
 }
 
 function depTypeToFlag(depType) {
-  const flag = Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).find(
+  let flag = Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).find(
     key => DEPENDENCY_TYPE_FLAGS_MAP[key] === depType
   );
 
@@ -27,8 +27,8 @@ export async function add(
   dependencies: Array<Dependency>,
   type?: configDependencyType
 ) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  const spawnArgs = ['add'];
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let spawnArgs = ['add'];
   if (!dependencies.length) return;
 
   dependencies.forEach(dep => {
@@ -40,7 +40,7 @@ export async function add(
   });
 
   if (type) {
-    const flag = depTypeToFlag(type);
+    let flag = depTypeToFlag(type);
     if (flag) spawnArgs.push(flag);
   }
 
@@ -56,8 +56,8 @@ export async function upgrade(
   dependencies: Array<Dependency> = [],
   flags: Array<string> = []
 ) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  const spawnArgs = ['upgrade'];
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let spawnArgs = ['upgrade'];
 
   if (dependencies.length) {
     dependencies.forEach(dep => {
@@ -81,10 +81,10 @@ export async function run(
   script: string,
   args: Array<string> = []
 ) {
-  const project = await Project.init(pkg.dir);
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let project = await Project.init(pkg.dir);
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
   // We use a relative path because the absolute paths are very long and noisy in logs
-  const localYarnRelative = path.relative(pkg.dir, localYarn);
+  let localYarnRelative = path.relative(pkg.dir, localYarn);
   let spawnArgs = ['run', '-s', script];
 
   if (args.length) {
@@ -102,7 +102,7 @@ export async function runIfExists(
   script: string,
   args: Array<string> = []
 ) {
-  const scriptExists = await getScript(pkg, script);
+  let scriptExists = await getScript(pkg, script);
   if (scriptExists) {
     await run(pkg, script, args);
   }
@@ -128,7 +128,7 @@ export async function getScript(pkg: Package, script: string) {
 }
 
 export async function remove(dependencies: Array<string>, cwd: string) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
   await processes.spawn(localYarn, ['remove', ...dependencies], {
     cwd,
     tty: true
@@ -140,7 +140,7 @@ export async function cliCommand(
   command: string = '',
   spawnArgs: Array<string> = []
 ) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
 
   return await processes.spawn(localYarn, [command, ...spawnArgs], {
     cwd,
@@ -149,7 +149,7 @@ export async function cliCommand(
 }
 
 export async function info(cwd: string, spawnArgs: Array<string> = []) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
   await processes.spawn(localYarn, ['info', ...spawnArgs], {
     cwd,
     tty: true
@@ -157,9 +157,9 @@ export async function info(cwd: string, spawnArgs: Array<string> = []) {
 }
 
 export async function userAgent() {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
 
-  const { stdout: yarnUserAgent } = await processes.spawn(
+  let { stdout: yarnUserAgent } = await processes.spawn(
     localYarn,
     ['config', 'get', 'user-agent'],
     {
@@ -174,7 +174,7 @@ export async function globalCli(
   command: string = '',
   dependencies: Array<Dependency>
 ) {
-  const spawnArgs = ['global', command];
+  let spawnArgs = ['global', command];
   if (!dependencies.length) return;
 
   dependencies.forEach(dep => {

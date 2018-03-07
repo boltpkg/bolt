@@ -46,10 +46,8 @@ export default async function updatePackageVersions(
   let { graph } = await project.getDependencyGraph(workspaces);
   let editedPackages = new Set();
 
-  const internalDeps = Object.keys(updatedPackages).filter(dep =>
-    graph.has(dep)
-  );
-  const externalDeps = Object.keys(updatedPackages).filter(
+  let internalDeps = Object.keys(updatedPackages).filter(dep => graph.has(dep));
+  let externalDeps = Object.keys(updatedPackages).filter(
     dep => !graph.has(dep)
   );
 
@@ -65,14 +63,14 @@ export default async function updatePackageVersions(
     let name = workspace.pkg.config.getName();
 
     for (let depName of internalDeps) {
-      const depRange = String(pkg.getDependencyVersionRange(depName));
-      const depTypes = pkg.getDependencyTypes(depName);
-      const rangeType = versionRangeToRangeType(depRange);
-      const newDepRange = rangeType + updatedPackages[depName];
+      let depRange = String(pkg.getDependencyVersionRange(depName));
+      let depTypes = pkg.getDependencyTypes(depName);
+      let rangeType = versionRangeToRangeType(depRange);
+      let newDepRange = rangeType + updatedPackages[depName];
       if (depTypes.length === 0) continue;
 
-      const inUpdatedPackages = includes(internalDeps, name);
-      const willLeaveSemverRange = !semver.satisfies(
+      let inUpdatedPackages = includes(internalDeps, name);
+      let willLeaveSemverRange = !semver.satisfies(
         updatedPackages[depName],
         depRange
       );

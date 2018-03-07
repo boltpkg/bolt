@@ -127,7 +127,7 @@ export default class Package {
 
   getDependencyVersionRange(depName: string) {
     for (let depType of DEPENDENCY_TYPES) {
-      const deps = this.config.getDeps(depType);
+      let deps = this.config.getDeps(depType);
       if (deps && deps[depName]) {
         return deps[depName];
       }

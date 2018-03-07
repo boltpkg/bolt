@@ -34,7 +34,7 @@ describe('Package', () => {
     it('should return dependency type of a dependency', async () => {
       let filePath = path.join(f.find('nested-workspaces'), 'package.json');
       let pkg = await Package.init(filePath);
-      const depTypes = pkg.getDependencyTypes('react');
+      let depTypes = pkg.getDependencyTypes('react');
       expect(depTypes).toEqual(['dependencies']);
     });
 
@@ -44,7 +44,7 @@ describe('Package', () => {
         'package.json'
       );
       let pkg = await Package.init(filePath);
-      const depTypes = pkg.getDependencyTypes('react');
+      let depTypes = pkg.getDependencyTypes('react');
       expect(depTypes).toEqual(['devDependencies', 'peerDependencies']);
     });
 

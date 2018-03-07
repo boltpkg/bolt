@@ -18,16 +18,16 @@ export default async function addDependenciesToPackage(
   dependencies: Array<Dependency>,
   type?: configDependencyType = 'dependencies'
 ) {
-  const workspaces = await project.getWorkspaces();
-  const projectDependencies = project.pkg.getAllDependencies();
-  const pkgDependencies = pkg.getAllDependencies();
-  const { graph: depGraph } = await project.getDependencyGraph(workspaces);
+  let workspaces = await project.getWorkspaces();
+  let projectDependencies = project.pkg.getAllDependencies();
+  let pkgDependencies = pkg.getAllDependencies();
+  let { graph: depGraph } = await project.getDependencyGraph(workspaces);
 
-  const dependencyNames = dependencies.map(dep => dep.name);
-  const externalDeps = dependencies.filter(dep => !depGraph.has(dep.name));
-  const internalDeps = dependencies.filter(dep => depGraph.has(dep.name));
+  let dependencyNames = dependencies.map(dep => dep.name);
+  let externalDeps = dependencies.filter(dep => !depGraph.has(dep.name));
+  let internalDeps = dependencies.filter(dep => depGraph.has(dep.name));
 
-  const externalDepsToInstallForProject = externalDeps.filter(
+  let externalDepsToInstallForProject = externalDeps.filter(
     dep => !projectDependencies.has(dep.name)
   );
   if (externalDepsToInstallForProject.length !== 0) {
@@ -44,12 +44,12 @@ export default async function addDependenciesToPackage(
     return true;
   }
 
-  const installedVersions = {};
+  let installedVersions = {};
 
   for (let dep of externalDeps) {
-    const installed = project.pkg.getDependencyVersionRange(dep.name);
+    let installed = project.pkg.getDependencyVersionRange(dep.name);
     // If we aren't specified a version, use the same one from the project
-    const depVersion = dep.version || installed;
+    let depVersion = dep.version || installed;
     if (depVersion !== installed) {
       throw new BoltError(
         messages.depMustMatchProject(
@@ -64,10 +64,10 @@ export default async function addDependenciesToPackage(
   }
 
   for (let dep of internalDeps) {
-    const dependencyPkg = (depGraph.get(dep.name) || {}).pkg;
-    const internalVersion = dependencyPkg.config.getVersion();
+    let dependencyPkg = (depGraph.get(dep.name) || {}).pkg;
+    let internalVersion = dependencyPkg.config.getVersion();
     // If no version is requested, default to caret at the current version
-    const requestedVersion = dep.version || `^${internalVersion}`;
+    let requestedVersion = dep.version || `^${internalVersion}`;
     if (!semver.satisfies(internalVersion, requestedVersion)) {
       throw new BoltError(
         messages.packageMustDependOnCurrentVersion(

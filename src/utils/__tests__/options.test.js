@@ -39,8 +39,8 @@ describe('options', () => {
   });
 
   test('toDependency', () => {
-    const name = 'packageName';
-    const version = '1.0.0';
+    let name = 'packageName';
+    let version = '1.0.0';
     expect(toDependency(name)).toEqual({ name });
     let nameWithVersion = `packageName@${version}`;
     expect(toDependency(nameWithVersion)).toEqual({ name, version });

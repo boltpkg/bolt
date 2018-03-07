@@ -10,25 +10,25 @@ const f = fixtures(__dirname);
 
 jest.mock('../utils/logger');
 
-const assertDependencies = (graph, pkg, dependencies) => {
-  const val = graph.get(pkg);
+function assertDependencies(graph, pkg, dependencies) {
+  let val = graph.get(pkg);
   expect(val && val.dependencies).toEqual(dependencies);
-};
+}
 
-const assertDependents = (graph, pkg, dependents) => {
-  const val = graph.get(pkg);
+function assertDependents(graph, pkg, dependents) {
+  let val = graph.get(pkg);
   expect(val && val.dependents).toEqual(dependents);
-};
+}
 
 // Asserts that a set of workspaces contains all (and only) the expected ones
-const assertWorkspaces = (workspaces, expectedNames) => {
+function assertWorkspaces(workspaces, expectedNames) {
   expect(workspaces.length).toEqual(expectedNames.length);
   expectedNames.forEach(expected => {
     expect(
       workspaces.some(workspace => workspace.pkg.config.getName() === expected)
     );
   });
-};
+}
 
 describe('Project', () => {
   let project;
@@ -181,28 +181,28 @@ describe('Project', () => {
     });
 
     it('should return all workspaces if no flags passed', async () => {
-      const filtered = await project.filterWorkspaces(workspaces, {});
+      let filtered = await project.filterWorkspaces(workspaces, {});
 
       expect(workspaces).toEqual(filtered);
     });
 
     describe('filtering by name', () => {
       it('should filter to names that match the `only` flag', async () => {
-        const filtered = await project.filterWorkspaces(workspaces, {
+        let filtered = await project.filterWorkspaces(workspaces, {
           only: 'foo'
         });
         assertWorkspaces(filtered, ['foo']);
       });
 
       it('should remove names that match the `ignore` flag', async () => {
-        const filtered = await project.filterWorkspaces(workspaces, {
+        let filtered = await project.filterWorkspaces(workspaces, {
           ignore: 'bar'
         });
         assertWorkspaces(filtered, ['foo', 'baz']);
       });
 
       it('should support combing only and ignore', async () => {
-        const filtered = await project.filterWorkspaces(workspaces, {
+        let filtered = await project.filterWorkspaces(workspaces, {
           only: '*ba*',
           ignore: 'bar'
         });
@@ -212,21 +212,21 @@ describe('Project', () => {
 
     describe('filtering by path', () => {
       it('should filter to names that match the `onlyFs` flag', async () => {
-        const filtered = await project.filterWorkspaces(workspaces, {
+        let filtered = await project.filterWorkspaces(workspaces, {
           onlyFs: 'packages/foo'
         });
         assertWorkspaces(filtered, ['foo']);
       });
 
       it('should not include names that match the `ignoreFs` flag', async () => {
-        const filtered = await project.filterWorkspaces(workspaces, {
+        let filtered = await project.filterWorkspaces(workspaces, {
           ignoreFs: 'packages/foo/**'
         });
         assertWorkspaces(filtered, ['foo', 'bar']);
       });
 
       it('should be able to combine onlyFs and ignoreFs', async () => {
-        const filtered = await project.filterWorkspaces(workspaces, {
+        let filtered = await project.filterWorkspaces(workspaces, {
           onlyFs: '**/packages/ba*',
           ignoreFs: 'packages/foo/packages/baz'
         });
@@ -235,7 +235,7 @@ describe('Project', () => {
     });
 
     it('should be able to combine name and path filters', async () => {
-      const filtered = await project.filterWorkspaces(workspaces, {
+      let filtered = await project.filterWorkspaces(workspaces, {
         only: 'ba*',
         ignoreFs: 'packages/foo/packages/baz'
       });

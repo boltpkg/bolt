@@ -18,8 +18,8 @@ const unsafeProcessses: any & typeof processes = processes;
 const unsafeYarn: any & typeof yarn = yarn;
 
 async function getDependencyVersion(workspaceDir: string, depName: string) {
-  const pkg = await Package.init(path.join(workspaceDir, 'package.json'));
-  const dirExists = await pathExists(
+  let pkg = await Package.init(path.join(workspaceDir, 'package.json'));
+  let dirExists = await pathExists(
     path.join(workspaceDir, 'node_modules', depName)
   );
 
@@ -27,7 +27,7 @@ async function getDependencyVersion(workspaceDir: string, depName: string) {
     return '1.0.0';
   }
 
-  const packageJson = await readPkg(
+  let packageJson = await readPkg(
     path.join(workspaceDir, 'node_modules', depName)
   );
 

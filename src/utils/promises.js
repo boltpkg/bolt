@@ -3,8 +3,8 @@
  * be able to clean up after yourself, but have many async operations happening at once
  *
  * try {
- *  const promises = [];
- *  const locksHeld = [];
+ *  let promises = [];
+ *  let locksHeld = [];
  *
  *  files.forEach(file => {
  *    promises.push(getLockForFile(f)

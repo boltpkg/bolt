@@ -7,7 +7,7 @@ jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt global remove', async () => {
-  const tag = await globalRemove(
+  let tag = await globalRemove(
     toGlobalRemoveOptions(['test-tag'], { cwd: dummyPath })
   );
   expect(yarn.globalCli).toHaveBeenCalledWith('remove', [{ name: 'test-tag' }]);

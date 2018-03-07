@@ -295,7 +295,7 @@ export function cannotInstallWorkspaceInProject(pkgName: string): Message {
 export function cannotUpgradeWorkspaceDependencyInProject(
   pkgName: string
 ): Message {
-  return `Cannot upgrade workspace "${pkgName}" as a dependency of a project. 
+  return `Cannot upgrade workspace "${pkgName}" as a dependency of a project.
   All the workspaces are symlinked, upgrading workspce dependency is invalid.`;
 }
 
@@ -317,11 +317,11 @@ export function unableToInstall(): Message {
 }
 
 export function cannotInitConfigMissingPkgJSON(filePath: string): Message {
-  const basePath = filePath.replace(/.package\.json$/, '');
+  let basePath = filePath.replace(/.package\.json$/, '');
   return `This folder does not contain a package.json:\n${basePath}
-  
+
   Sometimes this is caused by incomplete packages or switching branches.
-  
+
   Try removing the directory or fixing the package and run bolt again.`;
 }
 
@@ -341,7 +341,7 @@ export function errorWorkspaceUpgrade(): Message {
   return `${chalk.red.bold(
     '[bolt workspace upgrade]'
   )} Unable to upgrade dependencies for a single workspace.
-	
+
 	In order to upgrade a dependency [across all the workspaces] please run ${cmd(
     '"bolt upgrade [...args]"'
   )} or ${cmd('"bolt workspaces upgrade [...args]"')}`;

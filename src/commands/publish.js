@@ -24,12 +24,12 @@ export function toPublishOptions(
 }
 
 async function getUnpublishedPackages(packages) {
-  const semverGtCheckFailWithWarning = (
+  let semverGtCheckFailWithWarning = (
     pkgLocalVersion: string,
     pkgPublishedVersion: string,
     pkgName: string
   ): boolean => {
-    const shouldPublish = semver.gt(pkgLocalVersion, pkgPublishedVersion);
+    let shouldPublish = semver.gt(pkgLocalVersion, pkgPublishedVersion);
 
     // show a warning message if package is not published since pkgPublishedVersion > pkgLocalVersion
     if (!shouldPublish) {
@@ -45,7 +45,7 @@ async function getUnpublishedPackages(packages) {
     return shouldPublish;
   };
 
-  const results = await Promise.all(
+  let results = await Promise.all(
     packages.map(async pkg => {
       let config = pkg.config;
       let response = await npm.infoAllow404(config.getName());
@@ -73,10 +73,10 @@ async function getUnpublishedPackages(packages) {
 }
 
 export async function publish(opts: PublishOptions) {
-  const cwd = opts.cwd || process.cwd();
-  const project = await Project.init(cwd);
-  const workspaces = await project.getWorkspaces();
-  const packages = workspaces
+  let cwd = opts.cwd || process.cwd();
+  let project = await Project.init(cwd);
+  let workspaces = await project.getWorkspaces();
+  let packages = workspaces
     .map(workspace => workspace.pkg)
     .filter(pkg => !pkg.config.getPrivate());
   let publishedPackages = [];
@@ -84,22 +84,22 @@ export async function publish(opts: PublishOptions) {
   try {
     // TODO: Re-enable once locking issues are sorted out
     // await locks.lock(packages);
-    const unpublishedPackages = await getUnpublishedPackages(packages);
-    const isUnpublished = workspace =>
+    let unpublishedPackages = await getUnpublishedPackages(packages);
+    let isUnpublished = workspace =>
       unpublishedPackages.some(
         pkg => workspace.pkg.config.getName() === pkg.name
       );
-    const unpublishedWorkspaces = workspaces.filter(isUnpublished);
+    let unpublishedWorkspaces = workspaces.filter(isUnpublished);
     if (unpublishedPackages.length === 0) {
       logger.warn(messages.noUnpublishedPackagesToPublish());
     }
 
     await project.runWorkspaceTasks(unpublishedWorkspaces, async workspace => {
-      const name = workspace.pkg.config.getName();
-      const version = workspace.pkg.config.getVersion();
+      let name = workspace.pkg.config.getName();
+      let version = workspace.pkg.config.getVersion();
       logger.info(messages.publishingPackage(name, version));
 
-      const publishConfirmation = await npm.publish(name, {
+      let publishConfirmation = await npm.publish(name, {
         cwd: workspace.pkg.dir,
         access: opts.access
       });

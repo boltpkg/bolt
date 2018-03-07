@@ -21,8 +21,8 @@ async function getDepVersion(
   depName: string,
   depType: string = 'dependencies'
 ) {
-  const config = await Config.init(path.join(pathToPkg, 'package.json'));
-  const deps = config.getDeps(depType);
+  let config = await Config.init(path.join(pathToPkg, 'package.json'));
+  let deps = config.getDeps(depType);
   return deps ? deps[depName] : undefined;
 }
 

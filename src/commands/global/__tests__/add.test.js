@@ -7,7 +7,7 @@ jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt global add', async () => {
-  const tag = await globalAdd(
+  let tag = await globalAdd(
     toGlobalAddOptions(['test-tag'], { cwd: dummyPath })
   );
   expect(yarn.globalCli).toHaveBeenCalledWith('add', [{ name: 'test-tag' }]);

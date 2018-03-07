@@ -48,8 +48,8 @@ export async function install(opts: InstallOptions) {
     prefix: false
   });
 
-  const yarnUserAgent = await yarn.userAgent();
-  const boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
+  let yarnUserAgent = await yarn.userAgent();
+  let boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
 
   await processes.spawn('yarn', ['install', ...installFlags], {
     cwd: project.pkg.dir,
@@ -63,7 +63,7 @@ export async function install(opts: InstallOptions) {
   });
 
   for (let workspace of workspaces) {
-    const dependencies = workspace.pkg.getAllDependencies().keys();
+    let dependencies = workspace.pkg.getAllDependencies().keys();
     await symlinkPackageDependencies(project, workspace.pkg, dependencies);
   }
 

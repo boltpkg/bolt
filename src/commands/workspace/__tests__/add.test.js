@@ -22,12 +22,12 @@ async function depIsInstalled(
   depName: string,
   version?: string
 ) {
-  const pkg = await Package.init(path.join(workspaceDir, 'package.json'));
-  const dirExists = await pathExists(
+  let pkg = await Package.init(path.join(workspaceDir, 'package.json'));
+  let dirExists = await pathExists(
     path.join(workspaceDir, 'node_modules', depName)
   );
-  const depInPkgJson = pkg.getDependencyTypes(depName).length > 0;
-  const correctVersion =
+  let depInPkgJson = pkg.getDependencyTypes(depName).length > 0;
+  let correctVersion =
     !version || pkg.getDependencyVersionRange(depName) === version;
 
   return dirExists && depInPkgJson && correctVersion;

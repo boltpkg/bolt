@@ -4,7 +4,7 @@ import type { JSONValue } from '../types';
 export default async function addWorkspacesToJson(json: {
   [key: string]: JSONValue
 }) {
-  const workspaces = ['packages/*'];
+  let workspaces = ['packages/*'];
   json.bolt = {
     workspaces
   };

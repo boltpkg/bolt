@@ -406,9 +406,9 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
 }
 
 export default async function cli(argv: Array<string>, exit: boolean = false) {
-  const start = Date.now();
+  let start = Date.now();
 
-  const { pkg, input, flags } = meow({
+  let { pkg, input, flags } = meow({
     argv,
     help: messages.helpContent(),
     flags: {
@@ -440,8 +440,8 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
     }
   }
 
-  const timing = (Date.now() - start) / 1000;
-  const rounded = Math.round(timing * 100) / 100;
+  let timing = (Date.now() - start) / 1000;
+  let rounded = Math.round(timing * 100) / 100;
 
   logger.info(messages.doneInSeconds(rounded), {
     emoji: '🏁',

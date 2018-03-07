@@ -36,7 +36,7 @@ describe('bolt workspace run', () => {
         cwd: projectDir
       })
     );
-    const expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
+    let expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
       expectedRelativeYarnPath,
@@ -51,7 +51,7 @@ describe('bolt workspace run', () => {
         cwd: projectDir
       })
     );
-    const expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
+    let expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
 
     // Ensure the extra '--' gets passed in
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
@@ -67,7 +67,7 @@ describe('bolt workspace run', () => {
         cwd: barWorkspaceDir
       })
     );
-    const expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
+    let expectedRelativeYarnPath = relativeYarn(fooWorkspaceDir);
 
     expect(unsafeProcessses.spawn).toHaveBeenCalledWith(
       expectedRelativeYarnPath,

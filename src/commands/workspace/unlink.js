@@ -15,7 +15,7 @@ export function toWorkspaceUnlinkOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceUnlinkOptions {
-  const [workspaceName, ...packagesToUnlink] = args;
+  let [workspaceName, ...packagesToUnlink] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     workspaceName,

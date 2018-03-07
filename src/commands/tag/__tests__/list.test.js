@@ -7,7 +7,7 @@ jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt tag list', async () => {
-  const tag = await tagList(toTagListOptions(['react'], { cwd: dummyPath }));
+  let tag = await tagList(toTagListOptions(['react'], { cwd: dummyPath }));
   expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'tag', [
     'list',
     'react'

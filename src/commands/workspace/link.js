@@ -15,7 +15,7 @@ export function toWorkspacelinkOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceLinkOptions {
-  const [workspaceName, ...packagesToLink] = args;
+  let [workspaceName, ...packagesToLink] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     workspaceName,

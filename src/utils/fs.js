@@ -68,7 +68,7 @@ async function createPosixSymlink(origin, dest, type) {
     type = 'file';
   }
 
-  const src = path.relative(path.dirname(dest), origin);
+  let src = path.relative(path.dirname(dest), origin);
 
   return await createSymbolicLink(src, dest, type);
 }

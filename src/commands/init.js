@@ -35,11 +35,11 @@ export async function init(opts: InitOptions) {
     await yarn.cliCommand(cwd, 'init', spawnArgs);
 
     if (spawnArgs.indexOf('-y') === -1) {
-      const addWorkspace = await isWorkspaceNeeded();
+      let addWorkspace = await isWorkspaceNeeded();
 
       if (addWorkspace) {
-        const pkg = await Package.closest(cwd);
-        const config = pkg.config;
+        let pkg = await Package.closest(cwd);
+        let config = pkg.config;
         let json = await addWorkspacesToJson(config.json);
         config.write(json);
       }

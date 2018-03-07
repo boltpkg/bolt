@@ -20,7 +20,7 @@ export function toWorkspaceAddOptions(
   flags: options.Flags
 ): WorkspaceAddOptions {
   let [workspaceName, ...deps] = args;
-  const depsArgs = [];
+  let depsArgs = [];
   let type = 'dependencies';
 
   deps.forEach(dep => {

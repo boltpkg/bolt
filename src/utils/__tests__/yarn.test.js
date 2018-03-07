@@ -85,8 +85,8 @@ describe('utils/yarn', () => {
 
   describe('userAgent()', () => {
     it('should strip empty lines from the spawned yarn process stdout', async () => {
-      const expectedUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
-      const stdout = `
+      let expectedUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+      let stdout = `
 
 ${expectedUserAgent}
 `;

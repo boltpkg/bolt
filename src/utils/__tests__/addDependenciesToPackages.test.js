@@ -26,7 +26,7 @@ function fakeYarnAdd(pkg, dependencies, type = 'dependencies') {
 }
 
 function assertSingleYarnAddCall(expectedPkg, expectedDeps) {
-  const yarnAddCalls = unsafeYarn.add.mock.calls;
+  let yarnAddCalls = unsafeYarn.add.mock.calls;
 
   expect(yarnAddCalls.length).toEqual(1);
   expect(yarnAddCalls[0][0]).toEqual(expectedPkg);

@@ -28,7 +28,7 @@ describe('bolt publish', () => {
   });
 
   // test('should lock all workspaces', async () => {
-  //   const cwd = await getFixturePath(__dirname, 'simple-project');
+  //   let cwd = await getFixturePath(__dirname, 'simple-project');
   //   await publish({ cwd });
 
   //   expect(lockSpy).toHaveBeenCalledTimes(1);
@@ -37,7 +37,7 @@ describe('bolt publish', () => {
   // });
 
   // test('should unlock all workspaces', async () => {
-  //   const cwd = await getFixturePath(__dirname, 'simple-project');
+  //   let cwd = await getFixturePath(__dirname, 'simple-project');
   //   await publish({ cwd });
 
   //   expect(unlockSpy).toHaveBeenCalledTimes(1);

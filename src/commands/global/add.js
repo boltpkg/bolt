@@ -12,7 +12,7 @@ export function toGlobalAddOptions(
   args: options.Args,
   flags: options.Flags
 ): GlobalAddOptions {
-  const depsArgs = [];
+  let depsArgs = [];
 
   // args is each of our dependencies we are adding which may have "@version" parts to them
   args.forEach(dep => {

@@ -107,12 +107,12 @@ export default class Project {
   }
 
   async getDependentsGraph(workspaces: Array<Workspace>) {
-    const graph = new Map();
-    const { valid, graph: dependencyGraph } = await this.getDependencyGraph(
+    let graph = new Map();
+    let { valid, graph: dependencyGraph } = await this.getDependencyGraph(
       workspaces
     );
 
-    const dependentsLookup: {
+    let dependentsLookup: {
       [string]: { pkg: Package, dependents: Array<string> }
     } = {};
 
@@ -124,9 +124,9 @@ export default class Project {
     });
 
     workspaces.forEach(workspace => {
-      const dependent = workspace.pkg.config.getName();
-      const valFromDependencyGraph = dependencyGraph.get(dependent) || {};
-      const dependencies = valFromDependencyGraph.dependencies || [];
+      let dependent = workspace.pkg.config.getName();
+      let valFromDependencyGraph = dependencyGraph.get(dependent) || {};
+      let dependencies = valFromDependencyGraph.dependencies || [];
 
       dependencies.forEach(dependency => {
         dependentsLookup[dependency].dependents.push(dependent);

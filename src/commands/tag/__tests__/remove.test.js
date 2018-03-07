@@ -7,7 +7,7 @@ jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt tag remove', async () => {
-  const tag = await tagRemove(
+  let tag = await tagRemove(
     toTagRemoveOptions(['test-tag', 'stable'], { cwd: dummyPath })
   );
   expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'tag', [

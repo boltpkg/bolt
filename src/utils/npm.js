@@ -11,7 +11,7 @@ export function info(pkgName: string) {
   return npmRequestLimit(async () => {
     logger.info(messages.npmInfo(pkgName));
 
-    const result = await processes.spawn('npm', ['info', pkgName, '--json'], {
+    let result = await processes.spawn('npm', ['info', pkgName, '--json'], {
       silent: true
     });
 
@@ -21,10 +21,10 @@ export function info(pkgName: string) {
 
 export async function infoAllow404(pkgName: string) {
   try {
-    const pkgInfo = await info(pkgName);
+    let pkgInfo = await info(pkgName);
     return { published: true, pkgInfo };
   } catch (error) {
-    const output = JSON.parse(error.stdout);
+    let output = JSON.parse(error.stdout);
     if (output.error && output.error.code === 'E404') {
       logger.warn(messages.npmInfo404(pkgName));
       return { published: false, pkgInfo: {} };
@@ -39,7 +39,7 @@ export function publish(
 ) {
   return npmRequestLimit(async () => {
     logger.info(messages.npmPublish(pkgName));
-    const publishFlags = opts.access ? ['--access', opts.access] : [];
+    let publishFlags = opts.access ? ['--access', opts.access] : [];
 
     try {
       await processes.spawn('npm', ['publish', ...publishFlags], {

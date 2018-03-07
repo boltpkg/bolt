@@ -12,7 +12,7 @@ export function toGlobalRemoveOptions(
   args: options.Args,
   flags: options.Flags
 ): GlobalRemoveOptions {
-  const depsArgs = [];
+  let depsArgs = [];
 
   // args is each of our dependencies we are adding which may have "@version" parts to them
   args.forEach(dep => {

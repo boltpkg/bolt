@@ -7,7 +7,7 @@ jest.mock('inquirer');
 describe('Prompts', () => {
   test('isWorkspaceNeeded', async () => {
     inquirer.prompt.mockReturnValueOnce({ workspaces: true });
-    const workspaceNeeded = await prompts.isWorkspaceNeeded();
+    let workspaceNeeded = await prompts.isWorkspaceNeeded();
     expect(workspaceNeeded).toBe(true);
   });
 });
