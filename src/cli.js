@@ -8,11 +8,13 @@ import { BoltError } from './utils/errors';
 import cleanStack from 'clean-stack';
 import * as commands from './commands';
 import * as options from './utils/options';
+import * as flagHelpers from './utils/flagHelper';
 
 const commandMap = {
   ADD: { add: true },
   AUTOCLEAN: { autoclean: true },
   BIN: { bin: true },
+  BUILD: { build: true },
   CACHE: { cache: true },
   CACHE_CLEAN: { clean: true },
   CACHE_DIR: { dir: true },
@@ -100,6 +102,15 @@ const commandMap = {
 };
 
 function runCommandFromCli(args: options.Args, flags: options.Flags) {
+  const {
+    additionalArgs,
+    scriptFlags,
+    updatedFlags
+  } = flagHelpers.getArgsBooleanFlagsScriptFlags(flags);
+
+  args = args.concat(additionalArgs);
+  flags = updatedFlags;
+
   let [command, ...commandArgs] = args;
   let [subCommand, ...subCommandArgs] = commandArgs;
 
@@ -109,6 +120,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
     return commands.autoclean(commands.toAutocleanOptions(commandArgs, flags));
   } else if (commandMap.BIN[command]) {
     return commands.bin(commands.toBinOptions(commandArgs, flags));
+  } else if (commandMap.BUILD[command]) {
+    return commands.build(
+      commands.toBuildOptions(commandArgs, flags, scriptFlags)
+    );
   } else if (commandMap.CACHE[command]) {
     if (commandMap.CACHE_CLEAN[subCommand]) {
       return commands.cacheClean(
@@ -127,7 +142,9 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
       );
     }
   } else if (commandMap.CHECK[command]) {
-    return commands.check(commands.toCheckOptions(commandArgs, flags));
+    return commands.check(
+      commands.toCheckOptions(commandArgs, flags, scriptFlags)
+    );
   } else if (commandMap.CONFIG[command]) {
     if (commandMap.CONFIG_DELETE[subCommand]) {
       return commands.configDelete(
@@ -156,11 +173,13 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
   } else if (commandMap.CREATE[command]) {
     return commands.create(commands.toCreateOptions(commandArgs, flags));
   } else if (commandMap.DOC[command]) {
-    return commands.doc(commands.toDocOptions(commandArgs, flags));
+    return commands.doc(commands.toDocOptions(commandArgs, flags, scriptFlags));
   } else if (commandMap.EXEC[command]) {
     return commands.exec(commands.toExecOptions(commandArgs, flags));
   } else if (commandMap.FORMAT[command]) {
-    return commands.format(commands.toFormatOptions(commandArgs, flags));
+    return commands.format(
+      commands.toFormatOptions(commandArgs, flags, scriptFlags)
+    );
   } else if (commandMap.GENERATE[command]) {
     return commands.generate(commands.toGenerateOptions(commandArgs, flags));
   } else if (commandMap.GLOBAL[command]) {
@@ -197,7 +216,9 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
   } else if (commandMap.INIT[command]) {
     return commands.init(commands.toInitOptions(commandArgs, flags));
   } else if (commandMap.INSTALL[command] || typeof command === 'undefined') {
-    return commands.install(commands.toInstallOptions(commandArgs, flags));
+    return commands.install(
+      commands.toInstallOptions(commandArgs, flags, scriptFlags)
+    );
   } else if (commandMap.LICENSES[command]) {
     if (commandMap.LICENSES_GENERATE_DISCLAIMER[subCommand]) {
       return commands.licensesGenerateDisclaimer(
@@ -214,7 +235,9 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
   } else if (commandMap.LINK[command]) {
     return commands.link(commands.toLinkOptions(commandArgs, flags));
   } else if (commandMap.LINT[command]) {
-    return commands.lint(commands.toLintOptions(commandArgs, flags));
+    return commands.lint(
+      commands.toLintOptions(commandArgs, flags, scriptFlags)
+    );
   } else if (commandMap.LIST[command]) {
     return commands.list(commands.toListOptions(commandArgs, flags));
   } else if (commandMap.LOGIN[command]) {
@@ -283,7 +306,7 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
   } else if (commandMap.REMOVE[command]) {
     return commands.remove(commands.toRemoveOptions(commandArgs, flags));
   } else if (commandMap.RUN[command]) {
-    return commands.run(commands.toRunOptions(commandArgs, flags));
+    return commands.run(commands.toRunOptions(commandArgs, flags, scriptFlags));
   } else if (commandMap.TAG[command]) {
     if (commandMap.TAG_ADD[subCommand]) {
       return commands.tagAdd(commands.toTagAddOptions(subCommandArgs, flags));
@@ -321,7 +344,9 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
       );
     }
   } else if (commandMap.TEST[command]) {
-    return commands.test(commands.toTestOptions(commandArgs, flags));
+    return commands.test(
+      commands.toTestOptions(commandArgs, flags, scriptFlags)
+    );
   } else if (commandMap.UNLINK[command]) {
     return commands.unlink(commands.toUnlinkOptions(commandArgs, flags));
   } else if (commandMap.UPGRADE[command]) {
@@ -399,7 +424,7 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
       );
     }
   } else {
-    return commands.run(commands.toRunOptions(args, flags));
+    return commands.run(commands.toRunOptions(args, flags, scriptFlags));
   }
 
   throw new BoltError(`You must specify a valid command`);
