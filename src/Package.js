@@ -114,7 +114,7 @@ export default class Package {
     });
   }
 
-  getDependencyTypes(depName: string) {
+  getDependencyTypes(depName: string): Array<string> {
     let matchedTypes = [];
     for (let depType of DEPENDENCY_TYPES) {
       let deps = this.config.getDeps(depType);

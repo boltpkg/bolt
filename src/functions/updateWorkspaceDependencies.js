@@ -33,13 +33,15 @@ export default async function updateWorkspaceDependencies(
     let name = workspace.pkg.config.getName();
     for (let depName in dependencyToUpgrade) {
       if (pkgDependencies.has(depName)) {
-        let depType = pkg.getDependencyTypes(depName);
+        let depTypes = pkg.getDependencyTypes(depName);
         editedPackages.add(name);
-        await pkg.setDependencyVersionRange(
-          depName,
-          depType,
-          dependencyToUpgrade[depName]
-        );
+        for (let depType of depTypes) {
+          await pkg.setDependencyVersionRange(
+            depName,
+            depType,
+            dependencyToUpgrade[depName]
+          );
+        }
       }
     }
   }
