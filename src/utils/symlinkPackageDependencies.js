@@ -4,8 +4,7 @@ import pathIsInside from 'path-is-inside';
 import includes from 'array-includes';
 
 import Project from '../Project';
-import type Workspace from '../Workspace';
-import type Package from '../Package';
+import Package from '../Package';
 import { BoltError } from './errors';
 import * as fs from './fs';
 import * as logger from './logger';
@@ -19,11 +18,11 @@ export default async function symlinkPackageDependencies(
 ) {
   let projectDeps = project.pkg.getAllDependencies();
   let pkgDependencies = project.pkg.getAllDependencies();
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
   let {
     graph: dependencyGraph,
     valid: dependencyGraphValid
-  } = await project.getDependencyGraph(workspaces);
+  } = await project.getDependencyGraph(packages);
   let pkgName = pkg.config.getName();
   // get all the dependencies that are internal workspaces in this project
   let internalDeps = (dependencyGraph.get(pkgName) || {}).dependencies || [];

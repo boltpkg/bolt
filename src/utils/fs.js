@@ -141,3 +141,21 @@ export async function readlink(filePath: string) {
 
   return result;
 }
+
+export async function dirExists(dir: string) {
+  try {
+    let _stat = await stat(dir);
+    return _stat.isDirectory();
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function symlinkExists(filePath: string) {
+  try {
+    let stat = await lstat(filePath);
+    return stat.isSymbolicLink();
+  } catch (err) {
+    return false;
+  }
+}

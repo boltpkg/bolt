@@ -23,7 +23,7 @@ export function toRemoveOptions(
 export async function remove(opts: RemoveOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
   let pkg = await Package.closest(cwd);
-  await removeDependenciesFromPackages(project, workspaces, [pkg], opts.deps);
+  await removeDependenciesFromPackages(project, packages, [pkg], opts.deps);
 }

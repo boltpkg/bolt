@@ -20,29 +20,29 @@ async function updateConfig(config, props) {
 }
 
 describe('changes', () => {
-  test('changes.getWorkspaceVersionCommits()', async () => {
+  test('changes.getPackageVersionCommits()', async () => {
     let cwd = f.copy('simple-repo');
     await git.initRepository({ cwd });
 
     let project = await Project.init(cwd);
-    let workspaces = await project.getWorkspaces();
+    let packages = await project.getPackages();
     let repo = await Repository.init(cwd);
 
     await git.addAll({ cwd });
     await git.commit('init', { cwd });
 
-    let fooWorkspace = workspaces[1];
-    let barWorkspace = workspaces[0];
-    let fooConfig = fooWorkspace.pkg.config;
-    let barConfig = barWorkspace.pkg.config;
+    let fooPkg = packages[1];
+    let barPkg = packages[0];
+    let fooConfig = fooPkg.config;
+    let barConfig = barPkg.config;
 
-    let versionCommits1 = await changes.getWorkspaceVersionCommits(
+    let versionCommits1 = await changes.getPackageVersionCommits(
       repo,
-      workspaces
+      packages
     );
 
-    expect(versionCommits1.get(fooWorkspace)).toBe(null);
-    expect(versionCommits1.get(barWorkspace)).toBe(null);
+    expect(versionCommits1.get(fooPkg)).toBe(null);
+    expect(versionCommits1.get(barPkg)).toBe(null);
 
     await updateConfig(fooConfig, { version: '2.0.0' });
     await git.addAll({ cwd });
@@ -60,17 +60,12 @@ describe('changes', () => {
     await git.addAll({ cwd });
     await git.commit('bar2b', { cwd });
 
-    let versionCommits2 = await changes.getWorkspaceVersionCommits(
+    let versionCommits2 = await changes.getPackageVersionCommits(
       repo,
-      workspaces
+      packages
     );
 
-    expect(versionCommits2.get(fooWorkspace)).toEqual(
-      expectCommitMessage('foo2')
-    );
-
-    expect(versionCommits2.get(barWorkspace)).toEqual(
-      expectCommitMessage('bar2')
-    );
+    expect(versionCommits2.get(fooPkg)).toEqual(expectCommitMessage('foo2'));
+    expect(versionCommits2.get(barPkg)).toEqual(expectCommitMessage('bar2'));
   });
 });

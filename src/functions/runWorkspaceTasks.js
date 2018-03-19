@@ -19,12 +19,12 @@ export default async function runWorkspaceTasks(
 ): Promise<void> {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
 
-  await project.runWorkspaceTasks(workspaces, workspace => {
+  await project.runPackageTasks(packages, pkg => {
     return task({
-      dir: workspace.pkg.dir,
-      config: workspace.pkg.config.json
+      dir: pkg.dir,
+      config: pkg.config.json
     });
   });
 }

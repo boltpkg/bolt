@@ -7,6 +7,7 @@ import * as messages from '../utils/messages';
 import * as locks from '../utils/locks';
 import * as npm from '../utils/npm';
 import Project from '../Project';
+import Package from '../Package';
 
 export type PublishOptions = {|
   cwd?: string,
@@ -75,32 +76,29 @@ async function getUnpublishedPackages(packages) {
 export async function publish(opts: PublishOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let packages = workspaces
-    .map(workspace => workspace.pkg)
-    .filter(pkg => !pkg.config.getPrivate());
+  let packages = await project.getPackages();
+  let publicPackages = packages.filter(pkg => !pkg.config.getPrivate());
   let publishedPackages = [];
 
   try {
     // TODO: Re-enable once locking issues are sorted out
     // await locks.lock(packages);
-    let unpublishedPackages = await getUnpublishedPackages(packages);
-    let isUnpublished = workspace =>
-      unpublishedPackages.some(
-        pkg => workspace.pkg.config.getName() === pkg.name
-      );
-    let unpublishedWorkspaces = workspaces.filter(isUnpublished);
-    if (unpublishedPackages.length === 0) {
+    let unpublishedPackagesInfo = await getUnpublishedPackages(packages);
+    let unpublishedPackages = packages.filter(pkg => {
+      return unpublishedPackagesInfo.some(p => pkg.getName() === p.name);
+    });
+
+    if (unpublishedPackagesInfo.length === 0) {
       logger.warn(messages.noUnpublishedPackagesToPublish());
     }
 
-    await project.runWorkspaceTasks(unpublishedWorkspaces, async workspace => {
-      let name = workspace.pkg.config.getName();
-      let version = workspace.pkg.config.getVersion();
+    await project.runPackageTasks(unpublishedPackages, async pkg => {
+      let name = pkg.config.getName();
+      let version = pkg.config.getVersion();
       logger.info(messages.publishingPackage(name, version));
 
       let publishConfirmation = await npm.publish(name, {
-        cwd: workspace.pkg.dir,
+        cwd: pkg.dir,
         access: opts.access
       });
 

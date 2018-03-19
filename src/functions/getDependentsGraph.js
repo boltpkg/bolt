@@ -13,12 +13,12 @@ export default async function getDependentsGraph(
 ): Promise<DependentsGraph> {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
 
   let {
     graph: dependentsGraph,
     valid: graphIsValid
-  } = await project.getDependentsGraph(workspaces);
+  } = await project.getDependentsGraph(packages);
 
   if (!graphIsValid) {
     throw new Error('Dependents graph is not valid');

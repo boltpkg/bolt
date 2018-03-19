@@ -13,149 +13,98 @@ jest.mock('../yarn');
 const unsafeFs: any & typeof fs = fs;
 const unsafeYarn: any & typeof yarn = yarn;
 
-async function dirExists(dir: string) {
-  try {
-    let stat = await fs.stat(dir);
-    return stat.isDirectory();
-  } catch (err) {
-    return false;
-  }
+async function initProject(fixture) {
+  return await Project.init(f.copy(fixture));
 }
 
-async function symlinkExists(dir: string, symlink: string) {
-  try {
-    let stat = await fs.lstat(path.join(dir, symlink));
-    return stat.isSymbolicLink();
-  } catch (err) {
-    return false;
-  }
+async function getPackage(project, pkgName) {
+  let packages = await project.getPackages();
+  let pkg = project.getPackageByName(packages, pkgName);
+  if (!pkg) throw new Error(`Missing package ${pkgName}`);
+  return pkg;
 }
+
+const FIXTURE_NAME = 'nested-workspaces-with-root-dependencies-installed';
 
 describe('utils/symlinkPackageDependencies()', () => {
-  let project;
-  let workspaces;
-  let pkgToSymlink;
-  let nodeModules;
-  let nodeModulesBin;
-
-  beforeEach(async () => {
-    let tempDir = f.copy('nested-workspaces-with-root-dependencies-installed');
-    project = await Project.init(tempDir);
-    workspaces = await project.getWorkspaces();
+  test('creates node_modules and node_modules/.bin', async () => {
+    let project = await initProject(FIXTURE_NAME);
+    let pkg = await getPackage(project, 'foo');
+    expect(await fs.dirExists(pkg.nodeModules)).toBe(false);
+    expect(await fs.dirExists(pkg.nodeModulesBin)).toBe(false);
+    await symlinkPackageDependencies(project, pkg, ['bar']);
+    expect(await fs.dirExists(pkg.nodeModules)).toBe(true);
+    expect(await fs.dirExists(pkg.nodeModulesBin)).toBe(true);
   });
 
-  /********************
-   * Linking packages *
-  ********************/
-
-  describe('linking packages', () => {
-    beforeEach(() => {
-      // We use the foo package as it has internal and external dependencies
-      let workspaceToSymlink =
-        project.getWorkspaceByName(workspaces, 'foo') || {};
-      pkgToSymlink = workspaceToSymlink.pkg;
-      nodeModules = pkgToSymlink.nodeModules;
-      nodeModulesBin = pkgToSymlink.nodeModulesBin;
-    });
-
-    it('should create node modules and node_modules/.bin if not existing', async () => {
-      expect(await dirExists(pkgToSymlink.nodeModules)).toEqual(false);
-      expect(await dirExists(pkgToSymlink.nodeModulesBin)).toEqual(false);
-
-      await symlinkPackageDependencies(project, pkgToSymlink, ['bar']);
-
-      expect(await dirExists(pkgToSymlink.nodeModules)).toEqual(true);
-      expect(await dirExists(pkgToSymlink.nodeModulesBin)).toEqual(true);
-    });
-
-    it('should symlink external dependencies (only ones passed in)', async () => {
-      expect(await dirExists(path.join(nodeModules, 'external-dep'))).toEqual(
-        false
-      );
-
-      await symlinkPackageDependencies(project, pkgToSymlink, ['external-dep']);
-
-      expect(await dirExists(path.join(nodeModules, 'external-dep'))).toEqual(
-        true
-      );
-    });
-
-    it('should symlink internal dependencies', async () => {
-      expect(await dirExists(path.join(nodeModules, 'bar'))).toEqual(false);
-
-      await symlinkPackageDependencies(project, pkgToSymlink, ['bar']);
-
-      expect(await dirExists(path.join(nodeModules, 'bar'))).toEqual(true);
-      expect(await symlinkExists(nodeModules, 'bar')).toEqual(true);
-    });
-
-    it('should run correct lifecycle scripts', async () => {
-      await symlinkPackageDependencies(project, pkgToSymlink, ['bar']);
-
-      expect(yarn.runIfExists).toHaveBeenCalledTimes(4);
-      let yarnCalls = unsafeYarn.runIfExists.mock.calls;
-      expect(yarnCalls[0][1]).toEqual('preinstall');
-      expect(yarnCalls[1][1]).toEqual('postinstall');
-      expect(yarnCalls[2][1]).toEqual('prepublish');
-      expect(yarnCalls[3][1]).toEqual('prepare');
-    });
+  test('symlinks external dependencies', async () => {
+    let project = await initProject(FIXTURE_NAME);
+    let pkg = await getPackage(project, 'foo');
+    let depPath = path.join(pkg.nodeModules, 'external-dep');
+    expect(await fs.dirExists(depPath)).toBe(false);
+    await symlinkPackageDependencies(project, pkg, ['external-dep']);
+    expect(await fs.dirExists(depPath)).toBe(true);
   });
 
-  describe('linking binaries', () => {
-    beforeEach(() => {
-      // We use the zee package as it has internal and external dependencies that have various
-      // kinds of bin set ups
-      let workspaceToSymlink =
-        project.getWorkspaceByName(workspaces, 'zee') || {};
-      pkgToSymlink = workspaceToSymlink.pkg;
-      nodeModules = pkgToSymlink.nodeModules;
-      nodeModulesBin = pkgToSymlink.nodeModulesBin;
-    });
-
-    it('should symlink external dependencies bin files (when declared using strings)', async () => {
-      expect(
-        await symlinkExists(nodeModulesBin, 'external-dep-with-bins')
-      ).toEqual(false);
-
-      await symlinkPackageDependencies(project, pkgToSymlink, [
-        'external-dep-with-bin'
-      ]);
-
-      expect(
-        await symlinkExists(nodeModulesBin, 'external-dep-with-bin')
-      ).toEqual(true);
-    });
-
-    it('should symlink external dependencies bin files (when declared using object)', async () => {
-      expect(
-        await symlinkExists(nodeModulesBin, 'external-dep-two-bins-1')
-      ).toEqual(false);
-
-      await symlinkPackageDependencies(project, pkgToSymlink, [
-        'external-dep-with-two-bins'
-      ]);
-
-      expect(
-        await symlinkExists(nodeModulesBin, 'external-dep-two-bins-1')
-      ).toEqual(true);
-    });
+  test('symlinks internal dependencies', async () => {
+    let project = await initProject(FIXTURE_NAME);
+    let pkg = await getPackage(project, 'foo');
+    let depPath = path.join(pkg.nodeModules, 'bar');
+    expect(await fs.dirExists(depPath)).toEqual(false);
+    await symlinkPackageDependencies(project, pkg, ['bar']);
+    expect(await fs.dirExists(depPath)).toEqual(true);
+    expect(await fs.symlinkExists(depPath)).toEqual(true);
   });
 
-  it('should symlink internal dependencies bin files (when declared using string)', async () => {
-    expect(await symlinkExists(nodeModulesBin, 'bar')).toEqual(false);
-
-    await symlinkPackageDependencies(project, pkgToSymlink, ['bar']);
-
-    expect(await symlinkExists(nodeModulesBin, 'bar')).toEqual(true);
+  test('runs correct lifecycle scripts', async () => {
+    let project = await initProject(FIXTURE_NAME);
+    let pkg = await getPackage(project, 'foo');
+    await symlinkPackageDependencies(project, pkg, ['bar']);
+    expect(yarn.runIfExists).toHaveBeenCalledTimes(4);
+    expect(unsafeYarn.runIfExists.mock.calls[0][1]).toEqual('preinstall');
+    expect(unsafeYarn.runIfExists.mock.calls[1][1]).toEqual('postinstall');
+    expect(unsafeYarn.runIfExists.mock.calls[2][1]).toEqual('prepublish');
+    expect(unsafeYarn.runIfExists.mock.calls[3][1]).toEqual('prepare');
   });
 
-  it('should symlink internal dependencies bin files (when declared using object)', async () => {
-    expect(await symlinkExists(nodeModulesBin, 'baz-1')).toEqual(false);
-    expect(await symlinkExists(nodeModulesBin, 'baz-2')).toEqual(false);
+  test('symlinks external deps bins (string)', async () => {
+    let project = await initProject(FIXTURE_NAME);
+    let pkg = await getPackage(project, 'zee');
+    let symPath = path.join(pkg.nodeModulesBin, 'external-dep-with-bin');
+    expect(await fs.symlinkExists(symPath)).toEqual(false);
+    await symlinkPackageDependencies(project, pkg, ['external-dep-with-bin']);
+    expect(await fs.symlinkExists(symPath)).toEqual(true);
+  });
 
-    await symlinkPackageDependencies(project, pkgToSymlink, ['baz']);
+  test('symlinks external deps bins (object)', async () => {
+    let project = await initProject(FIXTURE_NAME);
+    let pkg = await getPackage(project, 'zee');
+    let symPath = path.join(pkg.nodeModulesBin, 'external-dep-two-bins-1');
+    expect(await fs.symlinkExists(symPath)).toEqual(false);
+    await symlinkPackageDependencies(project, pkg, [
+      'external-dep-with-two-bins'
+    ]);
+    expect(await fs.symlinkExists(symPath)).toEqual(true);
+  });
 
-    expect(await symlinkExists(nodeModulesBin, 'baz-1')).toEqual(true);
-    expect(await symlinkExists(nodeModulesBin, 'baz-2')).toEqual(true);
+  test('symlinks internal deps bins (string)', async () => {
+    let project = await initProject(FIXTURE_NAME);
+    let pkg = await getPackage(project, 'zee');
+    let symPath = path.join(pkg.nodeModulesBin, 'bar');
+    expect(await fs.symlinkExists(symPath)).toEqual(false);
+    await symlinkPackageDependencies(project, pkg, ['bar']);
+    expect(await fs.symlinkExists(symPath)).toEqual(true);
+  });
+
+  test('symlinks internal deps bins (when declared using object)', async () => {
+    let project = await initProject(FIXTURE_NAME);
+    let pkg = await getPackage(project, 'zee');
+    let baz1Path = path.join(pkg.nodeModulesBin, 'baz-1');
+    let baz2Path = path.join(pkg.nodeModulesBin, 'baz-2');
+    expect(await fs.symlinkExists(baz1Path)).toEqual(false);
+    expect(await fs.symlinkExists(baz2Path)).toEqual(false);
+    await symlinkPackageDependencies(project, pkg, ['baz']);
+    expect(await fs.symlinkExists(baz1Path)).toEqual(true);
+    expect(await fs.symlinkExists(baz2Path)).toEqual(true);
   });
 });

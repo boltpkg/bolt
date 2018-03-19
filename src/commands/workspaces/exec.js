@@ -27,13 +27,10 @@ export function toWorkspacesExecOptions(
 export async function workspacesExec(opts: WorkspacesExecOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let filteredWorkspaces = project.filterWorkspaces(
-    workspaces,
-    opts.filterOpts
-  );
+  let packages = await project.getPackages();
+  let filteredPackages = project.filterPackages(packages, opts.filterOpts);
 
-  await project.runWorkspaceTasks(filteredWorkspaces, async workspace => {
-    await execCommand(project, workspace.pkg, opts.command, opts.commandArgs);
+  await project.runPackageTasks(filteredPackages, async pkg => {
+    await execCommand(project, pkg, opts.command, opts.commandArgs);
   });
 }

@@ -2,18 +2,17 @@
 import semver from 'semver';
 import Project from '../Project';
 import Config from '../Config';
-import type Workspace from '../Workspace';
-import type Package from '../Package';
+import Package from '../Package';
 import * as messages from './messages';
 import { BoltError } from './errors';
 import * as logger from './logger';
 import { BOLT_VERSION } from '../constants';
 
 export default async function validateProject(project: Project) {
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
   let projectDependencies = project.pkg.getAllDependencies();
   let projectConfig = project.pkg.config;
-  let { graph: depGraph } = await project.getDependencyGraph(workspaces);
+  let { graph: depGraph } = await project.getDependencyGraph(packages);
 
   let projectIsValid = true;
 
@@ -29,8 +28,8 @@ export default async function validateProject(project: Project) {
   }
 
   // Workspaces should never appear as dependencies in the Project config
-  for (let workspace of workspaces) {
-    let depName = workspace.pkg.config.getName();
+  for (let pkg of packages) {
+    let depName = pkg.getName();
     if (projectDependencies.has(depName)) {
       logger.error(messages.projectCannotDependOnWorkspace(depName));
       projectIsValid = false;

@@ -6,14 +6,14 @@ import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as messages from '../utils/messages';
 
-function getWorkspaceMap(workspaces) {
-  let workspaceMap = new Map();
+function getPackageMap(packages) {
+  let packageMap = new Map();
 
-  for (let workspace of workspaces) {
-    workspaceMap.set(workspace.pkg.config.getName(), workspace);
+  for (let pkg of packages) {
+    packageMap.set(pkg.getName(), pkg);
   }
 
-  return workspaceMap;
+  return packageMap;
 }
 
 export type UnlinkOptions = {
@@ -35,14 +35,14 @@ export async function unlink(opts: UnlinkOptions) {
   let cwd = opts.cwd || process.cwd();
   let packagesToUnlink = opts.packagesToUnlink;
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let workspaceMap = getWorkspaceMap(workspaces);
+  let packages = await project.getPackages();
+  let packageMap = getPackageMap(packages);
 
   // guard to check if there are packages to unlink
   if (packagesToUnlink && packagesToUnlink.length) {
     await Promise.all(
       packagesToUnlink.map(async packageToUnlink => {
-        if (workspaceMap.has(packageToUnlink)) {
+        if (packageMap.has(packageToUnlink)) {
           logger.warn(messages.unlinkInternalPackage(packageToUnlink));
         } else {
           await yarn.cliCommand(cwd, 'unlink', [packageToUnlink]);

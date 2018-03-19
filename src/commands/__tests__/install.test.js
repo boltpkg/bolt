@@ -5,7 +5,7 @@ import * as yarn from '../../utils/yarn';
 import * as path from 'path';
 import * as fs from '../../utils/fs';
 import Project from '../../Project';
-import Workspace from '../../Workspace';
+import Package from '../../Package';
 import fixtures from 'fixturez';
 import * as constants from '../../constants';
 
@@ -21,18 +21,18 @@ const unsafeYarn: any & typeof yarn = yarn;
 const unsafeConstants: any & typeof constants = constants;
 const unsafeProcess: any & typeof process = process;
 
-async function assertNodeModulesExists(workspace: Workspace) {
-  let nodeModulesStat = await fs.stat(workspace.pkg.nodeModules);
-  let nodeModulesBinStat = await fs.stat(workspace.pkg.nodeModulesBin);
+async function assertNodeModulesExists(pkg: Package) {
+  let nodeModulesStat = await fs.stat(pkg.nodeModules);
+  let nodeModulesBinStat = await fs.stat(pkg.nodeModulesBin);
   expect(nodeModulesStat.isDirectory()).toEqual(true);
   expect(nodeModulesBinStat.isDirectory()).toEqual(true);
 }
 
-async function assertDependenciesSymlinked(workspace: Workspace) {
-  let deps = workspace.pkg.getAllDependencies();
+async function assertDependenciesSymlinked(pkg: Package) {
+  let deps = pkg.getAllDependencies();
 
   for (let dep of deps.keys()) {
-    let depStat = await fs.lstat(path.join(workspace.pkg.nodeModules, dep));
+    let depStat = await fs.lstat(path.join(pkg.nodeModules, dep));
     expect(depStat.isSymbolicLink()).toBe(true);
   }
 }
@@ -89,13 +89,13 @@ describe('install', () => {
   test('should work in project with scoped packages', async () => {
     let cwd = f.find('nested-workspaces-with-scoped-package-names');
     let project = await Project.init(cwd);
-    let workspaces = await project.getWorkspaces();
+    let packages = await project.getPackages();
 
     await install(toInstallOptions([], { cwd }));
 
-    for (let workspace of workspaces) {
-      assertNodeModulesExists(workspace);
-      assertDependenciesSymlinked(workspace);
+    for (let pkg of packages) {
+      assertNodeModulesExists(pkg);
+      assertDependenciesSymlinked(pkg);
     }
   });
 
@@ -122,15 +122,15 @@ describe('install', () => {
   test('should run preinstall, postinstall and prepublish in each ws', async () => {
     let cwd = f.find('simple-project');
     let project = await Project.init(cwd);
-    let workspaces = await project.getWorkspaces();
+    let packages = await project.getPackages();
 
     await install(toInstallOptions([], { cwd }));
 
-    for (let workspace of workspaces) {
+    for (let pkg of packages) {
       let runFn = unsafeYarn.runIfExists;
-      expect(runFn).toHaveBeenCalledWith(workspace.pkg, 'preinstall');
-      expect(runFn).toHaveBeenCalledWith(workspace.pkg, 'postinstall');
-      expect(runFn).toHaveBeenCalledWith(workspace.pkg, 'prepublish');
+      expect(runFn).toHaveBeenCalledWith(pkg, 'preinstall');
+      expect(runFn).toHaveBeenCalledWith(pkg, 'postinstall');
+      expect(runFn).toHaveBeenCalledWith(pkg, 'prepublish');
     }
   });
 
@@ -138,13 +138,13 @@ describe('install', () => {
   test('should install (symlink) all deps in workspaces', async () => {
     let cwd = f.copy('nested-workspaces-with-root-dependencies-installed');
     let project = await Project.init(cwd);
-    let workspaces = await project.getWorkspaces();
+    let packages = await project.getPackages();
 
     await install(toInstallOptions([], { cwd }));
 
-    for (let workspace of workspaces) {
-      assertNodeModulesExists(workspace);
-      assertDependenciesSymlinked(workspace);
+    for (let pkg of packages) {
+      assertNodeModulesExists(pkg);
+      assertDependenciesSymlinked(pkg);
       // TODO: assertBinfileSymlinked (currently tested partially in symlinkPackageDependencies)
     }
   });

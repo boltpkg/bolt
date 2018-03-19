@@ -6,7 +6,7 @@ import execCommand from '../../utils/execCommand';
 
 export type WorkspaceExecOptions = {
   cwd?: string,
-  workspaceName: string,
+  pkgName: string,
   command: string,
   commandArgs: options.Args
 };
@@ -15,11 +15,11 @@ export function toWorkspaceExecOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceExecOptions {
-  let [workspaceName] = args;
+  let [pkgName] = args;
   let [command, ...commandArgs] = flags['--'] || [];
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    workspaceName,
+    pkgName,
     command,
     commandArgs
   };
@@ -28,17 +28,14 @@ export function toWorkspaceExecOptions(
 export async function workspaceExec(opts: WorkspaceExecOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let workspace = await project.getWorkspaceByName(
-    workspaces,
-    opts.workspaceName
-  );
+  let packages = await project.getPackages();
+  let pkg = await project.getPackageByName(packages, opts.pkgName);
 
-  if (!workspace) {
+  if (!pkg) {
     throw new BoltError(
-      `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
+      `Could not find a workspace named "${opts.pkgName}" from "${cwd}"`
     );
   }
 
-  await execCommand(project, workspace.pkg, opts.command, opts.commandArgs);
+  await execCommand(project, pkg, opts.command, opts.commandArgs);
 }
