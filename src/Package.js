@@ -150,4 +150,8 @@ export default class Package {
   isSamePackage(pkg: Package) {
     return pkg.dir === this.dir;
   }
+
+  getName() {
+    return this.config.getName();
+  }
 }

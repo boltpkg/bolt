@@ -1,7 +1,6 @@
 // @flow
 import chalk from 'chalk';
-import type Workspace from '../Workspace';
-import type Package from '../Package';
+import Package from '../Package';
 
 /*::
 export opaque type Message = string;
@@ -135,12 +134,12 @@ export function dependencyNotInstalled(depName: string): Message {
 
 export function cannotRemoveDependencyDependendOnByWorkspaces(
   depName: string,
-  workspaces: Array<Workspace>
+  packages: Array<Package>
 ): Message {
   return `Cannot remove dependency ${normalPkg(
     depName
-  )} that is depended on by some workspaces:\n${workspaces
-    .map(workspace => ` - ${normalPkg(workspace.pkg.config.getName())}`)
+  )} that is depended on by some workspaces:\n${packages
+    .map(pkg => ` - ${normalPkg(pkg.getName())}`)
     .join('\n')}`;
 }
 export function externalDepsPassedToUpdatePackageVersions(

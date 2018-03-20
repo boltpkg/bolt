@@ -48,7 +48,7 @@ async function fakeYarnUpgrade(pkg: Package, dependencies) {
   }
 }
 
-describe.only('bolt upgrade', () => {
+describe('bolt upgrade', () => {
   let projectDir;
   let fooWorkspaceDir;
   let barWorkspaceDir;

@@ -17,11 +17,11 @@ export default async function getWorkspaces(
 ): Promise<Packages> {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
 
-  return workspaces.map(workspace => ({
-    dir: workspace.pkg.dir,
-    name: workspace.pkg.config.getName(),
-    config: workspace.pkg.config.json
+  return packages.map(pkg => ({
+    dir: pkg.dir,
+    name: pkg.getName(),
+    config: pkg.config.json
   }));
 }

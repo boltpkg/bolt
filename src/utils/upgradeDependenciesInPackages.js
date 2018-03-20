@@ -1,8 +1,7 @@
 // @flow
 
 import Project from '../Project';
-import type Workspace from '../Workspace';
-import type Package from '../Package';
+import Package from '../Package';
 import type { Dependency } from '../types';
 import * as messages from './messages';
 import { BoltError } from './errors';
@@ -17,9 +16,9 @@ export default async function upgradeDependenciesInPackage(
   dependencies: Array<Dependency>,
   flags?: Array<string>
 ) {
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
   let pkgDependencies = pkg.getAllDependencies();
-  let { graph: depGraph } = await project.getDependencyGraph(workspaces);
+  let { graph: depGraph } = await project.getDependencyGraph(packages);
 
   let externalDeps = dependencies.filter(dep => !depGraph.has(dep.name));
   let internalDeps = dependencies.filter(dep => depGraph.has(dep.name));

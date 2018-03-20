@@ -27,14 +27,11 @@ export function toWorkspacesRunOptions(
 export async function workspacesRun(opts: WorkspacesRunOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let filteredWorkspaces = project.filterWorkspaces(
-    workspaces,
-    opts.filterOpts
-  );
+  let packages = await project.getPackages();
+  let filteredPackages = project.filterPackages(packages, opts.filterOpts);
 
-  await project.runWorkspaceTasks(filteredWorkspaces, async workspace => {
+  await project.runPackageTasks(filteredPackages, async pkg => {
     // no need to error if script doesn't exist
-    await yarn.runIfExists(workspace.pkg, opts.script, opts.scriptArgs);
+    await yarn.runIfExists(pkg, opts.script, opts.scriptArgs);
   });
 }

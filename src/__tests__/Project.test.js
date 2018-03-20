@@ -2,7 +2,6 @@
 import path from 'path';
 import Project from '../Project';
 import Package from '../Package';
-import Workspace from '../Workspace';
 import * as logger from '../utils/logger';
 import fixtures from 'fixturez';
 
@@ -21,298 +20,306 @@ function assertDependents(graph, pkg, dependents) {
 }
 
 // Asserts that a set of workspaces contains all (and only) the expected ones
-function assertWorkspaces(workspaces, expectedNames) {
-  expect(workspaces.length).toEqual(expectedNames.length);
-  expectedNames.forEach(expected => {
-    expect(
-      workspaces.some(workspace => workspace.pkg.config.getName() === expected)
-    );
-  });
+function assertPackages(packages, expected) {
+  expect(packages.map(pkg => pkg.getName())).toEqual(expected);
 }
 
 describe('Project', () => {
   let project;
 
-  describe('A simple project', () => {
-    beforeEach(async () => {
-      let filePath = f.find('simple-project');
-      project = await Project.init(filePath);
-    });
+  test('init()', async () => {
+    let project = await Project.init(f.find('simple-project'));
+    expect(project).toBeInstanceOf(Project);
+    expect(project.pkg).toBeInstanceOf(Package);
+  });
 
-    it('should be able to create a simple project', async () => {
-      expect(project).toBeInstanceOf(Project);
-      expect(project.pkg).toBeInstanceOf(Package);
-    });
+  test('getPackages() with simple project', async () => {
+    let project = await Project.init(f.find('simple-project'));
+    let packages = await project.getPackages();
+    expect(packages.length).toEqual(2);
+    expect(packages[0]).toBeInstanceOf(Package);
+  });
 
-    it('should be able to getWorkspaces', async () => {
-      let workspaces = await project.getWorkspaces();
-      expect(workspaces.length).toEqual(2);
-      expect(workspaces[0]).toBeInstanceOf(Workspace);
-    });
+  test('getPackages() with nested workspaces', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    expect(packages.length).toEqual(3);
+    expect(packages[0]).toBeInstanceOf(Package);
+  });
 
-    it('should be able to runWorkspaceTasks', async () => {
-      let workspaces = await project.getWorkspaces();
-      let spy = jest.fn(() => Promise.resolve());
+  test('getPackages() with nested workspaces and transitive dependents', async () => {
+    let project = await Project.init(
+      f.find('nested-workspaces-transitive-dependents')
+    );
+    let packages = await project.getPackages();
+    expect(packages.length).toEqual(4);
+    expect(packages[0]).toBeInstanceOf(Package);
+  });
 
-      await project.runWorkspaceTasks(workspaces, spy);
+  test('getDependencyGraph() with nested workspaces', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let { valid, graph } = await project.getDependencyGraph(packages);
+    let expectedDependencies = {
+      'fixture-project-nested-workspaces': [],
+      foo: ['bar'],
+      bar: [],
+      baz: ['bar']
+    };
 
-      expect(spy).toHaveBeenCalledTimes(2);
-      // should be called with our workspace
-      expect(spy.mock.calls[0][0]).toBeInstanceOf(Workspace);
+    expect(valid).toEqual(true);
+    expect(graph).toBeInstanceOf(Map);
+    expect(graph.size).toBe(4);
+
+    Object.entries(expectedDependencies).forEach(([pkg, dependencies]) => {
+      assertDependencies(graph, pkg, dependencies);
     });
   });
 
-  describe('A project with nested workspaces', () => {
-    beforeEach(async () => {
-      let filePath = f.find('nested-workspaces');
-      project = await Project.init(filePath);
-    });
+  test('getDependencyGraph() with nested workspaced and transitive dependents', async () => {
+    let project = await Project.init(
+      f.find('nested-workspaces-transitive-dependents')
+    );
+    let packages = await project.getPackages();
+    let { valid, graph } = await project.getDependencyGraph(packages);
+    let expectedDependencies = {
+      'nested-workspaces-transitive-dependents': [],
+      'pkg-a': [],
+      'workspace-a': ['pkg-a'],
+      'pkg-b': ['pkg-a'],
+      'pkg-c': ['pkg-b']
+    };
 
-    it('should be able to getWorkspaces (including nested)', async () => {
-      let workspaces = await project.getWorkspaces();
-      expect(workspaces.length).toEqual(3);
-      expect(workspaces[0]).toBeInstanceOf(Workspace);
-    });
+    expect(valid).toEqual(true);
+    expect(graph).toBeInstanceOf(Map);
+    expect(graph.size).toBe(Object.keys(expectedDependencies).length);
 
-    it('should be able to getDependencyGraph', async () => {
-      let workspaces = await project.getWorkspaces();
-      let { valid, graph } = await project.getDependencyGraph(workspaces);
-      let expectedDependencies = {
-        'fixture-project-nested-workspaces': [],
-        foo: ['bar'],
-        bar: [],
-        baz: ['bar']
-      };
+    let assertDependencies = (pkg, deps) => {
+      let val = graph.get(pkg);
+      expect(val && val.dependencies).toEqual(deps);
+    };
 
-      expect(valid).toEqual(true);
-      expect(graph).toBeInstanceOf(Map);
-      expect(graph.size).toBe(4);
-
-      Object.entries(expectedDependencies).forEach(([pkg, dependencies]) => {
-        assertDependencies(graph, pkg, dependencies);
-      });
-    });
-
-    it('should be able to getDependentsGraph', async () => {
-      let workspaces = await project.getWorkspaces();
-      let { valid, graph } = await project.getDependentsGraph(workspaces);
-      let expectedDependents = {
-        bar: ['foo', 'baz'],
-        foo: [],
-        baz: []
-      };
-
-      expect(valid).toEqual(true);
-      expect(graph).toBeInstanceOf(Map);
-      expect(graph.size).toBe(Object.keys(expectedDependents).length);
-
-      Object.entries(expectedDependents).forEach(([pkg, dependents]) => {
-        assertDependents(graph, pkg, dependents);
-      });
+    Object.entries(expectedDependencies).forEach(([pkg, dependencies]) => {
+      assertDependencies(pkg, dependencies);
     });
   });
 
-  describe('A project with nested workspaces and transitive dependents', () => {
-    beforeEach(async () => {
-      let filePath = f.find('nested-workspaces-transitive-dependents');
-      project = await Project.init(filePath);
-    });
+  test('getDependentsGraph() with nested workspaces', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let { valid, graph } = await project.getDependentsGraph(packages);
+    let expectedDependents = {
+      bar: ['foo', 'baz'],
+      foo: [],
+      baz: []
+    };
 
-    it('should be able to getWorkspaces (including nested)', async () => {
-      let workspaces = await project.getWorkspaces();
-      expect(workspaces.length).toEqual(4);
-      expect(workspaces[0]).toBeInstanceOf(Workspace);
-    });
+    expect(valid).toEqual(true);
+    expect(graph).toBeInstanceOf(Map);
+    expect(graph.size).toBe(Object.keys(expectedDependents).length);
 
-    it('should be able to getDependencyGraph', async () => {
-      let workspaces = await project.getWorkspaces();
-      let { valid, graph } = await project.getDependencyGraph(workspaces);
-      let expectedDependencies = {
-        'nested-workspaces-transitive-dependents': [],
-        'pkg-a': [],
-        'workspace-a': ['pkg-a'],
-        'pkg-b': ['pkg-a'],
-        'pkg-c': ['pkg-b']
-      };
-
-      expect(valid).toEqual(true);
-      expect(graph).toBeInstanceOf(Map);
-      expect(graph.size).toBe(Object.keys(expectedDependencies).length);
-
-      let assertDependencies = (pkg, deps) => {
-        let val = graph.get(pkg);
-        expect(val && val.dependencies).toEqual(deps);
-      };
-
-      Object.entries(expectedDependencies).forEach(([pkg, dependencies]) => {
-        assertDependencies(pkg, dependencies);
-      });
-    });
-
-    it('should be able to getDependentsGraph', async () => {
-      let workspaces = await project.getWorkspaces();
-      let { valid, graph } = await project.getDependentsGraph(workspaces);
-      let expectedDependents = {
-        'pkg-a': ['workspace-a', 'pkg-b'],
-        'workspace-a': [],
-        'pkg-b': ['pkg-c'],
-        'pkg-c': []
-      };
-
-      expect(valid).toEqual(true);
-      expect(graph).toBeInstanceOf(Map);
-      expect(graph.size).toBe(Object.keys(expectedDependents).length);
-
-      Object.entries(expectedDependents).forEach(([pkg, dependents]) => {
-        assertDependents(graph, pkg, dependents);
-      });
+    Object.entries(expectedDependents).forEach(([pkg, dependents]) => {
+      assertDependents(graph, pkg, dependents);
     });
   });
 
-  describe('filtering', () => {
-    let cwd;
-    let project;
-    let workspaces;
+  test('getDependentsGraph() with nested workspaces and transitive dependents', async () => {
+    let project = await Project.init(
+      f.find('nested-workspaces-transitive-dependents')
+    );
+    let packages = await project.getPackages();
+    let { valid, graph } = await project.getDependentsGraph(packages);
+    let expectedDependents = {
+      'pkg-a': ['workspace-a', 'pkg-b'],
+      'workspace-a': [],
+      'pkg-b': ['pkg-c'],
+      'pkg-c': []
+    };
 
-    beforeEach(async () => {
-      cwd = f.find('nested-workspaces');
-      project = project = await Project.init(cwd);
-      workspaces = await project.getWorkspaces();
+    expect(valid).toEqual(true);
+    expect(graph).toBeInstanceOf(Map);
+    expect(graph.size).toBe(Object.keys(expectedDependents).length);
+
+    Object.entries(expectedDependents).forEach(([pkg, dependents]) => {
+      assertDependents(graph, pkg, dependents);
     });
+  });
 
-    it('should return all workspaces if no flags passed', async () => {
-      let filtered = await project.filterWorkspaces(workspaces, {});
+  test('filterPackages() with no flags', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let filtered = await project.filterPackages(packages, {});
+    assertPackages(filtered, ['bar', 'foo', 'baz']);
+  });
 
-      expect(workspaces).toEqual(filtered);
+  test('filterPackages() with only flag', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let filtered = await project.filterPackages(packages, {
+      only: 'foo'
     });
+    assertPackages(filtered, ['foo']);
+  });
 
-    describe('filtering by name', () => {
-      it('should filter to names that match the `only` flag', async () => {
-        let filtered = await project.filterWorkspaces(workspaces, {
-          only: 'foo'
-        });
-        assertWorkspaces(filtered, ['foo']);
-      });
-
-      it('should remove names that match the `ignore` flag', async () => {
-        let filtered = await project.filterWorkspaces(workspaces, {
-          ignore: 'bar'
-        });
-        assertWorkspaces(filtered, ['foo', 'baz']);
-      });
-
-      it('should support combing only and ignore', async () => {
-        let filtered = await project.filterWorkspaces(workspaces, {
-          only: '*ba*',
-          ignore: 'bar'
-        });
-        assertWorkspaces(filtered, ['bar']);
-      });
+  test('filterPackages() with only flag as glob', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let filtered = await project.filterPackages(packages, {
+      only: 'ba*'
     });
+    assertPackages(filtered, ['bar', 'baz']);
+  });
 
-    describe('filtering by path', () => {
-      it('should filter to names that match the `onlyFs` flag', async () => {
-        let filtered = await project.filterWorkspaces(workspaces, {
-          onlyFs: 'packages/foo'
-        });
-        assertWorkspaces(filtered, ['foo']);
-      });
-
-      it('should not include names that match the `ignoreFs` flag', async () => {
-        let filtered = await project.filterWorkspaces(workspaces, {
-          ignoreFs: 'packages/foo/**'
-        });
-        assertWorkspaces(filtered, ['foo', 'bar']);
-      });
-
-      it('should be able to combine onlyFs and ignoreFs', async () => {
-        let filtered = await project.filterWorkspaces(workspaces, {
-          onlyFs: '**/packages/ba*',
-          ignoreFs: 'packages/foo/packages/baz'
-        });
-        assertWorkspaces(filtered, ['bar']);
-      });
+  test('filterPackages() with ignore flag', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let filtered = await project.filterPackages(packages, {
+      ignore: 'bar'
     });
+    assertPackages(filtered, ['foo', 'baz']);
+  });
 
-    it('should be able to combine name and path filters', async () => {
-      let filtered = await project.filterWorkspaces(workspaces, {
-        only: 'ba*',
-        ignoreFs: 'packages/foo/packages/baz'
-      });
-      assertWorkspaces(filtered, ['bar']);
+  test('filterPackages() with only and ignore flags', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let filtered = await project.filterPackages(packages, {
+      only: 'ba*',
+      ignore: 'bar'
     });
+    assertPackages(filtered, ['baz']);
+  });
 
-    it('should support scoped workspaces', async () => {
-      cwd = f.find('nested-workspaces-with-scoped-package-names');
-      project = project = await Project.init(cwd);
-      workspaces = await project.getWorkspaces();
+  test('filterPackages() with onlyFs flag', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let filtered = await project.filterPackages(packages, {
+      onlyFs: 'packages/foo'
+    });
+    assertPackages(filtered, ['foo']);
+  });
 
-      let filtered = await project.filterWorkspaces(workspaces, {
+  test('filterPackages() with ignoreFs flag', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let filtered = await project.filterPackages(packages, {
+      ignoreFs: 'packages/foo'
+    });
+    assertPackages(filtered, ['bar', 'baz']);
+  });
+
+  test('filterPackages() with onlyFs and ignoreFs flags', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let filtered = await project.filterPackages(packages, {
+      onlyFs: '**/packages/ba*',
+      ignoreFs: '**/bar'
+    });
+    assertPackages(filtered, ['baz']);
+  });
+
+  test('filterPackages() with only and ignoreFs flags', async () => {
+    let project = await Project.init(f.find('nested-workspaces'));
+    let packages = await project.getPackages();
+    let filtered = await project.filterPackages(packages, {
+      only: 'ba*',
+      ignoreFs: '**/bar'
+    });
+    assertPackages(filtered, ['baz']);
+  });
+
+  test('filterPackages() with scoped workspaces', async () => {
+    let project = await Project.init(
+      f.find('nested-workspaces-with-scoped-package-names')
+    );
+    let packages = await project.getPackages();
+
+    assertPackages(
+      await project.filterPackages(packages, {
         only: '**/foo'
-      });
-      assertWorkspaces(filtered, ['foo']);
+      }),
+      ['@scope/foo']
+    );
 
-      filtered = await project.filterWorkspaces(workspaces, {
+    assertPackages(
+      await project.filterPackages(packages, {
         ignore: '**/foo'
-      });
-      assertWorkspaces(filtered, ['bar', 'baz']);
+      }),
+      ['@scope/bar', '@scope/baz']
+    );
 
-      filtered = await project.filterWorkspaces(workspaces, {
+    assertPackages(
+      await project.filterPackages(packages, {
         onlyFs: '**/packages/ba*',
-        ignore: '@scoped/baz'
-      });
-      assertWorkspaces(filtered, ['bar', 'baz']);
-    });
+        ignore: '@scope/baz'
+      }),
+      ['@scope/bar']
+    );
   });
 
-  describe('runWorkspaceTasks()', () => {
-    test('independent workspaces', async () => {
-      let cwd = f.find('independent-workspaces');
-      let project = await Project.init(cwd);
-      let workspaces = await project.getWorkspaces();
-      let ops = [];
+  test('runPackageTasks() with simple project', async () => {
+    let project = await Project.init(f.find('simple-project'));
+    let packages = await project.getPackages();
+    let spy = jest.fn(() => Promise.resolve());
+    await project.runPackageTasks(packages, spy);
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy.mock.calls[0][0]).toBeInstanceOf(Package);
+  });
 
-      await project.runWorkspaceTasks(workspaces, async workspace => {
-        ops.push('start:' + workspace.pkg.config.getName());
-        // wait until next tick
-        await Promise.resolve();
-        ops.push('end:' + workspace.pkg.config.getName());
-      });
+  test('runPackageTasks()', async () => {
+    let project = await Project.init(f.find('simple-project'));
+    let packages = await project.getPackages();
+    let spy = jest.fn(() => Promise.resolve());
+    await project.runPackageTasks(packages, spy);
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy.mock.calls[0][0]).toBeInstanceOf(Package);
+  });
 
-      expect(ops).toEqual(['start:bar', 'start:foo', 'end:bar', 'end:foo']);
+  test('runPackageTasks() with independent workspaces', async () => {
+    let cwd = f.find('independent-workspaces');
+    let project = await Project.init(cwd);
+    let packages = await project.getPackages();
+    let ops = [];
+
+    await project.runPackageTasks(packages, async pkg => {
+      ops.push('start:' + pkg.config.getName());
+      // wait until next tick
+      await Promise.resolve();
+      ops.push('end:' + pkg.config.getName());
     });
 
-    test('dependent workspaces', async () => {
-      let cwd = f.find('dependent-workspaces');
-      let project = await Project.init(cwd);
-      let workspaces = await project.getWorkspaces();
-      let ops = [];
+    expect(ops).toEqual(['start:bar', 'start:foo', 'end:bar', 'end:foo']);
+  });
 
-      await project.runWorkspaceTasks(workspaces, async workspace => {
-        ops.push('start:' + workspace.pkg.config.getName());
-        // wait until next tick
-        await Promise.resolve();
-        ops.push('end:' + workspace.pkg.config.getName());
-      });
+  test('runPackageTasks() with dependent workspaces', async () => {
+    let cwd = f.find('dependent-workspaces');
+    let project = await Project.init(cwd);
+    let packages = await project.getPackages();
+    let ops = [];
 
-      expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
+    await project.runPackageTasks(packages, async pkg => {
+      ops.push('start:' + pkg.getName());
+      // wait until next tick
+      await Promise.resolve();
+      ops.push('end:' + pkg.getName());
     });
 
-    test('dependent workspaces with cycle', async () => {
-      let cwd = f.find('dependent-workspaces-with-cycle');
-      let project = await Project.init(cwd);
-      let workspaces = await project.getWorkspaces();
-      let ops = [];
+    expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
+  });
 
-      await project.runWorkspaceTasks(workspaces, async workspace => {
-        ops.push('start:' + workspace.pkg.config.getName());
-        // wait until next tick
-        await Promise.resolve();
-        ops.push('end:' + workspace.pkg.config.getName());
-      });
+  test('runPackageTasks() with dependent workspaces with cycle', async () => {
+    let cwd = f.find('dependent-workspaces-with-cycle');
+    let project = await Project.init(cwd);
+    let packages = await project.getPackages();
+    let ops = [];
 
-      expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
-      expect(logger.warn).toHaveBeenCalled();
+    await project.runPackageTasks(packages, async pkg => {
+      ops.push('start:' + pkg.getName());
+      // wait until next tick
+      await Promise.resolve();
+      ops.push('end:' + pkg.getName());
     });
+
+    expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
+    expect(logger.warn).toHaveBeenCalled();
   });
 });

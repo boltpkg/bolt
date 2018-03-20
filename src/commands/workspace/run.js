@@ -6,7 +6,7 @@ import { BoltError } from '../../utils/errors';
 
 export type WorkspaceRunOptions = {
   cwd?: string,
-  workspaceName: string,
+  pkgName: string,
   script: string,
   scriptArgs: options.Args
 };
@@ -15,10 +15,10 @@ export function toWorkspaceRunOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceRunOptions {
-  let [workspaceName, script, ...scriptArgs] = args;
+  let [pkgName, script, ...scriptArgs] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    workspaceName,
+    pkgName,
     script,
     scriptArgs
   };
@@ -27,26 +27,22 @@ export function toWorkspaceRunOptions(
 export async function workspaceRun(opts: WorkspaceRunOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let workspace = await project.getWorkspaceByName(
-    workspaces,
-    opts.workspaceName
-  );
+  let packages = await project.getPackages();
+  let pkg = await project.getPackageByName(packages, opts.pkgName);
 
-  if (!workspace) {
+  if (!pkg) {
     throw new BoltError(
-      `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
+      `Could not find a workspace named "${opts.pkgName}" from "${cwd}"`
     );
   }
 
-  let validScript = await yarn.getScript(workspace.pkg, opts.script);
+  let validScript = await yarn.getScript(pkg, opts.script);
 
   if (!validScript) {
     throw new BoltError(
-      `Package at "${workspace.pkg
-        .dir}" does not have a script named "${opts.script}"`
+      `Package at "${pkg.dir}" does not have a script named "${opts.script}"`
     );
   }
 
-  await yarn.run(workspace.pkg, opts.script, opts.scriptArgs);
+  await yarn.run(pkg, opts.script, opts.scriptArgs);
 }

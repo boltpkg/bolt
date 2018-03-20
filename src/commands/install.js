@@ -31,7 +31,7 @@ export function toInstallOptions(
 export async function install(opts: InstallOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
   let installFlags = [];
 
   if (opts.pureLockfile) installFlags.push('--pure-lockfile');
@@ -62,9 +62,9 @@ export async function install(opts: InstallOptions) {
     prefix: false
   });
 
-  for (let workspace of workspaces) {
-    let dependencies = workspace.pkg.getAllDependencies().keys();
-    await symlinkPackageDependencies(project, workspace.pkg, dependencies);
+  for (let pkg of packages) {
+    let dependencies = pkg.getAllDependencies().keys();
+    await symlinkPackageDependencies(project, pkg, dependencies);
   }
 
   logger.success(messages.installedAndLinkedWorkspaces(), { emoji: '💥' });

@@ -3,7 +3,6 @@ import * as path from 'path';
 import includes from 'array-includes';
 import semver from 'semver';
 import Package from './Package';
-import Workspace from './Workspace';
 import Config from './Config';
 import type { FilterOpts } from './types';
 import * as fs from './utils/fs';
@@ -14,7 +13,7 @@ import * as globs from './utils/globs';
 import taskGraphRunner from 'task-graph-runner';
 import minimatch from 'minimatch';
 
-export type Task = (workspace: Workspace) => Promise<mixed>;
+export type Task = (pkg: Package) => Promise<mixed>;
 
 export default class Project {
   pkg: Package;
@@ -31,13 +30,13 @@ export default class Project {
     return new Project(pkg);
   }
 
-  async getWorkspaces() {
+  async getPackages() {
     let queue = [this.pkg];
-    let workspaces = [];
+    let packages = [];
 
-    for (let pkg of queue) {
-      let cwd = path.dirname(pkg.filePath);
-      let patterns = pkg.getWorkspacesConfig();
+    for (let item of queue) {
+      let cwd = path.dirname(item.filePath);
+      let patterns = item.getWorkspacesConfig();
       let matchedPaths = await globs.findWorkspaces(cwd, patterns);
 
       for (let matchedPath of matchedPaths) {
@@ -46,32 +45,31 @@ export default class Project {
         if (!stats.isDirectory()) continue;
 
         let filePath = path.join(dir, 'package.json');
-        let wPkg = await Package.init(filePath);
-        let workspace = await Workspace.init(wPkg);
+        let pkg = await Package.init(filePath);
 
-        queue.push(wPkg);
-        workspaces.push(workspace);
+        queue.push(pkg);
+        packages.push(pkg);
       }
     }
 
-    return workspaces;
+    return packages;
   }
 
-  async getDependencyGraph(workspaces: Array<Workspace>) {
+  async getDependencyGraph(packages: Array<Package>) {
     let graph: Map<
       string,
       { pkg: Package, dependencies: Array<string> }
     > = new Map();
-    let packages = [this.pkg];
-    let packagesByName = { [this.pkg.config.getName()]: this.pkg };
+    let queue = [this.pkg];
+    let packagesByName = { [this.pkg.getName()]: this.pkg };
     let valid = true;
 
-    for (let workspace of workspaces) {
-      packages.push(workspace.pkg);
-      packagesByName[workspace.pkg.config.getName()] = workspace.pkg;
+    for (let pkg of packages) {
+      queue.push(pkg);
+      packagesByName[pkg.getName()] = pkg;
     }
 
-    for (let pkg of packages) {
+    for (let pkg of queue) {
       let name = pkg.config.getName();
       let dependencies = [];
       let allDependencies = pkg.getAllDependencies();
@@ -106,25 +104,25 @@ export default class Project {
     return { graph, valid };
   }
 
-  async getDependentsGraph(workspaces: Array<Workspace>) {
+  async getDependentsGraph(packages: Array<Package>) {
     let graph = new Map();
     let { valid, graph: dependencyGraph } = await this.getDependencyGraph(
-      workspaces
+      packages
     );
 
     let dependentsLookup: {
       [string]: { pkg: Package, dependents: Array<string> }
     } = {};
 
-    workspaces.forEach(workspace => {
-      dependentsLookup[workspace.pkg.config.getName()] = {
-        pkg: workspace.pkg,
+    packages.forEach(pkg => {
+      dependentsLookup[pkg.config.getName()] = {
+        pkg,
         dependents: []
       };
     });
 
-    workspaces.forEach(workspace => {
-      let dependent = workspace.pkg.config.getName();
+    packages.forEach(pkg => {
+      let dependent = pkg.getName();
       let valFromDependencyGraph = dependencyGraph.get(dependent) || {};
       let dependencies = valFromDependencyGraph.dependencies || [];
 
@@ -141,9 +139,9 @@ export default class Project {
     return { valid, graph };
   }
 
-  async runWorkspaceTasks(workspaces: Array<Workspace>, task: Task) {
+  async runPackageTasks(packages: Array<Package>, task: Task) {
     let { graph: dependentsGraph, valid } = await this.getDependencyGraph(
-      workspaces
+      packages
     );
 
     let graph = new Map();
@@ -155,10 +153,10 @@ export default class Project {
     let { safe } = await taskGraphRunner({
       graph,
       force: true,
-      task: async workspaceName => {
-        let workspace = this.getWorkspaceByName(workspaces, workspaceName);
-        if (workspace) {
-          return task(workspace);
+      task: async pkgName => {
+        let pkg = this.getPackageByName(packages, pkgName);
+        if (pkg) {
+          return task(pkg);
         }
       }
     });
@@ -168,41 +166,38 @@ export default class Project {
     }
   }
 
-  getWorkspaceByName(workspaces: Array<Workspace>, workspaceName: string) {
-    return workspaces.find(workspace => {
-      return workspace.pkg.config.getName() === workspaceName;
-    });
+  getPackageByName(packages: Array<Package>, pkgName: string) {
+    return packages.find(pkg => pkg.getName() === pkgName);
   }
 
-  filterWorkspaces(workspaces: Array<Workspace>, opts: FilterOpts) {
-    let relativeDir = (workspace: Workspace) =>
-      path.relative(this.pkg.dir, workspace.pkg.dir);
+  filterPackages(packages: Array<Package>, opts: FilterOpts) {
+    let relativeDir = (pkg: Package) => path.relative(this.pkg.dir, pkg.dir);
 
-    let workspaceNames = workspaces.map(ws => ws.pkg.config.getName());
-    let workspaceDirs = workspaces.map(ws => relativeDir(ws));
+    let packageNames = packages.map(pkg => pkg.getName());
+    let packageDirs = packages.map(pkg => relativeDir(pkg));
 
     let filteredByName = globs.matchOnlyAndIgnore(
-      workspaceNames,
+      packageNames,
       opts.only,
       opts.ignore
     );
 
     let filteredByDir = globs.matchOnlyAndIgnore(
-      workspaceDirs,
+      packageDirs,
       opts.onlyFs,
       opts.ignoreFs
     );
 
-    let filteredWorkspaces = workspaces.filter(
-      workspace =>
-        includes(filteredByName, workspace.pkg.config.getName()) &&
-        includes(filteredByDir, relativeDir(workspace))
+    let filteredPackages = packages.filter(
+      pkg =>
+        includes(filteredByName, pkg.getName()) &&
+        includes(filteredByDir, relativeDir(pkg))
     );
 
-    if (filteredWorkspaces.length === 0) {
+    if (filteredPackages.length === 0) {
       logger.warn(messages.noPackagesMatchFilters());
     }
 
-    return filteredWorkspaces;
+    return filteredPackages;
   }
 }

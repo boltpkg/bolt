@@ -23,21 +23,21 @@ export function toNormalizeOptions(
   };
 }
 
-function getWorkspaceMap(workspaces) {
-  let workspaceMap = new Map();
+function getPackageMap(packages) {
+  let packageMap = new Map();
 
-  for (let workspace of workspaces) {
-    workspaceMap.set(workspace.pkg.config.getName(), workspace);
+  for (let pkg of packages) {
+    packageMap.set(pkg.getName(), pkg);
   }
 
-  return workspaceMap;
+  return packageMap;
 }
 
-function getPackageDependencyMap(project, projectDependencies, workspaces) {
+function getPackageDependencyMap(project, projectDependencies, packages) {
   let map = new Map();
   map.set(project.pkg, projectDependencies);
-  for (let workspace of workspaces) {
-    map.set(workspace.pkg, workspace.pkg.getAllDependencies());
+  for (let pkg of packages) {
+    map.set(pkg, pkg.getAllDependencies());
   }
   return map;
 }
@@ -103,15 +103,15 @@ function getMaxPackageNameLength(pkgNames) {
 export async function normalize(opts: NormalizeOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
 
-  let workspaceMap = getWorkspaceMap(workspaces);
+  let packageMap = getPackageMap(packages);
 
   let projectDependencies = project.pkg.getAllDependencies();
   let packageDependencyMap = getPackageDependencyMap(
     project,
     projectDependencies,
-    workspaces
+    packages
   );
   let allDependencies = getAllDependencies(packageDependencyMap);
 
@@ -160,10 +160,10 @@ export async function normalize(opts: NormalizeOptions) {
     let depTypes = project.pkg.getDependencyTypes(depName);
     depTypes = depTypes.length > 0 ? depTypes : ['dependencies'];
 
-    let isWorkspace = workspaceMap.has(depName);
+    let isInternal = packageMap.has(depName);
     let isUpdating = projectDependencies.has(depName);
 
-    if (finalVersion && (isWorkspace ? isUpdating : true)) {
+    if (finalVersion && (isInternal ? isUpdating : true)) {
       for (let depType of depTypes) {
         await project.pkg.setDependencyVersionRange(
           depName,

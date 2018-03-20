@@ -2,10 +2,10 @@
   "name": "@scope/foo",
   "version": "1.0.0",
   "bolt": {
-    "workspaces": ["packages/*"]  
+    "workspaces": ["packages/*"]
   },
   "dependencies": {
     "react": "^15.6.1",
-    "@scoped/bar": "^1.0.0"
+    "@scope/bar": "^1.0.0"
   }
 }

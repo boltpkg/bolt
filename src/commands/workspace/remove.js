@@ -8,7 +8,7 @@ import { BoltError } from '../../utils/errors';
 
 export type WorkspaceRemoveOptions = {
   cwd?: string,
-  workspaceName: string,
+  pkgName: string,
   deps: Array<string>
 };
 
@@ -16,10 +16,10 @@ export function toWorkspaceRemoveOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceRemoveOptions {
-  let [workspaceName, ...deps] = args;
+  let [pkgName, ...deps] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    workspaceName,
+    pkgName,
     deps
   };
 }
@@ -27,22 +27,14 @@ export function toWorkspaceRemoveOptions(
 export async function workspaceRemove(opts: WorkspaceRemoveOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let workspace = await project.getWorkspaceByName(
-    workspaces,
-    opts.workspaceName
-  );
+  let packages = await project.getPackages();
+  let pkg = await project.getPackageByName(packages, opts.pkgName);
 
-  if (!workspace) {
+  if (!pkg) {
     throw new BoltError(
-      `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
+      `Could not find a workspace named "${opts.pkgName}" from "${cwd}"`
     );
   }
 
-  await removeDependenciesFromPackages(
-    project,
-    workspaces,
-    [workspace.pkg],
-    opts.deps
-  );
+  await removeDependenciesFromPackages(project, packages, [pkg], opts.deps);
 }

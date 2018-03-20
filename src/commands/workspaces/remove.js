@@ -24,16 +24,13 @@ export function toWorkspacesRemoveOptions(
 export async function workspacesRemove(opts: WorkspacesRemoveOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let filteredWorkspaces = project.filterWorkspaces(
-    workspaces,
-    opts.filterOpts
-  );
+  let packages = await project.getPackages();
+  let filteredPackages = project.filterPackages(packages, opts.filterOpts);
 
   await removeDependenciesFromPackages(
     project,
-    workspaces,
-    filteredWorkspaces.map(workspace => workspace.pkg),
+    packages,
+    filteredPackages,
     opts.deps
   );
 }

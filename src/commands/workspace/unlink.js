@@ -7,7 +7,7 @@ import { BoltError } from '../../utils/errors';
 
 export type WorkspaceUnlinkOptions = {|
   cwd?: string,
-  workspaceName: string,
+  pkgName: string,
   packagesToUnlink?: Array<string>
 |};
 
@@ -15,10 +15,10 @@ export function toWorkspaceUnlinkOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceUnlinkOptions {
-  let [workspaceName, ...packagesToUnlink] = args;
+  let [pkgName, ...packagesToUnlink] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    workspaceName,
+    pkgName,
     packagesToUnlink
   };
 }
@@ -26,17 +26,14 @@ export function toWorkspaceUnlinkOptions(
 export async function workspaceUnlink(opts: WorkspaceUnlinkOptions) {
   let cwd = opts.cwd || process.cwd();
   let packagesToUnlink = opts.packagesToUnlink;
-  let workspaceName = opts.workspaceName;
+  let pkgName = opts.pkgName;
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let workspace = await project.getWorkspaceByName(
-    workspaces,
-    opts.workspaceName
-  );
+  let packages = await project.getPackages();
+  let pkg = await project.getPackageByName(packages, opts.pkgName);
 
-  if (!workspace) {
+  if (!pkg) {
     throw new BoltError(
-      `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
+      `Could not find a workspace named "${opts.pkgName}" from "${cwd}"`
     );
   }
 
@@ -47,6 +44,6 @@ export async function workspaceUnlink(opts: WorkspaceUnlinkOptions) {
       await unlink.toUnlinkOptions(packagesToUnlink, { '--': [] })
     );
   } else {
-    await yarn.cliCommand(workspace.pkg.dir, 'unlink');
+    await yarn.cliCommand(pkg.dir, 'unlink');
   }
 }
