@@ -3,7 +3,11 @@ import Project from '../Project';
 import type { JSONValue } from '../types';
 
 type Options = {
-  cwd?: string
+  cwd?: string,
+  only?: string,
+  ignore?: string,
+  onlyFs?: string,
+  ignoreFs?: string
 };
 
 type Packages = Array<{
@@ -19,7 +23,14 @@ export default async function getWorkspaces(
   let project = await Project.init(cwd);
   let packages = await project.getPackages();
 
-  return packages.map(pkg => ({
+  let filtered = project.filterPackages(packages, {
+    only: opts.only,
+    ignore: opts.ignore,
+    onlyFs: opts.onlyFs,
+    ignoreFs: opts.ignoreFs
+  });
+
+  return filtered.map(pkg => ({
     dir: pkg.dir,
     name: pkg.getName(),
     config: pkg.config.json
