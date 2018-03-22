@@ -50,7 +50,10 @@ function _symlink(src: string, dest: string, type: string) {
 }
 
 function stripExtension(filePath: string) {
-  return filePath.substr(0, filePath.length - path.extname(filePath).length);
+  return path.join(
+    path.dirname(filePath),
+    path.basename(filePath, path.extname(filePath))
+  );
 }
 
 async function cmdShim(src: string, dest: string) {
