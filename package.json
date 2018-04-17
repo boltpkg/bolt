@@ -1,6 +1,6 @@
 {
   "name": "bolt",
-  "version": "0.20.2",
+  "version": "0.20.3",
   "main": "index.js",
   "author": "James Kyle <me@thejameskyle.com>",
   "license": "MIT",
@@ -8,7 +8,11 @@
   "bin": {
     "bolt": "./bin.js"
   },
-  "files": ["dist", "index.js", "bin.js"],
+  "files": [
+    "dist",
+    "index.js",
+    "bin.js"
+  ],
   "scripts": {
     "clean": "rm -rf dist",
     "flow": "flow status",
@@ -72,10 +76,15 @@
   },
   "jest": {
     "resetMocks": true,
-    "testMatch": ["<rootDir>/src/**/__tests__/*.js"]
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/*.js"
+    ]
   },
   "lint-staged": {
-    "*.js": ["prettier --write", "git add"]
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "prettier": {
     "singleQuote": true
