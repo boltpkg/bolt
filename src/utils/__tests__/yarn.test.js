@@ -4,16 +4,20 @@ import * as path from 'path';
 import * as yarn from '../yarn';
 import * as processes from '../processes';
 import Project from '../../Project';
+import * as constants from '../../constants';
 import fixtures from 'fixturez';
+import containDeep from 'jest-expect-contain-deep';
 
 const f = fixtures(__dirname);
 
 jest.mock('../processes');
 
-async function getLocalBinPath(): Promise<string> {
-  return await projectBinPath();
+async function getLocalYarnPath(): Promise<string> {
+  const boltBinDir = await projectBinPath();
+  return path.join(boltBinDir, 'yarn');
 }
 const unsafeProcesses: any & typeof processes = processes;
+const unsafeConstants: any & typeof constants = constants;
 
 function assertSpawnCalls(expectedProcess, expectedArgs, expectedCwd) {
   let spawnCalls = unsafeProcesses.spawn.mock.calls;
@@ -24,7 +28,81 @@ function assertSpawnCalls(expectedProcess, expectedArgs, expectedCwd) {
   expect(spawnCalls[0][2].cwd).toEqual(expectedCwd);
 }
 
+let yarnUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+
 describe('utils/yarn', () => {
+  describe('install()', () => {
+    it('should call local yarn install', async () => {
+      const cwd = 'a/fake/path';
+      const localYarn = await getLocalYarnPath();
+      unsafeProcesses.spawn.mockReturnValueOnce(
+        Promise.resolve({ stdout: '' })
+      );
+      await yarn.install(cwd);
+      expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
+        localYarn,
+        ['install'],
+        expect.objectContaining({ cwd })
+      );
+    });
+
+    it('should pass on pure-lockfile flag', async () => {
+      const cwd = 'a/fake/path';
+      const localYarn = await getLocalYarnPath();
+      unsafeProcesses.spawn.mockReturnValueOnce(
+        Promise.resolve({ stdout: '' })
+      );
+      await yarn.install(cwd, true);
+      expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
+        localYarn,
+        ['install', '--pure-lockfile'],
+        expect.objectContaining({ cwd })
+      );
+    });
+
+    it('should append the bolt version to yarns npm_config_user_agent string', async () => {
+      const cwd = 'a/fake/path';
+      unsafeConstants.BOLT_VERSION = '9.9.9';
+      const yarnUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+      const boltUserAgent =
+        'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+      const localYarn = await getLocalYarnPath();
+      unsafeProcesses.spawn.mockReturnValueOnce(
+        Promise.resolve({ stdout: yarnUserAgent })
+      );
+
+      await yarn.install(cwd);
+      expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
+        localYarn,
+        ['install'],
+        containDeep({
+          env: { npm_config_user_agent: boltUserAgent }
+        })
+      );
+    });
+
+    it('should pass existing environment variables to yarn during install', async () => {
+      const cwd = 'a/fake/path';
+      const localYarn = await getLocalYarnPath();
+      unsafeProcesses.spawn.mockReturnValueOnce(
+        Promise.resolve({ stdout: '' })
+      );
+      process.env.TEST_CANARY = 'HERE';
+
+      await yarn.install(cwd);
+      expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
+        localYarn,
+        ['install'],
+        containDeep({
+          env: {
+            TEST_CANARY: 'HERE'
+          }
+        })
+      );
+      delete process.env.TEST_CANARY;
+    });
+  });
+
   describe('add()', () => {
     let cwd;
     let project;
@@ -33,7 +111,7 @@ describe('utils/yarn', () => {
     beforeEach(async () => {
       cwd = f.find('simple-project');
       project = await Project.init(cwd);
-      localYarn = path.join(await getLocalBinPath(), 'yarn');
+      localYarn = await getLocalYarnPath();
     });
 
     it('should be able to add a dependency', async () => {
@@ -71,7 +149,7 @@ describe('utils/yarn', () => {
   describe('cliCommand()', () => {
     let localYarn;
     beforeEach(async () => {
-      localYarn = path.join(await getLocalBinPath(), 'yarn');
+      localYarn = await getLocalYarnPath();
     });
     it('should be able to handle spawnArgs', async () => {
       await yarn.cliCommand('dummyPattern/dummyPath', 'test', ['jest']);

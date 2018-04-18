@@ -8,10 +8,10 @@ import Project from '../Project';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
 import * as logger from '../utils/fs';
-import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
+import { DEPENDENCY_TYPE_FLAGS_MAP, BOLT_VERSION } from '../constants';
 
-async function getLocalBinPath(): Promise<string> {
-  return await projectBinPath(__dirname);
+function getLocalBinPath(): Promise<string> {
+  return projectBinPath(__dirname);
 }
 
 function depTypeToFlag(depType) {
@@ -20,6 +20,23 @@ function depTypeToFlag(depType) {
   );
 
   return flag ? `--${flag}` : flag;
+}
+
+export async function install(cwd: string, pureLockfile?: boolean) {
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let installFlags = [];
+
+  if (pureLockfile) installFlags.push('--pure-lockfile');
+
+  let yarnUserAgent = await userAgent();
+  let boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
+
+  await processes.spawn(localYarn, ['install', ...installFlags], {
+    cwd,
+    tty: true,
+    env: { ...process.env, npm_config_user_agent: boltUserAgent },
+    useBasename: true
+  });
 }
 
 export async function add(
@@ -93,7 +110,8 @@ export async function run(
   await processes.spawn(localYarnRelative, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
-    tty: true
+    tty: true,
+    useBasename: true
   });
 }
 
@@ -144,7 +162,8 @@ export async function cliCommand(
 
   return await processes.spawn(localYarn, [command, ...spawnArgs], {
     cwd,
-    tty: true
+    tty: true,
+    useBasename: true
   });
 }
 
