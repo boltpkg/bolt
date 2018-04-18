@@ -32,9 +32,6 @@ export async function install(opts: InstallOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
   let packages = await project.getPackages();
-  let installFlags = [];
-
-  if (opts.pureLockfile) installFlags.push('--pure-lockfile');
 
   logger.info(messages.validatingProject(), { emoji: '🔎', prefix: false });
 
@@ -48,14 +45,7 @@ export async function install(opts: InstallOptions) {
     prefix: false
   });
 
-  let yarnUserAgent = await yarn.userAgent();
-  let boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
-
-  await processes.spawn('yarn', ['install', ...installFlags], {
-    cwd: project.pkg.dir,
-    tty: true,
-    env: { ...process.env, npm_config_user_agent: boltUserAgent }
-  });
+  yarn.install(project.pkg.dir, opts.pureLockfile);
 
   logger.info(messages.linkingWorkspaceDependencies(), {
     emoji: '🔗',

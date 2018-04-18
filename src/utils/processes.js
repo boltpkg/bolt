@@ -5,6 +5,7 @@ import type Package from '../Package';
 import type Project from '../Project';
 import pLimit from 'p-limit';
 import os from 'os';
+import path from 'path';
 
 const limit = pLimit(os.cpus().length);
 const processes = new Set();
@@ -39,6 +40,7 @@ export type SpawnOptions = {
   pkg?: Package,
   silent?: boolean,
   tty?: boolean,
+  useBasename?: boolean,
   env?: { [key: string]: ?string }
 };
 
@@ -53,8 +55,9 @@ export function spawn(
         let stdoutBuf = Buffer.from('');
         let stderrBuf = Buffer.from('');
         let isTTY = process.stdout.isTTY && opts.tty;
+        let cmdDisplayName = opts.useBasename ? path.basename(cmd) : cmd;
 
-        let cmdStr = cmd + ' ' + args.join(' ');
+        let cmdStr = cmdDisplayName + ' ' + args.join(' ');
 
         let spawnOpts: child_process$spawnOpts = {
           cwd: opts.cwd,
