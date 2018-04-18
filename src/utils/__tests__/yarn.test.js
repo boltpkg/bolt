@@ -28,8 +28,6 @@ function assertSpawnCalls(expectedProcess, expectedArgs, expectedCwd) {
   expect(spawnCalls[0][2].cwd).toEqual(expectedCwd);
 }
 
-let yarnUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
-
 describe('utils/yarn', () => {
   describe('install()', () => {
     it('should call local yarn install', async () => {
