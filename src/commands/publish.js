@@ -83,8 +83,8 @@ export async function publish(opts: PublishOptions) {
   try {
     // TODO: Re-enable once locking issues are sorted out
     // await locks.lock(packages);
-    let unpublishedPackagesInfo = await getUnpublishedPackages(packages);
-    let unpublishedPackages = packages.filter(pkg => {
+    let unpublishedPackagesInfo = await getUnpublishedPackages(publicPackages);
+    let unpublishedPackages = publicPackages.filter(pkg => {
       return unpublishedPackagesInfo.some(p => pkg.getName() === p.name);
     });
 
