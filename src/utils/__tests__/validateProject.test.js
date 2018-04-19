@@ -59,5 +59,14 @@ describe('utils/validateProject', () => {
 
       expect(valid).toBe(false);
     });
+
+    test('should return false if a config is missing a version field', async () => {
+      let cwd = f.find('project-with-missing-version-field');
+      let project = await Project.init(cwd);
+
+      let valid = await validateProject(project);
+
+      expect(valid).toBe(false);
+    });
   });
 });

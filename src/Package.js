@@ -154,4 +154,8 @@ export default class Package {
   getName() {
     return this.config.getName();
   }
+
+  getVersion() {
+    return this.config.getVersion();
+  }
 }

@@ -1,0 +1,9 @@
+{
+  "name": "simple-project",
+  "description": "The bar config is invalid as it is missing a version field",
+  "private": true,
+  "version": "1.0.0",
+  "bolt": {
+    "workspaces": ["packages/*"]
+  }
+}
