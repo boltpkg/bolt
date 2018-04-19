@@ -51,7 +51,21 @@ describe('bolt publish', () => {
 
     await publish({ cwd });
     expect(npmPublishSpy).toHaveBeenCalledTimes(1);
+    untypedNpm.__clearMockInfoAllow404();
   });
+
+  test('should not run publish on private packages', async () => {
+    // if we ask, npm will tell us that we are ahead for both packages (bar is private)
+    untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
+    untypedNpm.__mockInfoAllow404('bar', { published: false, pkgInfo: {} });
+    let cwd = f.find('simple-project-with-private-package');
+
+    await publish({ cwd });
+    expect(npmPublishSpy).toHaveBeenCalledWith('foo', expect.anything());
+    expect(npmPublishSpy).not.toHaveBeenCalledWith('bar', expect.anything());
+    untypedNpm.__clearMockInfoAllow404();
+  });
+
   test('should return publishedPackages', async () => {
     untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
     let cwd = f.find('simple-project');
@@ -62,6 +76,7 @@ describe('bolt publish', () => {
     expect(published).toEqual([
       { name: 'foo', newVersion: '1.0.0', published: true }
     ]);
+    untypedNpm.__clearMockInfoAllow404();
   });
   test('should return published false if it fails', async () => {
     untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
@@ -73,5 +88,6 @@ describe('bolt publish', () => {
     expect(published).toEqual([
       { name: 'foo', newVersion: '1.0.0', published: false }
     ]);
+    untypedNpm.__clearMockInfoAllow404();
   });
 });
