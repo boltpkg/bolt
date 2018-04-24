@@ -45,7 +45,7 @@ export async function install(opts: InstallOptions) {
     prefix: false
   });
 
-  yarn.install(project.pkg.dir, opts.pureLockfile);
+  await yarn.install(project.pkg.dir, opts.pureLockfile);
 
   logger.info(messages.linkingWorkspaceDependencies(), {
     emoji: '🔗',
