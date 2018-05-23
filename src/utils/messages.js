@@ -271,7 +271,22 @@ export function noUnpublishedPackagesToPublish(): Message {
   return 'No unpublished packages to publish';
 }
 
-export function notPublishingPackage(
+export function willPublishUnpublishedPackage(
+  pkgName: string,
+  pkgLocalVersion: string
+): Message {
+  return `${pkgName} is being published at version ${pkgLocalVersion} because it is not yet published`;
+}
+
+export function willPublishPackage(
+  pkgLocalVersion: string,
+  pkgPublishedVersion: string,
+  pkgName: string
+): Message {
+  return `${pkgName} is being published because our local version (${pkgLocalVersion}) is ahead of npm's (${pkgPublishedVersion})`;
+}
+
+export function willNotPublishPackage(
   pkgLocalVersion: string,
   pkgPublishedVersion: string,
   pkgName: string
