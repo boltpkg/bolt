@@ -25,27 +25,6 @@ export function toPublishOptions(
 }
 
 async function getUnpublishedPackages(packages) {
-  let semverGtCheckFailWithWarning = (
-    pkgLocalVersion: string,
-    pkgPublishedVersion: string,
-    pkgName: string
-  ): boolean => {
-    let shouldPublish = semver.gt(pkgLocalVersion, pkgPublishedVersion);
-
-    // show a warning message if package is not published since pkgPublishedVersion > pkgLocalVersion
-    if (!shouldPublish) {
-      logger.warn(
-        messages.notPublishingPackage(
-          pkgLocalVersion,
-          pkgPublishedVersion,
-          pkgName
-        )
-      );
-    }
-
-    return shouldPublish;
-  };
-
   let results = await Promise.all(
     packages.map(async pkg => {
       let config = pkg.config;
@@ -55,22 +34,31 @@ async function getUnpublishedPackages(packages) {
         name: config.getName(),
         localVersion: config.getVersion(),
         isPublished: response.published,
-        newVersion: response.pkgInfo.version || ''
+        publishedVersion: response.pkgInfo.version || ''
       };
     })
   );
 
-  return results.filter(result => {
-    // only publish if our version is higher than the one on npm
-    return (
-      !result.isPublished ||
-      semverGtCheckFailWithWarning(
-        result.localVersion,
-        result.newVersion,
-        result.name
-      )
-    );
-  });
+  let packagesToPublish = [];
+
+  for (let pkgInfo of results) {
+    let { name, isPublished, localVersion, publishedVersion } = pkgInfo;
+    if (!isPublished) {
+      packagesToPublish.push(pkgInfo);
+    } else if (semver.gt(localVersion, publishedVersion)) {
+      packagesToPublish.push(pkgInfo);
+      logger.info(
+        messages.willPublishPackage(localVersion, publishedVersion, name)
+      );
+    } else if (semver.lt(localVersion, publishedVersion)) {
+      // If the local version is behind npm, something is wrong, we warn here, and by not getting published later, it will fail
+      logger.warn(
+        messages.willNotPublishPackage(localVersion, publishedVersion, name)
+      );
+    }
+  }
+
+  return packagesToPublish;
 }
 
 export async function publish(opts: PublishOptions) {
