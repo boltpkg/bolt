@@ -30,6 +30,10 @@ function cmd(str) {
   return chalk.bgBlack.magenta(`\`${str}\``);
 }
 
+const importantSeparator = chalk.red(
+  '===============================IMPORTANT!==============================='
+);
+
 export function packageMustDependOnCurrentVersion(
   name: string,
   depName: string,
@@ -317,13 +321,18 @@ export function errorParsingJSON(filePath: string): Message {
   return `Error parsing JSON in file:\n${filePath}`;
 }
 
+// TODO: This message actually only makes sense when using changeset commands, so should probably
+// be rethought out once `bolt version`, etc is ready
 export function invalidBoltWorkspacesFromUpdate(
   name: string,
   depName: string,
   depRange: string,
   newVersion: string
 ): Message {
-  return `${name} has a dependency on ${depName} at ${depRange}, however the new version of ${newVersion} leaves this range. You will need to make a new changeset that includes an update to ${name}`;
+  return `${importantSeparator}
+  ${name} has a dependency on ${depName} at ${depRange}, however the new version of ${newVersion} leaves this range.
+  You will need to make a new changeset that includes an update to ${name}
+${importantSeparator}`;
 }
 
 export function unableToInstall(): Message {
