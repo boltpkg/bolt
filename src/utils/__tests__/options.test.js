@@ -29,6 +29,13 @@ describe('options', () => {
   });
 
   test('toFilerOptions', () => {
+    expect(toFilterOpts({ only: 'only' })).toEqual({ only: ['only'] });
+    expect(toFilterOpts({ onlyFs: 'onlyFs' })).toEqual({ onlyFs: ['onlyFs'] });
+    expect(toFilterOpts({ ignore: 'ignore' })).toEqual({ ignore: ['ignore'] });
+    expect(toFilterOpts({ ignoreFs: 'ignoreFs' })).toEqual({
+      ignoreFs: ['ignoreFs']
+    });
+
     expect(toFilterOpts({ only: 'onlyOne,onlyTwo' })).toEqual({
       only: ['onlyOne', 'onlyTwo']
     });

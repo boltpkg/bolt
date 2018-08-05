@@ -17,10 +17,10 @@ export type JSONValue =
   | { [key: string]: JSONValue };
 
 export type FilterOpts = {
-  only?: Array<string>,
-  ignore?: Array<string>,
-  onlyFs?: Array<string>,
-  ignoreFs?: Array<string>
+  only?: string | Array<string>,
+  ignore?: string | Array<string>,
+  onlyFs?: string | Array<string>,
+  ignoreFs?: string | Array<string>
 };
 
 export type Dependency = {

@@ -17,5 +17,12 @@ describe('globs', () => {
       'package-foo',
       'package-baz'
     ]);
+    expect(matchOnlyAndIgnore(paths, 'package-ba*')).toEqual([
+      'package-bar',
+      'package-baz'
+    ]);
+    expect(matchOnlyAndIgnore(paths, null, 'package-ba*')).toEqual([
+      'package-foo'
+    ]);
   });
 });

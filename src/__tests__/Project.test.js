@@ -155,76 +155,111 @@ describe('Project', () => {
   test('filterPackages() with only flag', async () => {
     let project = await Project.init(f.find('nested-workspaces'));
     let packages = await project.getPackages();
-    let filtered = await project.filterPackages(packages, {
+    let filteredString = await project.filterPackages(packages, {
+      only: 'foo'
+    });
+    let filteredArray = await project.filterPackages(packages, {
       only: ['foo', 'bar']
     });
-    assertPackages(filtered, ['bar', 'foo']);
+    assertPackages(filteredString, ['foo']);
+    assertPackages(filteredArray, ['bar', 'foo']);
   });
 
   test('filterPackages() with only flag as glob', async () => {
     let project = await Project.init(f.find('nested-workspaces'));
     let packages = await project.getPackages();
-    let filtered = await project.filterPackages(packages, {
+    let filteredString = await project.filterPackages(packages, {
+      only: 'ba*'
+    });
+    let filteredArray = await project.filterPackages(packages, {
       only: ['ba*']
     });
-    assertPackages(filtered, ['bar', 'baz']);
+    assertPackages(filteredArray, ['bar', 'baz']);
+    assertPackages(filteredString, ['bar', 'baz']);
   });
 
   test('filterPackages() with ignore flag', async () => {
     let project = await Project.init(f.find('nested-workspaces'));
     let packages = await project.getPackages();
-    let filtered = await project.filterPackages(packages, {
+    let filteredString = await project.filterPackages(packages, {
+      ignore: 'bar'
+    });
+    let filteredArray = await project.filterPackages(packages, {
       ignore: ['bar', 'baz']
     });
-    assertPackages(filtered, ['foo']);
+    assertPackages(filteredString, ['foo', 'baz']);
+    assertPackages(filteredArray, ['foo']);
   });
 
   test('filterPackages() with only and ignore flags', async () => {
     let project = await Project.init(f.find('nested-workspaces'));
     let packages = await project.getPackages();
-    let filtered = await project.filterPackages(packages, {
+    let filteredString = await project.filterPackages(packages, {
+      only: 'ba*',
+      ignore: 'bar'
+    });
+    let filteredArray = await project.filterPackages(packages, {
       only: ['ba*', 'foo'],
       ignore: ['bar']
     });
-    assertPackages(filtered, ['foo', 'baz']);
+    assertPackages(filteredString, ['baz']);
+    assertPackages(filteredArray, ['foo', 'baz']);
   });
 
   test('filterPackages() with onlyFs flag', async () => {
     let project = await Project.init(f.find('nested-workspaces'));
     let packages = await project.getPackages();
-    let filtered = await project.filterPackages(packages, {
+    let filteredString = await project.filterPackages(packages, {
+      onlyFs: 'packages/foo'
+    });
+    let filteredArray = await project.filterPackages(packages, {
       onlyFs: ['packages/foo', 'packages/bar']
     });
-    assertPackages(filtered, ['bar', 'foo']);
+    assertPackages(filteredString, ['foo']);
+    assertPackages(filteredArray, ['bar', 'foo']);
   });
 
   test('filterPackages() with ignoreFs flag', async () => {
     let project = await Project.init(f.find('nested-workspaces'));
     let packages = await project.getPackages();
-    let filtered = await project.filterPackages(packages, {
+    let filteredString = await project.filterPackages(packages, {
+      ignoreFs: 'packages/foo'
+    });
+    let filteredArray = await project.filterPackages(packages, {
       ignoreFs: ['packages/foo', 'packages/bar']
     });
-    assertPackages(filtered, ['baz']);
+    assertPackages(filteredString, ['bar', 'baz']);
+    assertPackages(filteredArray, ['baz']);
   });
 
   test('filterPackages() with onlyFs and ignoreFs flags', async () => {
     let project = await Project.init(f.find('nested-workspaces'));
     let packages = await project.getPackages();
-    let filtered = await project.filterPackages(packages, {
+    let filteredString = await project.filterPackages(packages, {
+      onlyFs: '**/packages/ba*',
+      ignoreFs: '**/bar'
+    });
+    let filteredArray = await project.filterPackages(packages, {
       onlyFs: ['**/packages/ba*', '**/packages/fo*'],
       ignoreFs: ['**/bar']
     });
-    assertPackages(filtered, ['foo', 'baz']);
+    assertPackages(filteredString, ['baz']);
+    assertPackages(filteredArray, ['foo', 'baz']);
   });
 
   test('filterPackages() with only and ignoreFs flags', async () => {
     let project = await Project.init(f.find('nested-workspaces'));
     let packages = await project.getPackages();
-    let filtered = await project.filterPackages(packages, {
+    let filteredString = await project.filterPackages(packages, {
+      only: 'ba*',
+      ignoreFs: '**/bar'
+    });
+    let filteredArray = await project.filterPackages(packages, {
       only: ['ba*'],
       ignoreFs: ['**/bar']
     });
-    assertPackages(filtered, ['baz']);
+    assertPackages(filteredString, ['baz']);
+    assertPackages(filteredArray, ['baz']);
   });
 
   test('filterPackages() with scoped workspaces', async () => {
@@ -239,10 +274,22 @@ describe('Project', () => {
       }),
       ['@scope/foo']
     );
+    assertPackages(
+      await project.filterPackages(packages, {
+        only: '**/foo'
+      }),
+      ['@scope/foo']
+    );
 
     assertPackages(
       await project.filterPackages(packages, {
         ignore: ['**/foo']
+      }),
+      ['@scope/bar', '@scope/baz']
+    );
+    assertPackages(
+      await project.filterPackages(packages, {
+        ignore: '**/foo'
       }),
       ['@scope/bar', '@scope/baz']
     );
@@ -251,6 +298,14 @@ describe('Project', () => {
       await project.filterPackages(packages, {
         onlyFs: ['**/packages/ba*'],
         ignore: ['@scope/baz']
+      }),
+      ['@scope/bar']
+    );
+
+    assertPackages(
+      await project.filterPackages(packages, {
+        onlyFs: '**/packages/ba*',
+        ignore: '@scope/baz'
       }),
       ['@scope/bar']
     );
