@@ -104,6 +104,7 @@ yarn global add bolt
 | `bolt [unknown command]`                | (Defaults to `bolt run [unknown command]`)                                |✅|
 | `bolt help`                             | View Bolt's help content                                                  |❌|
 | `bolt help [command]`                   | View Bolt's help content for a single command                             |❌|
+| `bolt start`                            | Start the server for a specific project                                   |✅|
 | `bolt init`                             | Create a new Bolt package in the current directory                        |✅|
 | └ `bolt init --yes`                     | Skip the prompts and use defaults                                         |✅|
 | `bolt install`                          | Install all the dependencies for a project                                |✅|
