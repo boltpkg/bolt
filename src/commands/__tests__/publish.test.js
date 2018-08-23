@@ -1,93 +1,102 @@
 // @flow
 import { publish, toPublishOptions } from '../publish';
-import * as locks from '../../utils/locks';
-import * as npm from '../../utils/npm';
 import fixtures from 'fixturez';
+import * as logger from '../../utils/logger';
+import * as publishUtils from '../../utils/publish';
+import { BoltError } from '../../utils/errors';
 
 const f = fixtures(__dirname);
 
 jest.mock('../../utils/logger');
-jest.mock('../../utils/locks');
-jest.mock('../../utils/npm');
+jest.mock('../../utils/publish');
 
-const untypedNpm: any = npm;
+const unsafePublishUtil: any & typeof publishUtils.publish =
+  publishUtils.publish;
 
 describe('bolt publish', () => {
-  let lockSpy;
-  let unlockSpy;
-  let npmPublishSpy;
-
-  beforeEach(() => {
-    lockSpy = jest.spyOn(locks, 'lock');
-    unlockSpy = jest.spyOn(locks, 'unlock');
-    npmPublishSpy = jest.spyOn(npm, 'publish');
-  });
+  beforeEach(() => {});
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  // test('should lock all workspaces', async () => {
-  //   let cwd = await getFixturePath(__dirname, 'simple-project');
-  //   await publish({ cwd });
-
-  //   expect(lockSpy).toHaveBeenCalledTimes(1);
-  //   // should have been called with two packages passed in
-  //   expect(lockSpy.mock.calls[0][0].length).toEqual(2);
-  // });
-
-  // test('should unlock all workspaces', async () => {
-  //   let cwd = await getFixturePath(__dirname, 'simple-project');
-  //   await publish({ cwd });
-
-  //   expect(unlockSpy).toHaveBeenCalledTimes(1);
-  //   // should have been called with two packages passed in
-  //   expect(unlockSpy.mock.calls[0][0].length).toEqual(2);
-  // });
-
-  test('should run publish on all unpublished packages', async () => {
-    untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
+  test('should successfully publish packages', async () => {
     let cwd = f.find('simple-project');
+    unsafePublishUtil.mockReturnValue([
+      {
+        published: true,
+        name: 'example-package-01',
+        version: '1.0.0'
+      },
+      {
+        published: true,
+        name: 'example-package-02',
+        version: '1.0.0'
+      },
+      {
+        published: true,
+        name: 'example-package-03',
+        version: '1.0.0'
+      }
+    ]);
 
     await publish({ cwd });
-    expect(npmPublishSpy).toHaveBeenCalledTimes(1);
-    untypedNpm.__clearMockInfoAllow404();
+    expect(unsafePublishUtil).toHaveBeenCalledTimes(1);
   });
 
-  test('should not run publish on private packages', async () => {
-    // if we ask, npm will tell us that we are ahead for both packages (bar is private)
-    untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
-    untypedNpm.__mockInfoAllow404('bar', { published: false, pkgInfo: {} });
-    let cwd = f.find('simple-project-with-private-package');
-
-    await publish({ cwd });
-    expect(npmPublishSpy).toHaveBeenCalledWith('foo', expect.anything());
-    expect(npmPublishSpy).not.toHaveBeenCalledWith('bar', expect.anything());
-    untypedNpm.__clearMockInfoAllow404();
-  });
-
-  test('should return publishedPackages', async () => {
-    untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
+  test('should throw if publishing failed for 1 or more packages', async () => {
     let cwd = f.find('simple-project');
-    untypedNpm.publish.mockReturnValueOnce({ published: true });
-    let published = await publish({ cwd });
-    expect(untypedNpm.publish).toHaveBeenCalledTimes(1);
-
-    expect(published).toEqual([
-      { name: 'foo', newVersion: '1.0.0', published: true }
+    unsafePublishUtil.mockReturnValue([
+      {
+        published: true,
+        name: 'example-package-01',
+        version: '1.0.0'
+      },
+      {
+        published: false,
+        name: 'example-package-02',
+        version: '1.0.0'
+      }
     ]);
-    untypedNpm.__clearMockInfoAllow404();
+
+    expect(publish({ cwd })).rejects.toBeInstanceOf(BoltError);
+    expect(unsafePublishUtil).toHaveBeenCalledTimes(1);
   });
-  test('should return published false if it fails', async () => {
-    untypedNpm.__mockInfoAllow404('foo', { published: false, pkgInfo: {} });
-    let cwd = f.find('simple-project');
-    untypedNpm.publish.mockReturnValueOnce({ published: false });
-    let published = await publish({ cwd });
-    expect(untypedNpm.publish).toHaveBeenCalledTimes(1);
 
-    expect(published).toEqual([
-      { name: 'foo', newVersion: '1.0.0', published: false }
+  xtest('should log successful and unsuccessful packages', async () => {
+    console.log('TEST STARTS HERE');
+    let cwd = f.find('simple-project');
+    unsafePublishUtil.mockReturnValue([
+      {
+        published: true,
+        name: 'example-package-01',
+        version: '1.0.0'
+      },
+      {
+        published: false,
+        name: 'example-package-02',
+        version: '1.0.0'
+      },
+      {
+        published: true,
+        name: 'example-package-03',
+        version: '1.0.0'
+      },
+      {
+        published: true,
+        name: 'example-package-04',
+        version: '1.0.0'
+      },
+      {
+        published: false,
+        name: 'example-package-05',
+        version: '1.0.0'
+      }
     ]);
-    untypedNpm.__clearMockInfoAllow404();
+
+    expect(publish({ cwd })).rejects.toBeInstanceOf(BoltError);
+    expect(unsafePublishUtil).toHaveBeenCalledTimes(1);
+    expect(logger.success).toHaveBeenCalledTimes(3);
+    expect(logger.error).toHaveBeenCalledTimes(2);
   });
 });
