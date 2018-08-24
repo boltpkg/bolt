@@ -3,7 +3,7 @@
   "version": "0.20.7",
   "main": "index.js",
   "author": "James Kyle <me@thejameskyle.com>",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": "https://github.com/boltpkg/bolt",
   "bin": {
     "bolt": "./bin.js"
