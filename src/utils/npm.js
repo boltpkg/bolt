@@ -40,10 +40,15 @@ export function publish(
   return npmRequestLimit(async () => {
     logger.info(messages.npmPublish(pkgName));
     let publishFlags = opts.access ? ['--access', opts.access] : [];
-
     try {
+      // Due to a super annoying issue in yarn, we have to manually override this env variable
+      // See: https://github.com/yarnpkg/yarn/issues/2935#issuecomment-355292633
+      const envOverride = {
+        npm_config_registry: 'https://registry.npmjs.org/'
+      };
       await processes.spawn('npm', ['publish', ...publishFlags], {
-        cwd: opts.cwd
+        cwd: opts.cwd,
+        env: Object.assign({}, process.env, envOverride)
       });
       return { published: true };
     } catch (error) {
