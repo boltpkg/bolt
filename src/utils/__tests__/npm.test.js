@@ -4,6 +4,7 @@ import * as npm from '../npm';
 import Project from '../../Project';
 import * as processes from '../processes';
 import fixtures from 'fixturez';
+import containDeep from 'jest-expect-contain-deep';
 
 const f = fixtures(__dirname);
 
@@ -35,6 +36,24 @@ describe('npm', () => {
         cwd
       });
       expect(result).toEqual({ published: false });
+    });
+
+    test('Overrides the npm_config_registry env variable correctly', async () => {
+      unsafeProcesses.spawn.mockImplementation(() => Promise.resolve());
+      result = await npm.publish('simple-project', {
+        cwd
+      });
+
+      expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
+        'npm',
+        ['publish'],
+        containDeep({
+          cwd,
+          env: {
+            npm_config_registry: 'https://registry.npmjs.org/'
+          }
+        })
+      );
     });
   });
 
