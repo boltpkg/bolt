@@ -27,6 +27,23 @@ export default async function validateProject(project: Project) {
     }
   }
 
+  // Workspaces always have a name and a version in their configs
+  for (let pkg of packages) {
+    try {
+      pkg.getName();
+    } catch (err) {
+      logger.error(err.message);
+      projectIsValid = false;
+    }
+
+    try {
+      pkg.getVersion();
+    } catch (err) {
+      logger.error(err.message);
+      projectIsValid = false;
+    }
+  }
+
   // Workspaces should never appear as dependencies in the Project config
   for (let pkg of packages) {
     let depName = pkg.getName();
