@@ -298,6 +298,17 @@ export function willNotPublishPackage(
   return `${pkgName} is not being published because version ${pkgPublishedVersion} is already published on npm and we are trying to publish version ${pkgLocalVersion}`;
 }
 
+export function successfullyPublishedPackage(
+  pkgName: string,
+  pkgVersion: string
+): Message {
+  return `Successfully published ${pkgName}@${pkgVersion}`;
+}
+
+export function failedToPublishPackage(pkgName: string): Message {
+  return `Failed to publish ${pkgName}`;
+}
+
 export function couldNotBeNormalized(): Message {
   return 'The following packages could not be normalized:';
 }

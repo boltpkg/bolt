@@ -17,6 +17,7 @@
     "clean": "rm -rf dist",
     "flow": "flow status",
     "test": "jest --coverage",
+    "whichnode": "node --version",
     "format": "prettier --write src/**/*.js",
     "build:legacy": "cross-env BABEL_ENV=legacy babel src -d dist/legacy",
     "build:modern": "cross-env BABEL_ENV=modern babel src -d dist/modern",
