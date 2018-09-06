@@ -72,7 +72,7 @@
     "task-graph-runner": "^1.0.1",
     "temp-write": "^3.4.0",
     "typeable-promisify": "^2.0.1",
-    "yarn": "^1.6.0"
+    "yarn": "^1.9.4"
   },
   "jest": {
     "resetMocks": true,
