@@ -53,7 +53,7 @@ export async function install(opts: InstallOptions) {
   });
 
   for (let pkg of packages) {
-    let dependencies = pkg.getAllDependencies().keys();
+    let dependencies = Array.from(pkg.getAllDependencies().keys());
     await symlinkPackageDependencies(project, pkg, dependencies);
   }
 
