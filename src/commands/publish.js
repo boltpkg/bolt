@@ -7,7 +7,7 @@ import {
   type PublishOptions,
   type PackageMeta
 } from '../utils/publish';
-import { BoltError } from '../../dist/modern/utils/errors';
+import { BoltError } from '../utils/errors';
 
 export function toPublishOptions(
   args: options.Args,
