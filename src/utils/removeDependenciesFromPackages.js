@@ -7,6 +7,7 @@ import * as yarn from './yarn';
 import * as fs from './fs';
 import * as path from 'path';
 import { BoltError } from './errors';
+import type { SpawnOpts } from '../types';
 
 const UNINSTALL_SCRIPTS = ['preuninstall', 'uninstall', 'postuninstall'];
 
@@ -58,7 +59,8 @@ export default async function removeDependenciesFromPackages(
   project: Project,
   packages: Array<Package>,
   targetPackages: Array<Package>,
-  dependencies: Array<string>
+  dependencies: Array<string>,
+  spawnOpts: SpawnOpts
 ) {
   // Is the set of packages that we're modifying include the project package? ...
   let includesProjectPackage = false;
@@ -141,7 +143,7 @@ export default async function removeDependenciesFromPackages(
   // Run the uninstall scripts for each workspace
   await Promise.all(
     UNINSTALL_SCRIPTS.map(async script => {
-      await project.runPackageTasks(includedPackages, async pkg => {
+      await project.runPackageTasks(includedPackages, spawnOpts, async pkg => {
         await yarn.runIfExists(pkg, script);
       });
     })

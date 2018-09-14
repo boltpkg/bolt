@@ -1,5 +1,5 @@
 // @flow
-import type { Dependency } from '../types';
+import type { Dependency, SpawnOpts, FilterOpts } from '../types';
 
 export type Args = Array<string>;
 
@@ -32,7 +32,22 @@ export function number(val: mixed, name: string): number | void {
   }
 }
 
-export function toFilterOpts(flags: Flags) {
+export function toSpawnOpts(flags: Flags): SpawnOpts {
+  let spawnOpts = {};
+
+  if (flags.parallel && flags.serial) {
+    throw new Error('Commands cannot be run both serially and in parallel');
+  }
+
+  if (flags.parallel) spawnOpts.orderMode = 'parallel';
+  if (flags.serial) spawnOpts.orderMode = 'serial';
+  // TODO:
+  // if (flags.concurrency) spawnOpts.maxConcurrent = number(flags.concurrency, 'concurrency');
+
+  return spawnOpts;
+}
+
+export function toFilterOpts(flags: Flags): FilterOpts {
   let filterOpts = {};
 
   if (flags.only) filterOpts.only = string(flags.only, 'only');

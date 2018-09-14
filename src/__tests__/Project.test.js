@@ -260,7 +260,7 @@ describe('Project', () => {
     let project = await Project.init(f.find('simple-project'));
     let packages = await project.getPackages();
     let spy = jest.fn(() => Promise.resolve());
-    await project.runPackageTasks(packages, spy);
+    await project.runPackageTasks(packages, {}, spy);
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy.mock.calls[0][0]).toBeInstanceOf(Package);
   });
@@ -269,7 +269,7 @@ describe('Project', () => {
     let project = await Project.init(f.find('simple-project'));
     let packages = await project.getPackages();
     let spy = jest.fn(() => Promise.resolve());
-    await project.runPackageTasks(packages, spy);
+    await project.runPackageTasks(packages, {}, spy);
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy.mock.calls[0][0]).toBeInstanceOf(Package);
   });
@@ -280,7 +280,7 @@ describe('Project', () => {
     let packages = await project.getPackages();
     let ops = [];
 
-    await project.runPackageTasks(packages, async pkg => {
+    await project.runPackageTasks(packages, {}, async pkg => {
       ops.push('start:' + pkg.config.getName());
       // wait until next tick
       await Promise.resolve();
@@ -296,7 +296,7 @@ describe('Project', () => {
     let packages = await project.getPackages();
     let ops = [];
 
-    await project.runPackageTasks(packages, async pkg => {
+    await project.runPackageTasks(packages, {}, async pkg => {
       ops.push('start:' + pkg.getName());
       // wait until next tick
       await Promise.resolve();
@@ -312,7 +312,7 @@ describe('Project', () => {
     let packages = await project.getPackages();
     let ops = [];
 
-    await project.runPackageTasks(packages, async pkg => {
+    await project.runPackageTasks(packages, {}, async pkg => {
       ops.push('start:' + pkg.getName());
       // wait until next tick
       await Promise.resolve();
@@ -321,5 +321,41 @@ describe('Project', () => {
 
     expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
     expect(logger.warn).toHaveBeenCalled();
+  });
+
+  test('runPackageTasks() orderMode: parallel', async () => {
+    let project = await Project.init(f.find('simple-project'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    await project.runPackageTasks(
+      packages,
+      { orderMode: 'parallel' },
+      async pkg => {
+        ops.push('start:' + pkg.getName());
+        await Promise.resolve();
+        ops.push('end:' + pkg.getName());
+      }
+    );
+
+    expect(ops).toEqual(['start:bar', 'start:foo', 'end:bar', 'end:foo']);
+  });
+
+  test('runPackageTasks() orderMode: serial', async () => {
+    let project = await Project.init(f.find('independent-workspaces'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    await project.runPackageTasks(
+      packages,
+      { orderMode: 'serial' },
+      async pkg => {
+        ops.push('start:' + pkg.getName());
+        await Promise.resolve();
+        ops.push('end:' + pkg.getName());
+      }
+    );
+
+    expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
   });
 });

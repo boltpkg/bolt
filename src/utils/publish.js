@@ -8,10 +8,12 @@ import * as locks from './locks';
 import * as npm from './npm';
 import Project from '../Project';
 import Package from '../Package';
+import type { SpawnOpts } from '../types';
 
 export type PublishOptions = {|
   cwd?: string,
-  access?: string
+  access?: string,
+  spawnOpts?: SpawnOpts
 |};
 
 export type PackageMeta = {|
@@ -61,6 +63,7 @@ export async function publish(
   opts: PublishOptions = Object.freeze({})
 ): Promise<PackageMeta[]> {
   let cwd = opts.cwd || process.cwd();
+  let spawnOpts = opts.spawnOpts || {};
   let project = await Project.init(cwd);
   let packages = await project.getPackages();
   let publicPackages = packages.filter(pkg => !pkg.config.getPrivate());
@@ -78,7 +81,7 @@ export async function publish(
       logger.warn(messages.noUnpublishedPackagesToPublish());
     }
 
-    await project.runPackageTasks(unpublishedPackages, async pkg => {
+    await project.runPackageTasks(unpublishedPackages, spawnOpts, async pkg => {
       let name = pkg.config.getName();
       let version = pkg.config.getVersion();
       logger.info(messages.publishingPackage(name, version));

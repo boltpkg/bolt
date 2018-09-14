@@ -4,7 +4,7 @@ import includes from 'array-includes';
 import semver from 'semver';
 import Package from './Package';
 import Config from './Config';
-import type { FilterOpts } from './types';
+import type { SpawnOpts, FilterOpts } from './types';
 import * as fs from './utils/fs';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
@@ -139,7 +139,35 @@ export default class Project {
     return { valid, graph };
   }
 
-  async runPackageTasks(packages: Array<Package>, task: Task) {
+  async runPackageTasks(
+    packages: Array<Package>,
+    spawnOpts: SpawnOpts,
+    task: Task
+  ) {
+    if (spawnOpts.orderMode === 'serial') {
+      await this.runPackageTasksSerial(packages, task);
+    } else if (spawnOpts.orderMode === 'parallel') {
+      await this.runPackageTasksParallel(packages, task);
+    } else {
+      await this.runPackageTasksGraphParallel(packages, task);
+    }
+  }
+
+  async runPackageTasksSerial(packages: Array<Package>, task: Task) {
+    for (let pkg of packages) {
+      await task(pkg);
+    }
+  }
+
+  async runPackageTasksParallel(packages: Array<Package>, task: Task) {
+    await Promise.all(
+      packages.map(pkg => {
+        return task(pkg);
+      })
+    );
+  }
+
+  async runPackageTasksGraphParallel(packages: Array<Package>, task: Task) {
     let { graph: dependentsGraph, valid } = await this.getDependencyGraph(
       packages
     );

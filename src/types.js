@@ -16,6 +16,11 @@ export type JSONValue =
   | Array<JSONValue>
   | { [key: string]: JSONValue };
 
+export type SpawnOpts = {
+  orderMode?: 'serial' | 'parallel'
+  // maxConcurrent?: number,
+};
+
 export type FilterOpts = {
   only?: string,
   ignore?: string,

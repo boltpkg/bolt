@@ -5,11 +5,13 @@ import * as options from '../../utils/options';
 import * as logger from '../../utils/logger';
 import removeDependenciesFromPackages from '../../utils/removeDependenciesFromPackages';
 import { BoltError } from '../../utils/errors';
+import type { SpawnOpts } from '../../types';
 
 export type WorkspaceRemoveOptions = {
   cwd?: string,
   pkgName: string,
-  deps: Array<string>
+  deps: Array<string>,
+  spawnOpts: SpawnOpts
 };
 
 export function toWorkspaceRemoveOptions(
@@ -20,7 +22,8 @@ export function toWorkspaceRemoveOptions(
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     pkgName,
-    deps
+    deps,
+    spawnOpts: options.toSpawnOpts(flags)
   };
 }
 
@@ -36,5 +39,11 @@ export async function workspaceRemove(opts: WorkspaceRemoveOptions) {
     );
   }
 
-  await removeDependenciesFromPackages(project, packages, [pkg], opts.deps);
+  await removeDependenciesFromPackages(
+    project,
+    packages,
+    [pkg],
+    opts.deps,
+    opts.spawnOpts
+  );
 }
