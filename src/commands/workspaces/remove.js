@@ -1,5 +1,5 @@
 // @flow
-import type { FilterOpts } from '../../types';
+import type { SpawnOpts, FilterOpts } from '../../types';
 import * as options from '../../utils/options';
 import Project from '../../Project';
 import removeDependenciesFromPackages from '../../utils/removeDependenciesFromPackages';
@@ -7,6 +7,7 @@ import removeDependenciesFromPackages from '../../utils/removeDependenciesFromPa
 export type WorkspacesRemoveOptions = {
   cwd?: string,
   deps: Array<string>,
+  spawnOpts: SpawnOpts,
   filterOpts: FilterOpts
 };
 
@@ -17,6 +18,7 @@ export function toWorkspacesRemoveOptions(
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     deps: args,
+    spawnOpts: options.toSpawnOpts(flags),
     filterOpts: options.toFilterOpts(flags)
   };
 }
@@ -31,6 +33,7 @@ export async function workspacesRemove(opts: WorkspacesRemoveOptions) {
     project,
     packages,
     filteredPackages,
-    opts.deps
+    opts.deps,
+    opts.spawnOpts
   );
 }
