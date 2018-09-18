@@ -1,0 +1,12 @@
+{
+  "name": "@scope/bar",
+  "private": true,
+  "version": "1.0.0",
+  "bin": {
+    "bar1": "bin/bar1.js",
+    "bar2": "bin/anotherBar.js"
+  },
+  "dependencies": {
+    "react": "^15.6.1"
+  }
+}

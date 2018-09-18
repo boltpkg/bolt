@@ -127,12 +127,6 @@ export default async function symlinkPackageDependencies(
       actualBinFileRelative
     );
 
-    if (!pathIsInside(actualBinFile, project.pkg.nodeModules)) {
-      throw new BoltError(
-        `${binName} is linked to a location outside of project node_modules: ${actualBinFileRelative}`
-      );
-    }
-
     // To find the name of the dep that created the bin we'll get its path from node_modules and
     // use the first one or two parts (two if the package is scoped)
     let binFileRelativeToNodeModules = path.relative(

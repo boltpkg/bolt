@@ -1,0 +1,8 @@
+{
+  "name": "@scope/baz",
+  "version": "1.0.0",
+  "bin": "baz.js",
+  "dependencies": {
+    "react": "^15.6.1"
+  }
+}
