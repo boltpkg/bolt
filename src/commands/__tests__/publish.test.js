@@ -3,7 +3,6 @@ import { publish, toPublishOptions } from '../publish';
 import fixtures from 'fixturez';
 import * as logger from '../../utils/logger';
 import * as publishUtils from '../../utils/publish';
-import { BoltError } from '../../utils/errors';
 
 const f = fixtures(__dirname);
 
@@ -44,7 +43,7 @@ describe('bolt publish', () => {
     expect(unsafePublishUtil).toHaveBeenCalledTimes(1);
   });
 
-  test('should throw if publishing failed for 1 or more packages', async () => {
+  test('should throw if publishing failed > 1 time', async () => {
     let cwd = f.find('simple-project');
     unsafePublishUtil.mockReturnValue([
       {
@@ -59,12 +58,11 @@ describe('bolt publish', () => {
       }
     ]);
 
-    expect(publish({ cwd })).rejects.toBeInstanceOf(BoltError);
+    await expect(publish({ cwd })).rejects.toBeInstanceOf(Error);
     expect(unsafePublishUtil).toHaveBeenCalledTimes(1);
   });
 
-  xtest('should log successful and unsuccessful packages', async () => {
-    console.log('TEST STARTS HERE');
+  test('should log successful and unsuccessful packages', async () => {
     let cwd = f.find('simple-project');
     unsafePublishUtil.mockReturnValue([
       {
@@ -94,7 +92,7 @@ describe('bolt publish', () => {
       }
     ]);
 
-    expect(publish({ cwd })).rejects.toBeInstanceOf(BoltError);
+    await expect(publish({ cwd })).rejects.toBeInstanceOf(Error);
     expect(unsafePublishUtil).toHaveBeenCalledTimes(1);
     expect(logger.success).toHaveBeenCalledTimes(3);
     expect(logger.error).toHaveBeenCalledTimes(2);

@@ -8,6 +8,7 @@ import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
 import validateProject from '../utils/validateProject';
 import symlinkPackageDependencies from '../utils/symlinkPackageDependencies';
+import symlinkPackagesBinaries from '../utils/symlinkPackagesBinariesToProject';
 import * as yarn from '../utils/yarn';
 import pathIsInside from 'path-is-inside';
 import { BoltError } from '../utils/errors';
@@ -56,6 +57,13 @@ export async function install(opts: InstallOptions) {
     let dependencies = Array.from(pkg.getAllDependencies().keys());
     await symlinkPackageDependencies(project, pkg, dependencies);
   }
+
+  logger.info(messages.linkingWorkspaceBinaries(), {
+    emoji: '🚀',
+    prefix: false
+  });
+
+  await symlinkPackagesBinaries(project);
 
   logger.success(messages.installedAndLinkedWorkspaces(), { emoji: '💥' });
 }

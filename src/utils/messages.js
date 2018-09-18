@@ -254,14 +254,18 @@ export function lockingAllPackages(): Message {
 }
 
 export function validatingProject(): Message {
-  return '[1/3] Validating project...';
+  return '[1/4] Validating project...';
 }
 export function installingProjectDependencies(): Message {
-  return '[2/3] Installing project dependencies...';
+  return '[2/4] Installing project dependencies...';
 }
 
 export function linkingWorkspaceDependencies(): Message {
-  return '[3/3] Linking workspace dependencies...';
+  return '[3/4] Linking workspace dependencies...';
+}
+
+export function linkingWorkspaceBinaries(): Message {
+  return '[4/4] Linking workspace binaries...';
 }
 
 export function publishingPackage(

@@ -1,0 +1,9 @@
+{
+  "name": "zee",
+  "private": true,
+  "version": "1.0.0",
+  "bin": "zee.js",
+  "dependencies": {
+    "react": "^15.6.1"
+  }
+}

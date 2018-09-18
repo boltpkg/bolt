@@ -1,0 +1,12 @@
+{
+  "name": "nested-workspaces-with-muliple-binaries",
+  "description": "A collection of packages with different types of binaries",
+  "private": true,
+  "version": "1.0.0",
+  "bolt": {
+    "workspaces": ["packages/*"]
+  },
+  "dependencies": {
+    "react": "^15.6.1"
+  }
+}
