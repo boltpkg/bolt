@@ -185,7 +185,10 @@ export default async function symlinkPackageDependencies(
       let src = path.join(depWorkspace.pkg.dir, String(binPath));
       let dest = path.join(pkg.nodeModulesBin, binName);
 
-      symlinksToCreate.push({ src, dest, type: 'exec' });
+      // Just in case the symlink is already added (it might have already existed in the projects bin/)
+      if (!symlinksToCreate.find(symlink => symlink.dest === dest)) {
+        symlinksToCreate.push({ src, dest, type: 'exec' });
+      }
     }
   }
 
