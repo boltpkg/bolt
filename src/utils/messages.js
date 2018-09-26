@@ -400,3 +400,11 @@ export function errorWorkspacesUpgrade(filterOpts: Array<string>): Message {
 export function noNeedToSymlinkInternalDependency(): Message {
   return `Internal packages are symlinked, there is no need update them`;
 }
+
+export function taskRunningAcrossCINodes(
+  nodes: number,
+  count: number,
+  total: number
+): Message {
+  return `Task is being split across ${nodes} nodes. Current node running across ${count} of ${total} workspaces`;
+}
