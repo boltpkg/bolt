@@ -35,10 +35,11 @@ export function number(val: mixed, name: string): number | void {
 export function toSpawnOpts(flags: Flags): SpawnOpts {
   let spawnOpts = {};
 
-  if (flags.parallel && flags.serial) {
+  if ((flags.parallelNodes || flags.parallel) && flags.serial) {
     throw new Error('Commands cannot be run both serially and in parallel');
   }
 
+  if (flags.parallelNodes) spawnOpts.orderMode = 'parallel-nodes';
   if (flags.parallel) spawnOpts.orderMode = 'parallel';
   if (flags.serial) spawnOpts.orderMode = 'serial';
   // TODO:

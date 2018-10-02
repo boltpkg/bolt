@@ -12,6 +12,8 @@ import { BoltError } from './utils/errors';
 import * as globs from './utils/globs';
 import taskGraphRunner from 'task-graph-runner';
 import minimatch from 'minimatch';
+import * as env from './utils/env';
+import chunkd from 'chunkd';
 
 export type Task = (pkg: Package) => Promise<mixed>;
 
@@ -148,6 +150,8 @@ export default class Project {
       await this.runPackageTasksSerial(packages, task);
     } else if (spawnOpts.orderMode === 'parallel') {
       await this.runPackageTasksParallel(packages, task);
+    } else if (spawnOpts.orderMode === 'parallel-nodes') {
+      await this.runPackageTasksParallelNodes(packages, task);
     } else {
       await this.runPackageTasksGraphParallel(packages, task);
     }
@@ -165,6 +169,25 @@ export default class Project {
         return task(pkg);
       })
     );
+  }
+
+  async runPackageTasksParallelNodes(packages: Array<Package>, task: Task) {
+    packages = packages.sort((a, b) => {
+      return a.filePath.localeCompare(b.filePath, [], { numeric: true });
+    });
+
+    let index = env.get('CI_NODE_INDEX');
+    let total = env.get('CI_NODE_TOTAL');
+
+    if (typeof index === 'number' && typeof total === 'number') {
+      let all = packages.length;
+      packages = chunkd(packages, index, total);
+      logger.info(
+        messages.taskRunningAcrossCINodes(total, packages.length, all)
+      );
+    }
+
+    await this.runPackageTasksParallel(packages, task);
   }
 
   async runPackageTasksGraphParallel(packages: Array<Package>, task: Task) {

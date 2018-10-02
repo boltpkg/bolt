@@ -3,6 +3,7 @@ import path from 'path';
 import Project from '../Project';
 import Package from '../Package';
 import * as logger from '../utils/logger';
+import * as env from '../utils/env';
 import fixtures from 'fixturez';
 
 const f = fixtures(__dirname);
@@ -23,6 +24,10 @@ function assertDependents(graph, pkg, dependents) {
 function assertPackages(packages, expected) {
   expect(packages.map(pkg => pkg.getName())).toEqual(expected);
 }
+
+afterEach(() => {
+  env.__reset();
+});
 
 describe('Project', () => {
   let project;
@@ -339,6 +344,33 @@ describe('Project', () => {
     );
 
     expect(ops).toEqual(['start:bar', 'start:foo', 'end:bar', 'end:foo']);
+  });
+
+  test('runPackageTasks() orderMode: parallel-nodes', async () => {
+    let project = await Project.init(f.find('simple-project'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    async function run() {
+      await project.runPackageTasks(
+        packages,
+        { orderMode: 'parallel-nodes' },
+        async pkg => {
+          ops.push('start:' + pkg.getName());
+          await Promise.resolve();
+          ops.push('end:' + pkg.getName());
+        }
+      );
+    }
+
+    env.__override('CI_NODE_TOTAL', 2);
+    env.__override('CI_NODE_INDEX', 0);
+    await run();
+    expect(ops).toEqual(['start:bar', 'end:bar']);
+    ops = [];
+    env.__override('CI_NODE_INDEX', 1);
+    await run();
+    expect(ops).toEqual(['start:foo', 'end:foo']);
   });
 
   test('runPackageTasks() orderMode: serial', async () => {

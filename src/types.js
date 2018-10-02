@@ -17,7 +17,7 @@ export type JSONValue =
   | { [key: string]: JSONValue };
 
 export type SpawnOpts = {
-  orderMode?: 'serial' | 'parallel'
+  orderMode?: 'serial' | 'parallel' | 'parallel-nodes'
   // maxConcurrent?: number,
 };
 
