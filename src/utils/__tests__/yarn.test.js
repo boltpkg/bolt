@@ -101,8 +101,29 @@ describe('utils/yarn', () => {
       );
       delete process.env.TEST_CANARY;
     });
-  });
 
+    it('should add bolt_config_user_agent environment variable during install', async () => {
+      const cwd = 'a/fake/path';
+      unsafeConstants.BOLT_VERSION = '9.9.9';
+      const yarnUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+      const boltUserAgent =
+      'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+      const localYarn = await getLocalYarnPath();
+      unsafeProcesses.spawn.mockReturnValueOnce(
+        Promise.resolve({ stdout: yarnUserAgent })
+      );
+
+      await yarn.install(cwd);
+      expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
+        localYarn,
+        ['install'],
+        containDeep({
+          env: { bolt_config_user_agent: boltUserAgent }
+        })
+      );
+    });
+  });
+  
   describe('add()', () => {
     let cwd;
     let project;
