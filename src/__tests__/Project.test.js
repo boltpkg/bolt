@@ -382,7 +382,7 @@ describe('Project', () => {
     expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
   });
 
-  test('runPackageTasks() fails with bail orderMode: serial', async () => {
+  test('runPackageTasks() fails with bail orderMode: serial', async done => {
     let project = await Project.init(f.find('independent-workspaces'));
     let packages = await project.getPackages();
     let ops = [];
@@ -393,19 +393,21 @@ describe('Project', () => {
         { orderMode: 'serial', bail: true },
         async pkg => {
           ops.push('start:' + pkg.getName());
-          throw new Error('test');
+          if (pkg.getName() === 'bar') {
+            throw new Error('test');
+          }
           await Promise.resolve();
           ops.push('end:' + pkg.getName());
         }
       );
+      done.fail(new Error('Error should have been thrown'));
     } catch (error) {
       expect(ops).toEqual(['start:bar']);
-      return;
     }
-    fail('Error should have been thrown');
+    done();
   });
 
-  test('runPackageTasks() fails with no bail orderMode: serial', async () => {
+  test('runPackageTasks() fails with no bail orderMode: serial', async done => {
     let project = await Project.init(f.find('independent-workspaces'));
     let packages = await project.getPackages();
     let ops = [];
@@ -423,14 +425,14 @@ describe('Project', () => {
           ops.push('end:' + pkg.getName());
         }
       );
+      done.fail(new Error('Error should have been thrown'));
     } catch (error) {
       expect(ops).toEqual(['start:bar', 'start:foo', 'end:foo']);
-      return;
     }
-    fail('Error should have been thrown');
+    done();
   });
 
-  test('runPackageTasks() cleans after bail', async () => {
+  test('runPackageTasks() cleans after bail', async done => {
     let project = await Project.init(f.find('independent-workspaces'));
     let packages = await project.getPackages();
     let ops = [];
@@ -450,10 +452,10 @@ describe('Project', () => {
         },
         cleanupSpy
       );
+      done.fail(new Error('Error should have been thrown'));
     } catch (error) {
       expect(cleanupSpy.mock.calls.length).toBe(1);
-      return;
     }
-    fail('Error should have been thrown');
+    done();
   });
 });
