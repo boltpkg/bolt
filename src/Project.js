@@ -7,7 +7,6 @@ import Config from './Config';
 import type { SpawnOpts, FilterOpts } from './types';
 import * as fs from './utils/fs';
 import * as logger from './utils/logger';
-import * as processes from './utils/processes';
 import {
   promiseWrapper,
   promiseWrapperSuccess,
@@ -198,32 +197,32 @@ export default class Project {
     });
   }
 
-  async runPackageTasksSerial(
+  async runPackageTasksSerial<T>(
     packages: Array<Package>,
-    task: InternalTask
-  ): Promise<Array<TaskResult>> {
-    const results: Array<TaskResult> = [];
+    task: GenericTask<T>
+  ): Promise<Array<T>> {
+    const results: Array<T> = [];
     for (let pkg of packages) {
       results.push(await task(pkg));
     }
     return results;
   }
 
-  async runPackageTasksParallel(
+  async runPackageTasksParallel<T>(
     packages: Array<Package>,
-    task: InternalTask
-  ): Promise<Array<TaskResult>> {
-    let taskPromises: Array<Promise<TaskResult>> = [];
+    task: GenericTask<T>
+  ): Promise<Array<T>> {
+    let taskPromises: Array<Promise<T>> = [];
     packages.forEach(pkg => {
       taskPromises.push(task(pkg));
     });
     return Promise.all(taskPromises);
   }
 
-  async runPackageTasksParallelNodes(
+  async runPackageTasksParallelNodes<T>(
     packages: Array<Package>,
-    task: InternalTask
-  ): Promise<Array<TaskResult>> {
+    task: GenericTask<T>
+  ): Promise<Array<T>> {
     packages = packages.sort((a, b) => {
       return a.filePath.localeCompare(b.filePath, [], { numeric: true });
     });
@@ -242,10 +241,10 @@ export default class Project {
     return this.runPackageTasksParallel(packages, task);
   }
 
-  async runPackageTasksGraphParallel(
+  async runPackageTasksGraphParallel<T>(
     packages: Array<Package>,
-    task: InternalTask
-  ): Promise<Array<TaskResult>> {
+    task: GenericTask<T>
+  ): Promise<Array<T>> {
     let { graph: dependentsGraph, valid } = await this.getDependencyGraph(
       packages
     );
@@ -270,7 +269,7 @@ export default class Project {
     if (!safe) {
       logger.warn(messages.unsafeCycles());
     }
-    return ((Object.values(values): any): Array<TaskResult>);
+    return ((Object.values(values): any): Array<T>);
   }
 
   getPackageByName(packages: Array<Package>, pkgName: string) {
