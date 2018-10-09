@@ -270,15 +270,6 @@ describe('Project', () => {
     expect(spy.mock.calls[0][0]).toBeInstanceOf(Package);
   });
 
-  test('runPackageTasks()', async () => {
-    let project = await Project.init(f.find('simple-project'));
-    let packages = await project.getPackages();
-    let spy = jest.fn(() => Promise.resolve());
-    await project.runPackageTasks(packages, {}, spy);
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy.mock.calls[0][0]).toBeInstanceOf(Package);
-  });
-
   test('runPackageTasks() with independent workspaces', async () => {
     let cwd = f.find('independent-workspaces');
     let project = await Project.init(cwd);
@@ -389,5 +380,80 @@ describe('Project', () => {
     );
 
     expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
+  });
+
+  test('runPackageTasks() fails with bail orderMode: serial', async () => {
+    let project = await Project.init(f.find('independent-workspaces'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    try {
+      await project.runPackageTasks(
+        packages,
+        { orderMode: 'serial', bail: true },
+        async pkg => {
+          ops.push('start:' + pkg.getName());
+          throw new Error('test');
+          await Promise.resolve();
+          ops.push('end:' + pkg.getName());
+        }
+      );
+    } catch (error) {
+      expect(ops).toEqual(['start:bar']);
+      return;
+    }
+    fail('Error should have been thrown');
+  });
+
+  test('runPackageTasks() fails with no bail orderMode: serial', async () => {
+    let project = await Project.init(f.find('independent-workspaces'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    try {
+      await project.runPackageTasks(
+        packages,
+        { orderMode: 'serial', bail: false },
+        async pkg => {
+          ops.push('start:' + pkg.getName());
+          if (pkg.getName() === 'bar') {
+            throw new Error('test');
+          }
+          await Promise.resolve();
+          ops.push('end:' + pkg.getName());
+        }
+      );
+    } catch (error) {
+      expect(ops).toEqual(['start:bar', 'start:foo', 'end:foo']);
+      return;
+    }
+    fail('Error should have been thrown');
+  });
+
+  test('runPackageTasks() cleans after bail', async () => {
+    let project = await Project.init(f.find('independent-workspaces'));
+    let packages = await project.getPackages();
+    let ops = [];
+    let cleanupSpy = jest.fn(() => {});
+
+    try {
+      await project.runPackageTasks(
+        packages,
+        { orderMode: 'serial', bail: true },
+        async pkg => {
+          ops.push('start:' + pkg.getName());
+          if (pkg.getName() === 'bar') {
+            throw new Error('test');
+          }
+          await Promise.resolve();
+          ops.push('end:' + pkg.getName());
+        },
+        cleanupSpy
+      );
+    } catch (error) {
+      expect(cleanupSpy.mock.calls.length).toBe(1);
+      return;
+    }
+    fail('Error should have been thrown');
   });
 });

@@ -4,7 +4,7 @@ import type Package from '../Package';
 import * as processes from './processes';
 import * as options from './options';
 
-export default async function execCommand(
+export default function execCommand(
   project: Project,
   pkg: Package,
   command: string,
@@ -25,10 +25,14 @@ export default async function execCommand(
 
   let PATH = PATH_PARTS.join(':');
 
-  return await processes.spawn(command, commandArgs, {
+  return processes.spawn(command, commandArgs, {
     pkg,
     cwd: pkg.dir,
     tty: false,
     env: { ...process.env, PATH }
   });
+}
+
+export function cleanUp() {
+  processes.killRunningProcesses();
 }

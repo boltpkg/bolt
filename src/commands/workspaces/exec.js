@@ -2,7 +2,7 @@
 import type { FilterOpts, SpawnOpts } from '../../types';
 import Project from '../../Project';
 import * as options from '../../utils/options';
-import execCommand from '../../utils/execCommand';
+import execCommand, { cleanUp } from '../../utils/execCommand';
 
 export type WorkspacesExecOptions = {|
   cwd?: string,
@@ -32,7 +32,11 @@ export async function workspacesExec(opts: WorkspacesExecOptions) {
   let packages = await project.getPackages();
   let filteredPackages = project.filterPackages(packages, opts.filterOpts);
 
-  await project.runPackageTasks(filteredPackages, opts.spawnOpts, async pkg => {
-    await execCommand(project, pkg, opts.command, opts.commandArgs);
-  });
+  await project.runPackageTasks(
+    filteredPackages,
+    opts.spawnOpts,
+    async pkg =>
+      await execCommand(project, pkg, opts.command, opts.commandArgs),
+    cleanUp
+  );
 }

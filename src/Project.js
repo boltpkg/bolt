@@ -7,6 +7,12 @@ import Config from './Config';
 import type { SpawnOpts, FilterOpts } from './types';
 import * as fs from './utils/fs';
 import * as logger from './utils/logger';
+import * as processes from './utils/processes';
+import {
+  promiseWrapper,
+  promiseWrapperSuccess,
+  type PromiseResult
+} from './utils/promiseWrapper';
 import * as messages from './utils/messages';
 import { BoltError } from './utils/errors';
 import * as globs from './utils/globs';
@@ -15,7 +21,21 @@ import minimatch from 'minimatch';
 import * as env from './utils/env';
 import chunkd from 'chunkd';
 
-export type Task = (pkg: Package) => Promise<mixed>;
+type GenericTask<T> = (pkg: Package) => Promise<T>;
+
+type TaskResult = PromiseResult<mixed>;
+
+type InternalTask = GenericTask<TaskResult>;
+
+export type Task = GenericTask<mixed>;
+
+function taskWrapper(task: Task, bail?: boolean): InternalTask {
+  if (bail === undefined || bail) {
+    return promiseWrapperSuccess(task);
+  } else {
+    return promiseWrapper(task);
+  }
+}
 
 export default class Project {
   pkg: Package;
@@ -144,34 +164,66 @@ export default class Project {
   async runPackageTasks(
     packages: Array<Package>,
     spawnOpts: SpawnOpts,
-    task: Task
+    task: Task,
+    cleanUp?: () => void
   ) {
-    if (spawnOpts.orderMode === 'serial') {
-      await this.runPackageTasksSerial(packages, task);
-    } else if (spawnOpts.orderMode === 'parallel') {
-      await this.runPackageTasksParallel(packages, task);
-    } else if (spawnOpts.orderMode === 'parallel-nodes') {
-      await this.runPackageTasksParallelNodes(packages, task);
-    } else {
-      await this.runPackageTasksGraphParallel(packages, task);
+    const wrappedTask = taskWrapper(task, spawnOpts.bail);
+    let results: TaskResult[];
+    try {
+      if (spawnOpts.orderMode === 'serial') {
+        results = await this.runPackageTasksSerial(packages, wrappedTask);
+      } else if (spawnOpts.orderMode === 'parallel') {
+        results = await this.runPackageTasksParallel(packages, wrappedTask);
+      } else if (spawnOpts.orderMode === 'parallel-nodes') {
+        results = await this.runPackageTasksParallelNodes(
+          packages,
+          wrappedTask
+        );
+      } else {
+        results = await this.runPackageTasksGraphParallel(
+          packages,
+          wrappedTask
+        );
+      }
+    } catch (error) {
+      if (cleanUp) {
+        cleanUp();
+      }
+      throw error;
     }
+    results.forEach(r => {
+      if (r.status === 'error') {
+        throw r.error;
+      }
+    });
   }
 
-  async runPackageTasksSerial(packages: Array<Package>, task: Task) {
+  async runPackageTasksSerial(
+    packages: Array<Package>,
+    task: InternalTask
+  ): Promise<Array<TaskResult>> {
+    const results: Array<TaskResult> = [];
     for (let pkg of packages) {
-      await task(pkg);
+      results.push(await task(pkg));
     }
+    return results;
   }
 
-  async runPackageTasksParallel(packages: Array<Package>, task: Task) {
-    await Promise.all(
-      packages.map(pkg => {
-        return task(pkg);
-      })
-    );
+  async runPackageTasksParallel(
+    packages: Array<Package>,
+    task: InternalTask
+  ): Promise<Array<TaskResult>> {
+    let taskPromises: Array<Promise<TaskResult>> = [];
+    packages.forEach(pkg => {
+      taskPromises.push(task(pkg));
+    });
+    return Promise.all(taskPromises);
   }
 
-  async runPackageTasksParallelNodes(packages: Array<Package>, task: Task) {
+  async runPackageTasksParallelNodes(
+    packages: Array<Package>,
+    task: InternalTask
+  ): Promise<Array<TaskResult>> {
     packages = packages.sort((a, b) => {
       return a.filePath.localeCompare(b.filePath, [], { numeric: true });
     });
@@ -187,10 +239,13 @@ export default class Project {
       );
     }
 
-    await this.runPackageTasksParallel(packages, task);
+    return this.runPackageTasksParallel(packages, task);
   }
 
-  async runPackageTasksGraphParallel(packages: Array<Package>, task: Task) {
+  async runPackageTasksGraphParallel(
+    packages: Array<Package>,
+    task: InternalTask
+  ): Promise<Array<TaskResult>> {
     let { graph: dependentsGraph, valid } = await this.getDependencyGraph(
       packages
     );
@@ -201,7 +256,7 @@ export default class Project {
       graph.set(pkgName, pkgInfo.dependencies);
     }
 
-    let { safe } = await taskGraphRunner({
+    let { safe, values } = await taskGraphRunner({
       graph,
       force: true,
       task: async pkgName => {
@@ -215,6 +270,7 @@ export default class Project {
     if (!safe) {
       logger.warn(messages.unsafeCycles());
     }
+    return ((Object.values(values): any): Array<TaskResult>);
   }
 
   getPackageByName(packages: Array<Package>, pkgName: string) {

@@ -19,6 +19,11 @@ export function handleSignals() {
   });
 }
 
+export function killRunningProcesses() {
+  processes.forEach(p => p.kill());
+  processes.clear();
+}
+
 export class ChildProcessError extends Error {
   code: number;
   stdout: string;
