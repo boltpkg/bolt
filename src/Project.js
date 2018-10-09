@@ -163,33 +163,20 @@ export default class Project {
   async runPackageTasks(
     packages: Array<Package>,
     spawnOpts: SpawnOpts,
-    task: Task,
-    cleanUp?: () => void
+    task: Task
   ) {
     const wrappedTask = taskWrapper(task, spawnOpts.bail);
     let results: TaskResult[];
-    try {
-      if (spawnOpts.orderMode === 'serial') {
-        results = await this.runPackageTasksSerial(packages, wrappedTask);
-      } else if (spawnOpts.orderMode === 'parallel') {
-        results = await this.runPackageTasksParallel(packages, wrappedTask);
-      } else if (spawnOpts.orderMode === 'parallel-nodes') {
-        results = await this.runPackageTasksParallelNodes(
-          packages,
-          wrappedTask
-        );
-      } else {
-        results = await this.runPackageTasksGraphParallel(
-          packages,
-          wrappedTask
-        );
-      }
-    } catch (error) {
-      if (cleanUp) {
-        cleanUp();
-      }
-      throw error;
+    if (spawnOpts.orderMode === 'serial') {
+      results = await this.runPackageTasksSerial(packages, wrappedTask);
+    } else if (spawnOpts.orderMode === 'parallel') {
+      results = await this.runPackageTasksParallel(packages, wrappedTask);
+    } else if (spawnOpts.orderMode === 'parallel-nodes') {
+      results = await this.runPackageTasksParallelNodes(packages, wrappedTask);
+    } else {
+      results = await this.runPackageTasksGraphParallel(packages, wrappedTask);
     }
+
     results.forEach(r => {
       if (r.status === 'error') {
         throw r.error;
@@ -208,15 +195,11 @@ export default class Project {
     return results;
   }
 
-  async runPackageTasksParallel<T>(
+  runPackageTasksParallel<T>(
     packages: Array<Package>,
     task: GenericTask<T>
   ): Promise<Array<T>> {
-    let taskPromises: Array<Promise<T>> = [];
-    packages.forEach(pkg => {
-      taskPromises.push(task(pkg));
-    });
-    return Promise.all(taskPromises);
+    return Promise.all(packages.map(pkg => task(pkg)));
   }
 
   async runPackageTasksParallelNodes<T>(

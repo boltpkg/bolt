@@ -431,31 +431,4 @@ describe('Project', () => {
     }
     done();
   });
-
-  test('runPackageTasks() cleans after bail', async done => {
-    let project = await Project.init(f.find('independent-workspaces'));
-    let packages = await project.getPackages();
-    let ops = [];
-    let cleanupSpy = jest.fn(() => {});
-
-    try {
-      await project.runPackageTasks(
-        packages,
-        { orderMode: 'serial', bail: true },
-        async pkg => {
-          ops.push('start:' + pkg.getName());
-          if (pkg.getName() === 'bar') {
-            throw new Error('test');
-          }
-          await Promise.resolve();
-          ops.push('end:' + pkg.getName());
-        },
-        cleanupSpy
-      );
-      done.fail(new Error('Error should have been thrown'));
-    } catch (error) {
-      expect(cleanupSpy.mock.calls.length).toBe(1);
-    }
-    done();
-  });
 });

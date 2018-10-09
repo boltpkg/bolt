@@ -212,7 +212,3 @@ export async function globalCli(
     tty: true
   });
 }
-
-export function cleanUp() {
-  processes.killRunningProcesses();
-}

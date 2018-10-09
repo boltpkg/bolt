@@ -35,7 +35,7 @@ export async function workspacesRun(opts: WorkspacesRunOptions) {
   await project.runPackageTasks(
     filteredPackages,
     opts.spawnOpts,
-    async pkg => await yarn.runIfExists(pkg, opts.script, opts.scriptArgs),
-    yarn.cleanUp
+    // no need to error if script doesn't exist
+    async pkg => await yarn.runIfExists(pkg, opts.script, opts.scriptArgs)
   );
 }

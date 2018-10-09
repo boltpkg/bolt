@@ -146,8 +146,7 @@ export default async function removeDependenciesFromPackages(
       await project.runPackageTasks(
         includedPackages,
         spawnOpts,
-        async pkg => await yarn.runIfExists(pkg, script),
-        yarn.cleanUp
+        async pkg => await yarn.runIfExists(pkg, script)
       );
     })
   );

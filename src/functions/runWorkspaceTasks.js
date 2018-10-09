@@ -16,23 +16,17 @@ type Options = {
 
 export default async function runWorkspaceTasks(
   task: Task,
-  opts: Options = {},
-  cleanUp?: () => void
+  opts: Options = {}
 ): Promise<void> {
   let cwd = opts.cwd || process.cwd();
   let spawnOpts = opts.spawnOpts || {};
   let project = await Project.init(cwd);
   let packages = await project.getPackages();
 
-  await project.runPackageTasks(
-    packages,
-    spawnOpts,
-    pkg => {
-      return task({
-        dir: pkg.dir,
-        config: pkg.config.json
-      });
-    },
-    cleanUp
-  );
+  await project.runPackageTasks(packages, spawnOpts, pkg => {
+    return task({
+      dir: pkg.dir,
+      config: pkg.config.json
+    });
+  });
 }

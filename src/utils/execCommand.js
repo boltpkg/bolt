@@ -32,7 +32,3 @@ export default function execCommand(
     env: { ...process.env, PATH }
   });
 }
-
-export function cleanUp() {
-  processes.killRunningProcesses();
-}
