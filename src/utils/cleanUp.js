@@ -15,10 +15,10 @@ export function handleAllSignals(cleanUp: () => void) {
   });
   process.on('unhandledRejection', err => {
     cleanUp();
-    process.exit(code);
+    process.exit(1);
   });
   process.on('uncaughtException', err => {
     cleanUp();
-    process.exit(code);
+    process.exit(1);
   });
 }
