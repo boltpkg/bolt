@@ -31,7 +31,7 @@ export async function install(cwd: string, pureLockfile?: boolean) {
   let yarnUserAgent = await userAgent();
   let boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
 
-  await processes.spawn(localYarn, ['install', ...installFlags], {
+  await processes.spawn(`"${localYarn}"`, ['install', ...installFlags], {
     cwd,
     tty: true,
     env: { ...process.env, npm_config_user_agent: boltUserAgent, bolt_config_user_agent: boltUserAgent },
