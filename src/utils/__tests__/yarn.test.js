@@ -40,7 +40,7 @@ describe('utils/yarn', () => {
       );
       await yarn.install(cwd);
       expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
-        localYarn,
+        `"${localYarn}"`,
         ['install'],
         expect.objectContaining({ cwd })
       );
@@ -54,7 +54,7 @@ describe('utils/yarn', () => {
       );
       await yarn.install(cwd, true);
       expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
-        localYarn,
+        `"${localYarn}"`,
         ['install', '--pure-lockfile'],
         expect.objectContaining({ cwd })
       );
@@ -73,7 +73,7 @@ describe('utils/yarn', () => {
 
       await yarn.install(cwd);
       expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
-        localYarn,
+        `"${localYarn}"`,
         ['install'],
         containDeep({
           env: { npm_config_user_agent: boltUserAgent }
@@ -91,7 +91,7 @@ describe('utils/yarn', () => {
 
       await yarn.install(cwd);
       expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
-        localYarn,
+        `"${localYarn}"`,
         ['install'],
         containDeep({
           env: {
@@ -107,7 +107,7 @@ describe('utils/yarn', () => {
       unsafeConstants.BOLT_VERSION = '9.9.9';
       const yarnUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
       const boltUserAgent =
-      'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+        'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
       const localYarn = await getLocalYarnPath();
       unsafeProcesses.spawn.mockReturnValueOnce(
         Promise.resolve({ stdout: yarnUserAgent })
@@ -115,7 +115,7 @@ describe('utils/yarn', () => {
 
       await yarn.install(cwd);
       expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
-        localYarn,
+        `"${localYarn}"`,
         ['install'],
         containDeep({
           env: { bolt_config_user_agent: boltUserAgent }
@@ -123,7 +123,7 @@ describe('utils/yarn', () => {
       );
     });
   });
-  
+
   describe('add()', () => {
     let cwd;
     let project;
