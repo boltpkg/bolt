@@ -13,7 +13,8 @@ import type { SpawnOpts } from '../types';
 export type PublishOptions = {|
   cwd?: string,
   access?: string,
-  spawnOpts?: SpawnOpts
+  spawnOpts?: SpawnOpts,
+  prePublish?: Function
 |};
 
 export type PackageMeta = {|
@@ -86,8 +87,17 @@ export async function publish(
       let version = pkg.config.getVersion();
       logger.info(messages.publishingPackage(name, version));
 
+      let publishDir = pkg.dir;
+
+      if (opts.prePublish) {
+        publishDir = await opts.prePublish({
+          name,
+          pkg,
+        }) || pkg.dir;
+      }
+
       let publishConfirmation = await npm.publish(name, {
-        cwd: pkg.dir,
+        cwd: publishDir,
         access: opts.access
       });
 
