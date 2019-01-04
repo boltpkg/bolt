@@ -20,7 +20,8 @@ export function toWorkspacesRunOptions(
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     script,
-    scriptArgs,
+    // for ws run commands we pass in all flags that are added after the `--`
+    scriptArgs: [...scriptArgs, ...flags['--']],
     spawnOpts: options.toSpawnOpts(flags),
     filterOpts: options.toFilterOpts(flags)
   };

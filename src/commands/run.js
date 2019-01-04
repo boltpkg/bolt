@@ -15,11 +15,25 @@ export function toRunOptions(
   args: options.Args,
   flags: options.Flags
 ): RunOptions {
+  /**
+   * Unfortunately, in run commands, we are unable to use meow's parsed flags and args as we really
+   * want to be able to pass all args and flags to yarn without modification. For example, we could
+   * get a flag called `t` and we wont know if `t` was passed in with `--t` or `-t` and could pass it in
+   * incorrectly. The only other alternative would be to pass in all flags using the `--` separator
+   * and args on the other side e.g `bolt run test src/* -- --watch --bail` which is further away from
+   * how yarn handles things and is more complicated for the consumer.
+   */
   let [script, ...scriptArgs] = args;
+  // the flags that we'll be passing in as args (we want to hide the optional `run` arg)
+  let flagArgs = process.argv
+    .slice(2)
+    .filter(
+      (arg, idx) => args.indexOf(arg) === -1 && !(arg === 'run' && idx === 0)
+    );
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     script,
-    scriptArgs
+    scriptArgs: [...scriptArgs, ...flagArgs]
   };
 }
 
