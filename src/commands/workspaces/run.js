@@ -17,11 +17,13 @@ export function toWorkspacesRunOptions(
   flags: options.Flags
 ): WorkspacesRunOptions {
   let [script, ...scriptArgs] = args;
+  const flagArgs = flags['--'] || [];
+
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     script,
     // for ws run commands we pass in all flags that are added after the `--`
-    scriptArgs: [...scriptArgs, ...flags['--']],
+    scriptArgs: [...scriptArgs, ...flagArgs],
     spawnOpts: options.toSpawnOpts(flags),
     filterOpts: options.toFilterOpts(flags)
   };
