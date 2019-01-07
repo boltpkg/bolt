@@ -57,14 +57,17 @@ function stripExtension(filePath: string) {
 }
 
 async function cmdShim(src: string, dest: string) {
-  var currentShimTarget = src;
+  let currentShimTarget;
   try{
-    var currentShimTarget = path.resolve(
+      currentShimTarget = path.resolve(
       path.dirname(src),
       await readCmdShim(src)
     );
   }catch(err){
-    
+    if(err.code !== 'ENOTASHIM'){
+      throw err;
+    }
+    currentShimTarget = src;
   }
   await promisify(cb => _cmdShim(currentShimTarget, stripExtension(dest), cb));
 }
