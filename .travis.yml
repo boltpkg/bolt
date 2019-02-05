@@ -1,13 +1,17 @@
 git:
   depth: 1
-sudo: false
 language: node_js
 node_js:
   - '4'
   - '6'
   - '8'
   - '10'
-cache: 
+matrix:
+  include:
+  - os: osx
+  - os: windows
+
+cache:
   yarn: true
   directories:
   - node_modules
