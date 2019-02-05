@@ -9,7 +9,9 @@ node_js:
 matrix:
   include:
   - os: osx
+    node_js: 6
   - os: windows
+    node_js: 6
 
 cache:
   yarn: true
