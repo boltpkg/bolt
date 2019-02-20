@@ -28,12 +28,42 @@ describe('options', () => {
     expect(() => number('number', 'flag')).toThrow();
   });
 
-  test('toFilerOptions', () => {
-    expect(toFilterOpts({ only: 'only' })).toEqual({ only: ['only'] });
-    expect(toFilterOpts({ onlyFs: 'onlyFs' })).toEqual({ onlyFs: ['onlyFs'] });
-    expect(toFilterOpts({ ignore: 'ignore' })).toEqual({ ignore: ['ignore'] });
-    expect(toFilterOpts({ ignoreFs: 'ignoreFs' })).toEqual({
-      ignoreFs: ['ignoreFs']
+  test('toFilterOptions', () => {
+    expect(toFilterOpts({ only: 'one' })).toEqual({
+      only: ['one']
+    });
+    expect(toFilterOpts({ only: 'one,two' })).toEqual({
+      only: ['one', 'two']
+    });
+    expect(toFilterOpts({ only: ['one', 'two'] })).toEqual({
+      only: ['one', 'two']
+    });
+    expect(toFilterOpts({ onlyFs: 'one' })).toEqual({
+      onlyFs: ['one']
+    });
+    expect(toFilterOpts({ onlyFs: 'one,two' })).toEqual({
+      onlyFs: ['one', 'two']
+    });
+    expect(toFilterOpts({ onlyFs: ['one', 'two'] })).toEqual({
+      onlyFs: ['one', 'two']
+    });
+    expect(toFilterOpts({ ignore: 'one' })).toEqual({
+      ignore: ['one']
+    });
+    expect(toFilterOpts({ ignore: 'one,two' })).toEqual({
+      ignore: ['one', 'two']
+    });
+    expect(toFilterOpts({ ignore: ['one', 'two'] })).toEqual({
+      ignore: ['one', 'two']
+    });
+    expect(toFilterOpts({ ignoreFs: 'one' })).toEqual({
+      ignoreFs: ['one']
+    });
+    expect(toFilterOpts({ ignoreFs: 'one,two' })).toEqual({
+      ignoreFs: ['one', 'two']
+    });
+    expect(toFilterOpts({ ignoreFs: ['one', 'two'] })).toEqual({
+      ignoreFs: ['one', 'two']
     });
     expect(toFilterOpts({})).toEqual({});
   });
