@@ -5,7 +5,7 @@ export type Args = Array<string>;
 
 export type Flags = {
   '--'?: Array<string>,
-  [key: string]: boolean | string | Array<string>
+  [key: string]: boolean | string | Array<string> | void
 };
 
 export function string(val: mixed, name: string): string | void {
