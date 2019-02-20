@@ -24,7 +24,7 @@ export default async function getWorkspaces(
   let project = await Project.init(cwd);
   let packages = await project.getPackages();
 
-  let filtered = project.filterPackages(packages, toFilterOpts({
+  let filtered = project.filterPackages(packages, options.toFilterOpts({
     only: opts.only,
     ignore: opts.ignore,
     onlyFs: opts.onlyFs,
