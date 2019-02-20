@@ -21,10 +21,11 @@ export function findWorkspaces(cwd: string, patterns: Array<string>) {
 
 export function matchOnlyAndIgnore(
   paths: Array<string>,
-  only: string | void,
-  ignore: string | void
+  only: Array<string> = ['**'],
+  ignore: Array<string> = []
 ) {
-  let onlyPattern = only || '**';
-  let ignorePattern = ignore ? `!${ignore}` : '';
-  return matchGlobs(paths, [onlyPattern, ignorePattern]);
+  return matchGlobs(paths, [
+    ...only,
+    ...ignore.map(pattern => `!${pattern}`),
+  ]);
 }

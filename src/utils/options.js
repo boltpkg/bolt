@@ -5,7 +5,7 @@ export type Args = Array<string>;
 
 export type Flags = {
   '--'?: Array<string>,
-  [key: string]: boolean | string
+  [key: string]: boolean | string | Array<string>
 };
 
 export function string(val: mixed, name: string): string | void {
@@ -32,6 +32,22 @@ export function number(val: mixed, name: string): number | void {
   }
 }
 
+function isArrayOfStrings(val: mixed) {
+  return Array.isArray(val) && val.every(v => typeof v === 'string');
+}
+
+export function arrayify(val: mixed, name: string): Array<string> {
+  if (typeof val === 'undefined') {
+    return [];
+  } else if (typeof val === 'string') {
+    return val.split(',');
+  } else if (Array.isArray(val) && val.every(v => typeof v === 'string')) {
+    return ((val: any): Array<string>);
+  } else {
+    throw new Error(`Flag "${name}" must be string or an array of strings`);
+  }
+}
+
 export function toSpawnOpts(flags: Flags): SpawnOpts {
   let spawnOpts = {};
 
@@ -51,10 +67,10 @@ export function toSpawnOpts(flags: Flags): SpawnOpts {
 export function toFilterOpts(flags: Flags): FilterOpts {
   let filterOpts = {};
 
-  if (flags.only) filterOpts.only = string(flags.only, 'only');
-  if (flags.onlyFs) filterOpts.onlyFs = string(flags.onlyFs, 'onlyFs');
-  if (flags.ignore) filterOpts.ignore = string(flags.ignore, 'ignore');
-  if (flags.ignoreFs) filterOpts.ignoreFs = string(flags.ignoreFs, 'ignoreFs');
+  if (flags.only) filterOpts.only = arrayify(flags.only, 'only');
+  if (flags.onlyFs) filterOpts.onlyFs = arrayify(flags.onlyFs, 'onlyFs');
+  if (flags.ignore) filterOpts.ignore = arrayify(flags.ignore, 'ignore');
+  if (flags.ignoreFs) filterOpts.ignoreFs = arrayify(flags.ignoreFs, 'ignoreFs');
 
   return filterOpts;
 }

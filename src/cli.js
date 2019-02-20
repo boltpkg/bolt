@@ -425,7 +425,7 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
   processes.handleSignals();
 
   try {
-    await runCommandFromCli(input, flags);
+    await runCommandFromCli(input, (flags: any));
   } catch (err) {
     if (err instanceof BoltError) {
       logger.error(err.message);
