@@ -23,18 +23,16 @@ export function toWorkspaceRunOptions(
    * and args on the other side e.g `bolt run test src/* -- --watch --bail` which is further away from
    * how yarn handles things and is more complicated for the consumer.
    */
-  let [pkgName, script, ...scriptArgs] = args;
-  // the flags that we'll be passing in as args
-  let flagArgs = process.argv
-    .slice(4)
-    .filter(
-      (arg, idx) => args.indexOf(arg) === -1 && !(arg === 'run' && idx === 0)
-    );
+  let [pkgName, script] = args;
+  const scriptArgIdx = process.argv.indexOf(script);
+  // the flags that we'll be passing in as args start after the script name, and we'll pass them all directly
+  const scriptArgs = process.argv.slice(scriptArgIdx + 1);
+
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     pkgName,
     script,
-    scriptArgs: [...scriptArgs, ...flagArgs]
+    scriptArgs
   };
 }
 
