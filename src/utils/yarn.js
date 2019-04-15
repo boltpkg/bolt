@@ -34,7 +34,11 @@ export async function install(cwd: string, pureLockfile?: boolean) {
   await processes.spawn(localYarn, ['install', ...installFlags], {
     cwd,
     tty: true,
-    env: { ...process.env, npm_config_user_agent: boltUserAgent, bolt_config_user_agent: boltUserAgent },
+    env: {
+      ...process.env,
+      npm_config_user_agent: boltUserAgent,
+      bolt_config_user_agent: boltUserAgent
+    },
     useBasename: true
   });
 }

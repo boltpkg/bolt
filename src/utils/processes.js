@@ -1,6 +1,7 @@
 // @flow
 import crossSpawn from 'cross-spawn';
 import * as logger from './logger';
+import * as cleanUp from './cleanUp';
 import type Package from '../Package';
 import type Project from '../Project';
 import pLimit from 'p-limit';
@@ -11,11 +12,11 @@ const limit = pLimit(os.cpus().length);
 const processes = new Set();
 
 export function handleSignals() {
-  process.on('SIGTERM', () => {
+  cleanUp.handleAllSignals(() => {
     for (let child of processes) {
       child.kill('SIGTERM');
     }
-    process.exit(1);
+    processes.clear();
   });
 }
 

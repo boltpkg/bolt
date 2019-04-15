@@ -29,7 +29,7 @@ async function getDepVersion(
 describe('function/updatePackageVersions', () => {
   let cwd, pkgWithDepsPath, pkgPeerDepsPath, loggerSpy;
 
-  describe('A simple project with lots of internally linked deps', async () => {
+  describe('A simple project with lots of internally linked deps', () => {
     beforeEach(async () => {
       cwd = f.copy('lots-of-internally-linked-deps');
       pkgWithDepsPath = path.join(cwd, 'packages', 'has-all-deps');

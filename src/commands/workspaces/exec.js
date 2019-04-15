@@ -32,7 +32,9 @@ export async function workspacesExec(opts: WorkspacesExecOptions) {
   let packages = await project.getPackages();
   let filteredPackages = project.filterPackages(packages, opts.filterOpts);
 
-  await project.runPackageTasks(filteredPackages, opts.spawnOpts, async pkg => {
-    await execCommand(project, pkg, opts.command, opts.commandArgs);
-  });
+  await project.runPackageTasks(
+    filteredPackages,
+    opts.spawnOpts,
+    async pkg => await execCommand(project, pkg, opts.command, opts.commandArgs)
+  );
 }

@@ -7,6 +7,11 @@ import Config from './Config';
 import type { SpawnOpts, FilterOpts } from './types';
 import * as fs from './utils/fs';
 import * as logger from './utils/logger';
+import {
+  promiseWrapper,
+  promiseWrapperSuccess,
+  type PromiseResult
+} from './utils/promiseWrapper';
 import * as messages from './utils/messages';
 import { BoltError } from './utils/errors';
 import * as globs from './utils/globs';
@@ -15,7 +20,21 @@ import minimatch from 'minimatch';
 import * as env from './utils/env';
 import chunkd from 'chunkd';
 
-export type Task = (pkg: Package) => Promise<mixed>;
+type GenericTask<T> = (pkg: Package) => Promise<T>;
+
+type TaskResult = PromiseResult<mixed>;
+
+type InternalTask = GenericTask<TaskResult>;
+
+export type Task = GenericTask<mixed>;
+
+function taskWrapper(task: Task, bail?: boolean): InternalTask {
+  if (bail === undefined || bail) {
+    return promiseWrapperSuccess(task);
+  } else {
+    return promiseWrapper(task);
+  }
+}
 
 export default class Project {
   pkg: Package;
@@ -146,32 +165,47 @@ export default class Project {
     spawnOpts: SpawnOpts,
     task: Task
   ) {
+    const wrappedTask = taskWrapper(task, spawnOpts.bail);
+    let results: TaskResult[];
     if (spawnOpts.orderMode === 'serial') {
-      await this.runPackageTasksSerial(packages, task);
+      results = await this.runPackageTasksSerial(packages, wrappedTask);
     } else if (spawnOpts.orderMode === 'parallel') {
-      await this.runPackageTasksParallel(packages, task);
+      results = await this.runPackageTasksParallel(packages, wrappedTask);
     } else if (spawnOpts.orderMode === 'parallel-nodes') {
-      await this.runPackageTasksParallelNodes(packages, task);
+      results = await this.runPackageTasksParallelNodes(packages, wrappedTask);
     } else {
-      await this.runPackageTasksGraphParallel(packages, task);
+      results = await this.runPackageTasksGraphParallel(packages, wrappedTask);
     }
+
+    results.forEach(r => {
+      if (r.status === 'error') {
+        throw r.error;
+      }
+    });
   }
 
-  async runPackageTasksSerial(packages: Array<Package>, task: Task) {
+  async runPackageTasksSerial<T>(
+    packages: Array<Package>,
+    task: GenericTask<T>
+  ): Promise<Array<T>> {
+    const results: Array<T> = [];
     for (let pkg of packages) {
-      await task(pkg);
+      results.push(await task(pkg));
     }
+    return results;
   }
 
-  async runPackageTasksParallel(packages: Array<Package>, task: Task) {
-    await Promise.all(
-      packages.map(pkg => {
-        return task(pkg);
-      })
-    );
+  runPackageTasksParallel<T>(
+    packages: Array<Package>,
+    task: GenericTask<T>
+  ): Promise<Array<T>> {
+    return Promise.all(packages.map(pkg => task(pkg)));
   }
 
-  async runPackageTasksParallelNodes(packages: Array<Package>, task: Task) {
+  async runPackageTasksParallelNodes<T>(
+    packages: Array<Package>,
+    task: GenericTask<T>
+  ): Promise<Array<T>> {
     packages = packages.sort((a, b) => {
       return a.filePath.localeCompare(b.filePath, [], { numeric: true });
     });
@@ -187,10 +221,13 @@ export default class Project {
       );
     }
 
-    await this.runPackageTasksParallel(packages, task);
+    return this.runPackageTasksParallel(packages, task);
   }
 
-  async runPackageTasksGraphParallel(packages: Array<Package>, task: Task) {
+  async runPackageTasksGraphParallel<T>(
+    packages: Array<Package>,
+    task: GenericTask<T>
+  ): Promise<Array<T>> {
     let { graph: dependentsGraph, valid } = await this.getDependencyGraph(
       packages
     );
@@ -201,7 +238,7 @@ export default class Project {
       graph.set(pkgName, pkgInfo.dependencies);
     }
 
-    let { safe } = await taskGraphRunner({
+    let { safe, values } = await taskGraphRunner({
       graph,
       force: true,
       task: async pkgName => {
@@ -215,6 +252,7 @@ export default class Project {
     if (!safe) {
       logger.warn(messages.unsafeCycles());
     }
+    return ((Object.values(values): any): Array<T>);
   }
 
   getPackageByName(packages: Array<Package>, pkgName: string) {
