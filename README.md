@@ -108,7 +108,7 @@ yarn global add bolt
 | └ `bolt init --yes`                     | Skip the prompts and use defaults                                         |✅|
 | `bolt install`                          | Install all the dependencies for a project                                |✅|
 | `bolt add [dependency]`                 | Add a dependency                                                          |✅|
-| `bolt upgrade [dependency]`             | Upgrade a dependency                                                      |❌|
+| `bolt upgrade [dependency]`             | Upgrade a dependency                                                      |✅|
 | `bolt remove [dependency]`              | remove a dependency                                                       |✅|
 | `bolt version`                          | Updates the version of your package(s)                                    |❌|
 | `bolt publish`                          | Publish new version(s) of your package(s) to npm                          |✅|
@@ -125,7 +125,7 @@ yarn global add bolt
 | `bolt workspaces/ws`                    | **Run the following commands across all workspaces:**                     ||
 | └ `bolt ws run [script]`                | Run a script in every package                                             |✅|
 | └ `bolt ws exec -- [cmd]`               | Run a shell cmd in every package                                          |✅|
-| └ `bolt ws upgrade [dependency]`        | Upgrade a dependency from every package that depends on it                |❌|
+| └ `bolt ws upgrade [dependency]`        | Upgrade a dependency from every package that depends on it                |✅|
 | └ `bolt ws remove [dependency]`         | Remove a dependency from every package that depends on it                 |✅|
 | └ `bolt ws ... --only [name glob]`      | Filter workspaces by name                                                 |✅|
 | └ `bolt ws ... --ignore [name glob]`    | Filter out workspaces by name                                             |✅|
@@ -134,7 +134,7 @@ yarn global add bolt
 | `bolt workspace/w [name]`               | **Run the following commands on a single workspace:**                     ||
 | └ `bolt w [name] run [script]`          | Run a script in a single workspace                                        |✅|
 | └ `bolt w [name] add [dependency]`      | Add a dependency to a single workspace                                    |✅|
-| └ `bolt w [name] upgrade [dependency]`  | Upgrade a dependency in a single workspace                                |❌|
+| └ `bolt w [name] upgrade [dependency]`  | Upgrade a dependency in a single workspace                                |✅|
 | `bolt project/p`                        | **Run the following commands on your project package:**                   ||
 | └ `bolt p run [script]`                 | Run a script on the project package                                       |✅|
 | └ `bolt p add [dependency]`             | Add a dependency to the project package                                   |✅|
@@ -160,5 +160,32 @@ For examples, for declaring workspaces in sub-directories:
   }
 }
 ```
+
+## Passing flags to run commands
+
+Depending on your needs you might run a script in one of many ways.
+
+```
+bolt script
+bolt run script
+bolt p run script
+bolt w package run script
+bolt ws --only="my-package" run script
+bolt ws exec --only="my-package" -- yarn script
+```
+
+Similar to later versions of yarn, you can also call a script with extra flags:
+
+```
+bolt script --flag1 --flag2
+bolt run script --flag1 --flag2
+bolt p run script --flag1 --flag2
+bolt w my-package run script --flag1 --flag2
+bolt ws --only="my-package" run script -- --flag1 --flag2
+bolt ws exec --only="my-package" -- yarn script  --flag1 --flag2
+```
+
+The only slightly surprising one might be the `ws run` command where you'll notice you need to add in the extra `--` flag to pass in flags. This is to avoid ambiguity in which flags are meant for bolt and which are meant for your script.
+
 
 > Please note that this project is released with a [Contributor Code of Conduct](code-of-conduct.md). By participating in this project you agree to its terms.
