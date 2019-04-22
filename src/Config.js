@@ -72,6 +72,7 @@ export default class Config {
   fileContents: string;
   json: JSONValue;
   indent: string;
+  newline: string;
   invalid: boolean;
 
   constructor(filePath: string, fileContents: string) {
