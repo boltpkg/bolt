@@ -1,4 +1,5 @@
 // @flow
+import os from 'os';
 import Config from '../Config';
 import * as fs from '../utils/fs';
 import { mkdtempSync } from 'fs';
@@ -40,7 +41,7 @@ describe('writeConfigFile', () => {
   it('should write a json file', async () => {
     let filePath = path.join(f.find('simple-package'), 'package.json');
     let json = { name: 'wat', version: '0.0.0' };
-    let fileContents = JSON.stringify(json, null, 2) + '\n';
+    let fileContents = JSON.stringify(json, null, 2) + os.EOL;
     let config = await Config.init(filePath);
     await config.write(json);
     expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);
@@ -52,7 +53,7 @@ describe('writeConfigFile', () => {
       'package.json'
     );
     let json = { name: 'wat', version: '0.0.0' };
-    let fileContents = JSON.stringify(json, null, 4) + '\n';
+    let fileContents = JSON.stringify(json, null, 4) + os.EOL;
     let config = await Config.init(filePath);
     await config.write(json);
     expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);
@@ -64,7 +65,7 @@ describe('writeConfigFile', () => {
       'package.json'
     );
     let json = { name: 'wat', version: '0.0.0' };
-    let fileContents = JSON.stringify(json, null, 2) + '\n';
+    let fileContents = JSON.stringify(json, null, 2) + os.EOL;
     let config = await Config.init(filePath);
     await config.write(json);
     expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);

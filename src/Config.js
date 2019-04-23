@@ -1,4 +1,5 @@
 // @flow
+import os from 'os';
 import pkgUp from 'pkg-up';
 import detectIndent from 'detect-indent';
 import detectNewline from 'detect-newline';
@@ -80,7 +81,7 @@ export default class Config {
     this.fileContents = fileContents;
     try {
       this.indent = detectIndent(fileContents).indent || '  ';
-      this.newline = detectNewline(fileContents) || '\n';
+      this.newline = detectNewline(fileContents) || os.EOL;
       this.json = parseJson(fileContents);
     } catch (e) {
       if (e.name === 'JSONError') {
