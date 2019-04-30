@@ -53,6 +53,7 @@
     "cmd-shim": "^2.0.2",
     "cross-spawn": "^5.1.0",
     "detect-indent": "^5.0.0",
+    "detect-newline": "2.1.0",
     "find-up": "^2.1.0",
     "globby": "^6.1.0",
     "inquirer": "3.3.0",
