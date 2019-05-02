@@ -109,7 +109,7 @@ export async function run(
   let spawnArgs = ['run', '-s', script];
 
   if (args.length) {
-    spawnArgs = spawnArgs.concat('--', args);
+    spawnArgs = spawnArgs.concat(args);
   }
   await processes.spawn(localYarnRelative, spawnArgs, {
     cwd: pkg.dir,
