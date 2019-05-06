@@ -90,10 +90,11 @@ export async function publish(
       let publishDir = pkg.dir;
 
       if (opts.prePublish) {
-        publishDir = await opts.prePublish({
-          name,
-          pkg,
-        }) || pkg.dir;
+        publishDir =
+          (await opts.prePublish({
+            name,
+            pkg
+          })) || pkg.dir;
       }
 
       let publishConfirmation = await npm.publish(name, {
@@ -104,7 +105,8 @@ export async function publish(
       publishedPackages.push({
         name,
         newVersion: version,
-        published: publishConfirmation && publishConfirmation.published
+        published: publishConfirmation && publishConfirmation.published,
+        requiresOTP: publishConfirmation && publishConfirmation.requiresOTP
       });
     });
 
