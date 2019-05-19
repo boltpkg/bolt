@@ -14,11 +14,11 @@ import * as yarn from './yarn';
 export default async function symlinkPackageDependencies(
   project: Project,
   pkg: Package,
-  dependencies: Array<string>
+  dependencies: Array<string>,
+  packages: Array<Package>
 ) {
   let projectDeps = project.pkg.getAllDependencies();
   let pkgDependencies = project.pkg.getAllDependencies();
-  let packages = await project.getPackages();
   let {
     graph: dependencyGraph,
     valid: dependencyGraphValid

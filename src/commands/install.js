@@ -55,7 +55,8 @@ export async function install(opts: InstallOptions) {
 
   for (let pkg of packages) {
     let dependencies = Array.from(pkg.getAllDependencies().keys());
-    await symlinkPackageDependencies(project, pkg, dependencies);
+    logger.info(`Linking ${pkg.config.json.name}`, {});
+    await symlinkPackageDependencies(project, pkg, dependencies, packages);
   }
 
   logger.info(messages.linkingWorkspaceBinaries(), {
