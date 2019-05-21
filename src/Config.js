@@ -10,6 +10,7 @@ import * as path from 'path';
 import * as globs from './utils/globs';
 import * as logger from './utils/logger';
 import * as messages from './utils/messages';
+import * as flowVersion from './utils/flowVersion';
 import { BoltError } from './utils/errors';
 
 async function getPackageStack(cwd: string) {
@@ -195,6 +196,18 @@ export default class Config {
     return name;
   }
 
+  getPrimaryKey(): string {
+    let config = this.getConfig();
+    let name = config.name;
+    let { tag = 'latest' } = config.publishConfig || {};
+    if (typeof name !== 'string') {
+      throw new BoltError(
+        `package.json#name must be a string. See "${this.filePath}"`
+      );
+    }
+    return tag === 'latest' ? name : `${name}/${tag}`;
+  }
+
   getVersion(): string {
     let config = this.getConfig();
     let version = config.version;
@@ -204,6 +217,11 @@ export default class Config {
       );
     }
     return version;
+  }
+
+  getFlowVersion(): string {
+    let config = this.getConfig();
+    return flowVersion.parseDirString(config.flowVersion);
   }
 
   getPrivate(): boolean | void {
@@ -243,9 +261,8 @@ export default class Config {
     if (typeof workspaces === 'undefined') return;
     return toArrayOfStrings(
       workspaces,
-      `package.json#bolt.workspaces must be an array of globs. See "${
-        this.filePath
-      }"`
+      `package.json#bolt.workspaces must be an array of globs. See "${this
+        .filePath}"`
     );
   }
 
@@ -255,9 +272,8 @@ export default class Config {
     if (typeof deps === 'undefined') return;
     return toObjectOfStrings(
       deps,
-      `package.json#${depType} must be an object of strings. See "${
-        this.filePath
-      }"`
+      `package.json#${depType} must be an object of strings. See "${this
+        .filePath}"`
     );
   }
 
@@ -267,9 +283,8 @@ export default class Config {
     if (typeof scripts === 'undefined') return;
     return toObjectOfStrings(
       scripts,
-      `package.json#scripts must be an object of strings. See "${
-        this.filePath
-      }"`
+      `package.json#scripts must be an object of strings. See "${this
+        .filePath}"`
     );
   }
 
@@ -280,9 +295,8 @@ export default class Config {
     if (typeof bin === 'string') return bin;
     return toObjectOfStrings(
       bin,
-      `package.json#bin must be an object of strings or a string. See "${
-        this.filePath
-      }"`
+      `package.json#bin must be an object of strings or a string. See "${this
+        .filePath}"`
     );
   }
 }
