@@ -155,8 +155,16 @@ export default class Package {
     return this.config.getName();
   }
 
+  getPrimaryKey() {
+    return this.config.getPrimaryKey();
+  }
+
   getVersion() {
     return this.config.getVersion();
+  }
+
+  getFlowVersion() {
+    return this.config.getFlowVersion();
   }
 
   getBins(): Array<{ name: string, filePath: string }> {
