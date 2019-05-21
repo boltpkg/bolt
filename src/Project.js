@@ -110,6 +110,7 @@ export default class Project {
         if (!match) continue;
         if (match.length === 0) continue;
 
+        let errorMessages = [];
         let flowVersions = match
           .map(childPkg => {
             const _flowVersion = childPkg.config.getFlowVersion();
@@ -122,11 +123,33 @@ export default class Project {
               )
             };
           })
-          .filter(data => semver.satisfies(data.pkg.getVersion(), depVersion))
-          .filter(data => !data.isDisjoint);
+          .filter(data => {
+            const isValid = semver.satisfies(data.pkg.getVersion(), depVersion);
+            if (!isValid)
+              errorMessages.push(
+                messages.packageMustDependOnCurrentVersion(
+                  name,
+                  depName,
+                  data.pkg.getVersion(),
+                  depVersion
+                )
+              );
+            return isValid;
+          })
+          .filter(data => {
+            if (data.isDisjoint)
+              errorMessages.push(
+                messages.packageMustDependOnCurrentVersion(
+                  name,
+                  depName,
+                  flowVersion.toDirString(data.pkg.getFlowVersion()),
+                  flowVersion.toDirString(currentFlowVersion)
+                )
+              );
+            return !data.isDisjoint;
+          });
 
         let link = flowVersions[0];
-        // console.log(flowVersions);
         if (link) {
           if (paths.has(link.parentPkg)) {
             paths.get(link.parentPkg).set(link.pkg.getName(), link.pkg);
@@ -136,6 +159,10 @@ export default class Project {
               new Map([[link.pkg.getName(), link.pkg]])
             );
           }
+        } else {
+          valid = false;
+          errorMessages.forEach(msg => logger.error(msg));
+          continue;
         }
 
         // Workspace dependencies only need to semver satisfy, not '==='

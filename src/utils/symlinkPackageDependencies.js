@@ -32,7 +32,7 @@ export default async function symlinkPackageDependencies(
   // get all the dependencies that are internal workspaces in this project
   let internalDeps =
     (dependencyGraph.get(pkgPrimaryKey) || {}).dependencies || [];
-  let links = dependencyPaths.get(pkg);
+  let links = dependencyPaths.get(pkg) || new Map();
 
   let directoriesToCreate = [];
   let symlinksToCreate = [];
@@ -97,7 +97,8 @@ export default async function symlinkPackageDependencies(
   **********************************************************************/
 
   for (let dependency of internalDeps) {
-    let depPkg = links.get(dependency) || {};
+    let depPkg = links.get(dependency);
+    if (!depPkg) continue;
     let src = depPkg.dir;
     let dest = path.join(pkg.nodeModules, dependency);
 
