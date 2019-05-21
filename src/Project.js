@@ -18,6 +18,7 @@ import * as globs from './utils/globs';
 import taskGraphRunner from 'task-graph-runner';
 import minimatch from 'minimatch';
 import * as env from './utils/env';
+import * as flowVersion from './utils/flowVersion';
 import chunkd from 'chunkd';
 
 type GenericTask<T> = (pkg: Package) => Promise<T>;
@@ -71,7 +72,6 @@ export default class Project {
 
         queue.push(pkg);
         packages.push(pkg);
-
       }
     }
 
@@ -83,48 +83,82 @@ export default class Project {
       string,
       { pkg: Package, dependencies: Array<string> }
     > = new Map();
+    let paths: Map<Package, Map<string, Package>> = new Map();
     let queue = [this.pkg];
-    let packagesByName = { [this.pkg.getName()]: this.pkg };
+    let packagesByName = { [this.pkg.getName()]: [this.pkg] };
     let valid = true;
 
     for (let pkg of packages) {
+      if (!packagesByName[pkg.getName()]) {
+        packagesByName[pkg.getName()] = [];
+      }
+
       queue.push(pkg);
-      packagesByName[pkg.getName()] = pkg;
+      packagesByName[pkg.getName()].push(pkg);
     }
 
     for (let pkg of queue) {
       let name = pkg.config.getName();
+      let version = pkg.config.getVersion();
+      let primaryKey = pkg.config.getPrimaryKey();
+      let currentFlowVersion = pkg.config.getFlowVersion();
       let dependencies = [];
       let allDependencies = pkg.getAllDependencies();
 
       for (let [depName, depVersion] of allDependencies) {
         let match = packagesByName[depName];
         if (!match) continue;
+        if (match.length === 0) continue;
 
-        let actual = depVersion;
-        let expected = match.config.getVersion();
+        let flowVersions = match
+          .map(childPkg => {
+            const _flowVersion = childPkg.config.getFlowVersion();
+            return {
+              parentPkg: pkg,
+              pkg: childPkg,
+              isDisjoint: flowVersion.disjointVersions(
+                _flowVersion,
+                currentFlowVersion
+              )
+            };
+          })
+          .filter(data => semver.satisfies(data.pkg.getVersion(), depVersion))
+          .filter(data => !data.isDisjoint);
+
+        let link = flowVersions[0];
+        // console.log(flowVersions);
+        if (link) {
+          if (paths.has(link.parentPkg)) {
+            paths.get(link.parentPkg).set(link.pkg.getName(), link.pkg);
+          } else {
+            paths.set(
+              link.parentPkg,
+              new Map([[link.pkg.getName(), link.pkg]])
+            );
+          }
+        }
 
         // Workspace dependencies only need to semver satisfy, not '==='
-        if (!semver.satisfies(expected, depVersion)) {
-          valid = false;
-          logger.error(
-            messages.packageMustDependOnCurrentVersion(
-              name,
-              depName,
-              expected,
-              depVersion
-            )
-          );
-          continue;
-        }
+        // if (!semver.satisfies(expected, depVersion)) {
+        //   valid = false;
+        //   logger.error(
+        //     messages.packageMustDependOnCurrentVersion(
+        //       name,
+        //       depName,
+        //       expected,
+        //       depVersion
+        //     )
+        //   );
+        //   continue;
+        // }
 
         dependencies.push(depName);
       }
 
-      graph.set(name, { pkg, dependencies });
+      graph.set(primaryKey, { pkg, dependencies });
     }
 
-    return { graph, valid };
+    return { graph, paths, valid };
   }
 
   async getDependentsGraph(packages: Array<Package>) {
