@@ -15,17 +15,24 @@ export default async function symlinkPackageDependencies(
   project: Project,
   pkg: Package,
   dependencies: Array<string>,
-  packages: Array<Package>
+  packages: Array<Package>,
+  {
+    graph: dependencyGraph,
+    paths: dependencyPaths,
+    valid: dependencyGraphValid
+  }: {
+    graph: Map<string, { pkg: Package, dependencies: Array<string> }>,
+    paths: Map<Package, Map<string, Package>>,
+    valid: boolean
+  }
 ) {
   let projectDeps = project.pkg.getAllDependencies();
   let pkgDependencies = project.pkg.getAllDependencies();
-  let {
-    graph: dependencyGraph,
-    valid: dependencyGraphValid
-  } = await project.getDependencyGraph(packages);
-  let pkgName = pkg.config.getName();
+  let pkgPrimaryKey = pkg.config.getPrimaryKey();
   // get all the dependencies that are internal workspaces in this project
-  let internalDeps = (dependencyGraph.get(pkgName) || {}).dependencies || [];
+  let internalDeps =
+    (dependencyGraph.get(pkgPrimaryKey) || {}).dependencies || [];
+  let links = dependencyPaths.get(pkg);
 
   let directoriesToCreate = [];
   let symlinksToCreate = [];
@@ -43,7 +50,7 @@ export default async function symlinkPackageDependencies(
     let versionInPkg = pkg.getDependencyVersionRange(depName);
 
     // If dependency is internal we can ignore it (we symlink below)
-    if (dependencyGraph.has(depName)) {
+    if (links.has(depName)) {
       continue;
     }
 
@@ -90,8 +97,8 @@ export default async function symlinkPackageDependencies(
   **********************************************************************/
 
   for (let dependency of internalDeps) {
-    let depWorkspace = dependencyGraph.get(dependency) || {};
-    let src = depWorkspace.pkg.dir;
+    let depPkg = links.get(dependency) || {};
+    let src = depPkg.dir;
     let dest = path.join(pkg.nodeModules, dependency);
 
     symlinksToCreate.push({ src, dest, type: 'junction' });
@@ -156,11 +163,8 @@ export default async function symlinkPackageDependencies(
   // TODO: Same as above, we should really be making sure we get all the transitive bins as well
 
   for (let dependency of internalDeps) {
-    let depWorkspace = dependencyGraph.get(dependency) || {};
-    let depBinFiles =
-      depWorkspace.pkg &&
-      depWorkspace.pkg.config &&
-      depWorkspace.pkg.config.getBin();
+    let depPkg = links.get(dependency) || {};
+    let depBinFiles = depPkg && depPkg.config && depPkg.config.getBin();
 
     if (!depBinFiles) {
       continue;
@@ -174,7 +178,7 @@ export default async function symlinkPackageDependencies(
     if (typeof depBinFiles === 'string') {
       // package may be scoped, name will only be the second part
       let binName = dependency.split('/').pop();
-      let src = path.join(depWorkspace.pkg.dir, depBinFiles);
+      let src = path.join(depPkg.dir, depBinFiles);
       let dest = path.join(pkg.nodeModulesBin, binName);
 
       symlinksToCreate.push({ src, dest, type: 'exec' });
@@ -182,7 +186,7 @@ export default async function symlinkPackageDependencies(
     }
 
     for (let [binName, binPath] of Object.entries(depBinFiles)) {
-      let src = path.join(depWorkspace.pkg.dir, String(binPath));
+      let src = path.join(depPkg.dir, String(binPath));
       let dest = path.join(pkg.nodeModulesBin, binName);
 
       // Just in case the symlink is already added (it might have already existed in the projects bin/)
