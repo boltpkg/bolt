@@ -15,14 +15,17 @@ export default async function symlinkPackageDependencies(
   project: Project,
   pkg: Package,
   dependencies: Array<string>,
-  packages: Array<Package>
+  packages: Array<Package>,
+  {
+    graph: dependencyGraph,
+    valid: dependencyGraphValid
+  }: {
+    graph: Map<string, { pkg: Package, dependencies: Array<string> }>,
+    valid: boolean
+  }
 ) {
   let projectDeps = project.pkg.getAllDependencies();
   let pkgDependencies = project.pkg.getAllDependencies();
-  let {
-    graph: dependencyGraph,
-    valid: dependencyGraphValid
-  } = await project.getDependencyGraph(packages);
   let pkgName = pkg.config.getName();
   // get all the dependencies that are internal workspaces in this project
   let internalDeps = (dependencyGraph.get(pkgName) || {}).dependencies || [];
@@ -34,7 +37,7 @@ export default async function symlinkPackageDependencies(
 
   /*********************************************************************
    * Calculate all the external dependencies that need to be symlinked *
-  **********************************************************************/
+   **********************************************************************/
 
   directoriesToCreate.push(pkg.nodeModules, pkg.nodeModulesBin);
 
@@ -87,7 +90,7 @@ export default async function symlinkPackageDependencies(
 
   /*********************************************************************
    * Calculate all the internal dependencies that need to be symlinked *
-  **********************************************************************/
+   **********************************************************************/
 
   for (let dependency of internalDeps) {
     let depWorkspace = dependencyGraph.get(dependency) || {};
@@ -103,7 +106,7 @@ export default async function symlinkPackageDependencies(
 
   /********************************************************
    * Calculate all the bin files that need to be symlinked *
-  *********************************************************/
+   *********************************************************/
   let projectBinFiles = await fs.readdirSafe(project.pkg.nodeModulesBin);
 
   // TODO: For now, we'll search through each of the bin files in the Project and find which ones are
@@ -151,7 +154,7 @@ export default async function symlinkPackageDependencies(
 
   /*****************************************************************
    * Calculate all the internal bin files that need to be symlinked *
-  ******************************************************************/
+   ******************************************************************/
 
   // TODO: Same as above, we should really be making sure we get all the transitive bins as well
 
@@ -194,7 +197,7 @@ export default async function symlinkPackageDependencies(
 
   /**********************************
    * Create directories and symlinks *
-  ***********************************/
+   ***********************************/
 
   await yarn.runIfExists(pkg, 'preinstall');
 
