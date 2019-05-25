@@ -9,12 +9,13 @@ node_js:
 matrix:
   include:
   - os: osx
-    node_js: 6
+    node_js: 8
   - os: windows
-    node_js: 6
+    node_js: 8
+env:
+- YARN_GPG=no
 
 cache:
+  npm: true
   yarn: true
-  directories:
-  - node_modules
 script: yarn test --maxWorkers=4 && yarn flow
