@@ -50,7 +50,7 @@ describe('npm', () => {
         containDeep({
           cwd,
           env: {
-            npm_config_registry: 'https://registry.npmjs.org/'
+            npm_config_registry: undefined
           }
         })
       );
