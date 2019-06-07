@@ -11,6 +11,8 @@ const f = fixtures(__dirname);
 jest.mock('../logger');
 jest.mock('../processes');
 
+let REAL_ENV = process.env
+
 const unsafeProcesses: any & typeof processes = processes;
 
 describe('npm', () => {
@@ -20,6 +22,10 @@ describe('npm', () => {
 
     beforeEach(async () => {
       cwd = f.find('simple-project');
+    });
+
+    afterEach(async () => {
+      process.env = REAL_ENV
     });
 
     test('returns published true when npm publish <package> is successesful', async () => {
@@ -39,6 +45,7 @@ describe('npm', () => {
     });
 
     test('Overrides the npm_config_registry env variable correctly', async () => {
+      process.env = { npm_config_registry: "https://registry.yarnpkg.com" }
       unsafeProcesses.spawn.mockImplementation(() => Promise.resolve());
       result = await npm.publish('simple-project', {
         cwd
@@ -49,9 +56,7 @@ describe('npm', () => {
         ['publish'],
         containDeep({
           cwd,
-          env: {
-            npm_config_registry: 'https://registry.npmjs.org/'
-          }
+          env: {}
         })
       );
     });

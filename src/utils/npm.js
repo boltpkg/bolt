@@ -7,6 +7,13 @@ import pLimit from 'p-limit';
 
 const npmRequestLimit = pLimit(40);
 
+function getCorrectRegistry() {
+  let registry = process.env.npm_config_registry === 'https://registry.yarnpkg.com'
+    ? undefined
+    : process.env.npm_config_registry
+  return registry
+}
+
 export function info(pkgName: string) {
   return npmRequestLimit(async () => {
     logger.info(messages.npmInfo(pkgName));
@@ -18,7 +25,7 @@ export function info(pkgName: string) {
     // as they will always give a 404, which will tell `publish` to always try to publish.
     // See: https://github.com/yarnpkg/yarn/issues/2935#issuecomment-355292633
     const envOverride = {
-      npm_config_registry: 'https://registry.npmjs.org/'
+      npm_config_registry: getCorrectRegistry()
     };
 
     let result = await processes.spawn('npm', ['info', pkgName, '--json'], {
@@ -55,7 +62,7 @@ export function publish(
       // Due to a super annoying issue in yarn, we have to manually override this env variable
       // See: https://github.com/yarnpkg/yarn/issues/2935#issuecomment-355292633
       const envOverride = {
-        npm_config_registry: 'https://registry.npmjs.org/'
+        npm_config_registry: getCorrectRegistry()
       };
       await processes.spawn('npm', ['publish', ...publishFlags], {
         cwd: opts.cwd,
