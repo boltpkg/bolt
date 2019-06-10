@@ -22,7 +22,8 @@
     "build:legacy": "cross-env BABEL_ENV=legacy babel src -d dist/legacy",
     "build:modern": "cross-env BABEL_ENV=modern babel src -d dist/modern",
     "build": "yarn run clean && yarn build:legacy && yarn build:modern",
-    "prepublish": "yarn build",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn build",
     "precommit": "lint-staged"
   },
   "devDependencies": {

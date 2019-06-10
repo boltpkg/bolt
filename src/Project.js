@@ -61,15 +61,17 @@ export default class Project {
       let matchedPaths = await globs.findWorkspaces(cwd, patterns);
 
       for (let matchedPath of matchedPaths) {
-        let dir = path.join(cwd, matchedPath);
-        let stats = await fs.stat(dir);
-        if (!stats.isDirectory()) continue;
+        let file = path.join(cwd, matchedPath);
+        let stats = await fs.stat(file);
+        if (!stats.isFile()) continue;
 
-        let filePath = path.join(dir, 'package.json');
-        let pkg = await Package.init(filePath);
+        let isPackage = path.basename(file) === 'package.json';
+        if (!isPackage) continue;
+        let pkg = await Package.init(file);
 
         queue.push(pkg);
         packages.push(pkg);
+
       }
     }
 
