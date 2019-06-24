@@ -1,14 +1,21 @@
 git:
   depth: 1
-sudo: false
 language: node_js
 node_js:
   - '4'
   - '6'
   - '8'
   - '10'
-cache: 
+matrix:
+  include:
+  - os: osx
+    node_js: 8
+  - os: windows
+    node_js: 8
+env:
+- YARN_GPG=no
+
+cache:
+  npm: true
   yarn: true
-  directories:
-  - node_modules
 script: yarn test --maxWorkers=4 && yarn flow
