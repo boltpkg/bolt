@@ -354,15 +354,6 @@ export function unableToInstall(): Message {
   return `Project is invalid, bolt is unable to install`;
 }
 
-export function cannotInitConfigMissingPkgJSON(filePath: string): Message {
-  let basePath = filePath.replace(/.package\.json$/, '');
-  return `This folder does not contain a package.json:\n${basePath}
-
-  Sometimes this is caused by incomplete packages or switching branches.
-
-  Try removing the directory or fixing the package and run bolt again.`;
-}
-
 export function unsafeCycles(): Message {
   return 'Task ran with unsafe dependency cycles in workspaces.';
 }

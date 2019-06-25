@@ -29,7 +29,8 @@ export default class Package {
   static async init(filePath: string) {
     let config = await Config.init(filePath);
     if (!config) {
-      throw new BoltError(`Could not init config for "${filePath}"`);
+      // skip workspaces that don't have a config
+      return;
     }
     return new Package(filePath, config);
   }

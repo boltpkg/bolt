@@ -67,9 +67,10 @@ export default class Project {
 
         let filePath = path.join(dir, 'package.json');
         let pkg = await Package.init(filePath);
-
-        queue.push(pkg);
-        packages.push(pkg);
+        if (pkg) {
+          queue.push(pkg);
+          packages.push(pkg);
+        }
       }
     }
 
