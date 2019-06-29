@@ -14,7 +14,7 @@ jest.mock('../utils/logger');
 describe('Config.init', () => {
   it('should read a valid package.json file', async () => {
     let filePath = path.join(f.find('simple-package'), 'package.json');
-    let pkg = await Config.init(filePath);
+    let pkg = (await Config.init(filePath)) || {};
     expect(pkg.json).toMatchObject({ name: 'fixture-basic' });
   });
 
@@ -42,7 +42,7 @@ describe('writeConfigFile', () => {
     let filePath = path.join(f.find('simple-package'), 'package.json');
     let json = { name: 'wat', version: '0.0.0' };
     let fileContents = JSON.stringify(json, null, 2) + os.EOL;
-    let config = await Config.init(filePath);
+    let config = (await Config.init(filePath)) || {};
     await config.write(json);
     expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);
   });
@@ -54,7 +54,7 @@ describe('writeConfigFile', () => {
     );
     let json = { name: 'wat', version: '0.0.0' };
     let fileContents = JSON.stringify(json, null, 4) + os.EOL;
-    let config = await Config.init(filePath);
+    let config = (await Config.init(filePath)) || {};
     await config.write(json);
     expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);
   });
@@ -66,7 +66,7 @@ describe('writeConfigFile', () => {
     );
     let json = { name: 'wat', version: '0.0.0' };
     let fileContents = JSON.stringify(json, null, 2) + os.EOL;
-    let config = await Config.init(filePath);
+    let config = (await Config.init(filePath)) || {};
     await config.write(json);
     expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);
   });
@@ -81,7 +81,7 @@ describe('writeConfigFile', () => {
     let json = { name: 'wat', version: '0.0.0' };
     let fileContents =
       JSON.stringify(json, null, 2).replace(/\n/g, '\r\n') + '\r\n';
-    let config = await Config.init(filePath);
+    let config = (await Config.init(filePath)) || {};
     await config.write(json);
     expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);
     readMock.mockRestore();
