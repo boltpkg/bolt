@@ -21,9 +21,7 @@ async function getPackageStack(cwd: string) {
 
     if (filePath) {
       let config = await Config.init(filePath);
-      if (config) {
-        stack.unshift({ filePath, config });
-      }
+      stack.unshift({ filePath, config });
       searching = path.dirname(path.dirname(filePath));
     } else {
       searching = null;
@@ -100,7 +98,7 @@ export default class Config {
     return await pkgUp(filePath);
   }
 
-  static async init(filePath: string): Promise<?Config> {
+  static async init(filePath: string): Promise<Config> {
     let fileContents;
     try {
       fileContents = await fs.readFile(filePath);
