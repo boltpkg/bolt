@@ -66,7 +66,17 @@ export default class Project {
         if (!stats.isDirectory()) continue;
 
         let filePath = path.join(dir, 'package.json');
-        let pkg = await Package.init(filePath);
+        let pkg;
+        try {
+          pkg = await Package.init(filePath);
+        } catch (err) {
+          if (err instanceof BoltError) {
+            // skip cases where unable to initialize package and bolt error was throw
+            // this is typically because the package.json was not found
+            continue;
+          }
+          throw err;
+        }
 
         queue.push(pkg);
         packages.push(pkg);
