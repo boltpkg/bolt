@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "name": "simple-project",
+  "version": "1.0.0",
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  }
+}

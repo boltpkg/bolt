@@ -89,6 +89,18 @@ describe('install', () => {
     }
   });
 
+  test('should install even if a workspace is missing a package.json', async () => {
+    let cwd = f.find('no-package-json-workspace');
+    let project = await Project.init(cwd);
+    let packages = await project.getPackages();
+
+    await install(
+      toInstallOptions([], {
+        cwd
+      })
+    );
+  });
+
   test('should run preinstall, postinstall and prepublish in each ws', async () => {
     let cwd = f.find('simple-project');
     let project = await Project.init(cwd);

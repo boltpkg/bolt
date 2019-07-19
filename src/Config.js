@@ -104,7 +104,7 @@ export default class Config {
       fileContents = await fs.readFile(filePath);
     } catch (e) {
       if (e.code === 'ENOENT') {
-        logger.error(messages.cannotInitConfigMissingPkgJSON(filePath));
+        throw new BoltError(messages.cannotInitConfigMissingPkgJSON(filePath));
       }
       throw e;
     }
