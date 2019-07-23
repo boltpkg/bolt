@@ -13,19 +13,27 @@ import * as yarn from '../utils/yarn';
 import pathIsInside from 'path-is-inside';
 import { BoltError } from '../utils/errors';
 import { BOLT_VERSION } from '../constants';
+import type { LockFileMode } from '../utils/yarn';
 
 export type InstallOptions = {|
   cwd?: string,
-  pureLockfile: boolean
+  lockfileMode: LockFileMode
 |};
 
 export function toInstallOptions(
   args: options.Args,
   flags: options.Flags
 ): InstallOptions {
+  let lockfileMode: LockFileMode = 'default';
+  // in order of strictness:
+  if (options.boolean(flags.frozenLockfile, 'frozen-lockfile')) {
+    lockfileMode = 'frozen';
+  } else if (options.boolean(flags.pureLockfile, 'pure-lockfile')) {
+    lockfileMode = 'pure';
+  }
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    pureLockfile: options.boolean(flags.pureLockfile, 'pure-lockfile') || false
+    lockfileMode
   };
 }
 
@@ -46,7 +54,7 @@ export async function install(opts: InstallOptions) {
     prefix: false
   });
 
-  await yarn.install(project.pkg.dir, opts.pureLockfile);
+  await yarn.install(project.pkg.dir, opts.lockfileMode);
 
   logger.info(messages.linkingWorkspaceDependencies(), {
     emoji: '🔗',

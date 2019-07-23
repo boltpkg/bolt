@@ -46,16 +46,44 @@ describe('utils/yarn', () => {
       );
     });
 
+    it('should pass on lockfile flag only if requested', async () => {
+      const cwd = 'a/fake/path';
+      const localYarn = await getLocalYarnPath();
+      unsafeProcesses.spawn.mockReturnValueOnce(
+        Promise.resolve({ stdout: '' })
+      );
+      await yarn.install(cwd);
+      expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
+        localYarn,
+        ['install'],
+        expect.objectContaining({ cwd })
+      );
+    });
+
     it('should pass on pure-lockfile flag', async () => {
       const cwd = 'a/fake/path';
       const localYarn = await getLocalYarnPath();
       unsafeProcesses.spawn.mockReturnValueOnce(
         Promise.resolve({ stdout: '' })
       );
-      await yarn.install(cwd, true);
+      await yarn.install(cwd, 'pure');
       expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
         localYarn,
         ['install', '--pure-lockfile'],
+        expect.objectContaining({ cwd })
+      );
+    });
+
+    it('should pass on frozenlockfile flag', async () => {
+      const cwd = 'a/fake/path';
+      const localYarn = await getLocalYarnPath();
+      unsafeProcesses.spawn.mockReturnValueOnce(
+        Promise.resolve({ stdout: '' })
+      );
+      await yarn.install(cwd, 'frozen');
+      expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
+        localYarn,
+        ['install', '--frozen-lockfile'],
         expect.objectContaining({ cwd })
       );
     });
@@ -107,7 +135,7 @@ describe('utils/yarn', () => {
       unsafeConstants.BOLT_VERSION = '9.9.9';
       const yarnUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
       const boltUserAgent =
-      'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+        'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
       const localYarn = await getLocalYarnPath();
       unsafeProcesses.spawn.mockReturnValueOnce(
         Promise.resolve({ stdout: yarnUserAgent })
@@ -123,7 +151,7 @@ describe('utils/yarn', () => {
       );
     });
   });
-  
+
   describe('add()', () => {
     let cwd;
     let project;

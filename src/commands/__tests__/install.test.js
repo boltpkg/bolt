@@ -44,7 +44,7 @@ describe('install', () => {
       })
     );
     expect(yarn.install).toHaveBeenCalledTimes(1);
-    expect(yarn.install).toHaveBeenCalledWith(cwd, false);
+    expect(yarn.install).toHaveBeenCalledWith(cwd, 'default');
   });
 
   test('should still run yarn install at the root when called from ws', async () => {
@@ -56,7 +56,7 @@ describe('install', () => {
       })
     );
     expect(yarn.install).toHaveBeenCalledTimes(1);
-    expect(yarn.install).toHaveBeenCalledWith(rootDir, false);
+    expect(yarn.install).toHaveBeenCalledWith(rootDir, 'default');
   });
 
   test('should pass the --pure-lockfile flag correctly', async () => {
@@ -69,7 +69,34 @@ describe('install', () => {
       })
     );
     expect(yarn.install).toHaveBeenCalledTimes(1);
-    expect(yarn.install).toHaveBeenCalledWith(rootDir, true);
+    expect(yarn.install).toHaveBeenCalledWith(rootDir, 'pure');
+  });
+
+  test('should pass the --frozen-lockfile flag correctly', async () => {
+    const rootDir = f.find('simple-project');
+    const cwd = path.join(path.join(rootDir, 'packages', 'foo'));
+    await install(
+      toInstallOptions([], {
+        cwd,
+        frozenLockfile: true
+      })
+    );
+    expect(yarn.install).toHaveBeenCalledTimes(1);
+    expect(yarn.install).toHaveBeenCalledWith(rootDir, 'frozen');
+  });
+
+  test('should correctly give priority to --frozen-lockfile if --pure-lockfile is also passed', async () => {
+    const rootDir = f.find('simple-project');
+    const cwd = path.join(path.join(rootDir, 'packages', 'foo'));
+    await install(
+      toInstallOptions([], {
+        cwd,
+        frozenLockfile: true,
+        pureLockfile: true
+      })
+    );
+    expect(yarn.install).toHaveBeenCalledTimes(1);
+    expect(yarn.install).toHaveBeenCalledWith(rootDir, 'frozen');
   });
 
   test('should work in project with scoped packages', async () => {
