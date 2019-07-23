@@ -22,11 +22,25 @@ function depTypeToFlag(depType) {
   return flag ? `--${flag}` : flag;
 }
 
-export async function install(cwd: string, pureLockfile?: boolean) {
+export type LockFileMode = 'default' | 'pure' | 'frozen';
+
+export async function install(
+  cwd: string,
+  lockfileMode: LockFileMode = 'default'
+) {
   let localYarn = path.join(await getLocalBinPath(), 'yarn');
   let installFlags = [];
 
-  if (pureLockfile) installFlags.push('--pure-lockfile');
+  switch (lockfileMode) {
+    case 'frozen':
+      installFlags.push('--frozen-lockfile');
+      break;
+    case 'pure':
+      installFlags.push('--pure-lockfile');
+      break;
+    default:
+      break;
+  }
 
   let yarnUserAgent = await userAgent();
   let boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
