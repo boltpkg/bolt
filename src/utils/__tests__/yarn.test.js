@@ -20,7 +20,11 @@ const unsafeProcesses: any & typeof processes = processes;
 const unsafeConstants: any & typeof constants = constants;
 
 function assertSpawnCalls(expectedProcess, expectedArgs, expectedCwd) {
-  let spawnCalls = unsafeProcesses.spawn.mock.calls;
+  // Filter out the spawn call to get user agent which occurs before the yarn call
+  // itself
+  let spawnCalls = unsafeProcesses.spawn.mock.calls.filter(
+    c => !(c.length >= 2 && c[1].join(' ') === 'config get user-agent')
+  );
 
   expect(spawnCalls.length).toEqual(1);
   expect(spawnCalls[0][0]).toEqual(expectedProcess);
@@ -161,6 +165,9 @@ describe('utils/yarn', () => {
       cwd = f.find('simple-project');
       project = await Project.init(cwd);
       localYarn = await getLocalYarnPath();
+      unsafeProcesses.spawn.mockReturnValueOnce(
+        Promise.resolve({ stdout: '' })
+      );
     });
 
     it('should be able to add a dependency', async () => {
@@ -191,6 +198,27 @@ describe('utils/yarn', () => {
     it('should be able to add multiple dependencies', async () => {
       await yarn.add(project.pkg, [{ name: 'chalk' }, { name: 'left-pad' }]);
       assertSpawnCalls(localYarn, ['add', 'chalk', 'left-pad'], cwd);
+    });
+
+    it('should add bolt_config_user_agent environment variable', async () => {
+      unsafeConstants.BOLT_VERSION = '9.9.9';
+      const yarnUserAgent = 'yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+      const boltUserAgent =
+        'bolt/9.9.9 yarn/7.7.7 npm/? node/v8.9.4 darwin x64';
+      const localYarn = await getLocalYarnPath();
+      unsafeProcesses.spawn.mockReset();
+      unsafeProcesses.spawn.mockReturnValueOnce(
+        Promise.resolve({ stdout: yarnUserAgent })
+      );
+
+      await yarn.add(project.pkg, [{ name: 'chalk' }]);
+      expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
+        localYarn,
+        ['add', 'chalk'],
+        containDeep({
+          env: { bolt_config_user_agent: boltUserAgent }
+        })
+      );
     });
   });
   describe('run()', () => {});

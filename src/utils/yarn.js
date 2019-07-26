@@ -22,6 +22,17 @@ function depTypeToFlag(depType) {
   return flag ? `--${flag}` : flag;
 }
 
+async function getEnvWithUserAgents() {
+  let yarnUserAgent = await userAgent();
+  let boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
+
+  return {
+    ...process.env,
+    npm_config_user_agent: boltUserAgent,
+    bolt_config_user_agent: boltUserAgent
+  };
+}
+
 export type LockFileMode = 'default' | 'pure' | 'frozen';
 
 export async function install(
@@ -42,16 +53,11 @@ export async function install(
       break;
   }
 
-  let yarnUserAgent = await userAgent();
-  let boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
-
   await processes.spawn(localYarn, ['install', ...installFlags], {
     cwd,
     tty: true,
     env: {
-      ...process.env,
-      npm_config_user_agent: boltUserAgent,
-      bolt_config_user_agent: boltUserAgent
+      ...(await getEnvWithUserAgents())
     },
     useBasename: true
   });
@@ -82,7 +88,10 @@ export async function add(
   await processes.spawn(localYarn, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
-    tty: true
+    tty: true,
+    env: {
+      ...(await getEnvWithUserAgents())
+    }
   });
 }
 
