@@ -57,10 +57,12 @@ function stripExtension(filePath: string) {
 }
 
 async function cmdShim(src: string, dest: string) {
-  const currentShimTarget = path.resolve(
-    path.dirname(src),
-    await readCmdShim(src)
-  );
+  // If not a symlink we default to the actual src file
+  // https://github.com/npm/npm/blob/d081cc6c8d73f2aa698aab36605377c95e916224/lib/utils/gently-rm.js#L273
+  let relativeShimTarget = await readlink(src);
+  let currentShimTarget = relativeShimTarget
+    ? path.resolve(path.dirname(src), relativeShimTarget)
+    : src;
   await promisify(cb => _cmdShim(currentShimTarget, stripExtension(dest), cb));
 }
 
