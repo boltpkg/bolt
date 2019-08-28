@@ -246,7 +246,8 @@ export default class Project {
     task: GenericTask<T>
   ): Promise<Array<T>> {
     let { graph: dependentsGraph, valid } = await this.getDependencyGraph(
-      packages
+      packages,
+      ['devDependencies']
     );
 
     let graph = new Map();
