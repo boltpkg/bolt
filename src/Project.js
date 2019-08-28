@@ -4,7 +4,7 @@ import includes from 'array-includes';
 import semver from 'semver';
 import Package from './Package';
 import Config from './Config';
-import type { SpawnOpts, FilterOpts } from './types';
+import type { configDependencyType, SpawnOpts, FilterOpts } from './types';
 import * as fs from './utils/fs';
 import * as logger from './utils/logger';
 import {
@@ -86,7 +86,10 @@ export default class Project {
     return packages;
   }
 
-  async getDependencyGraph(packages: Array<Package>) {
+  async getDependencyGraph(
+    packages: Array<Package>,
+    excludedDependencyTypes?: Array<configDependencyType>
+  ) {
     let graph: Map<
       string,
       { pkg: Package, dependencies: Array<string> }
@@ -103,7 +106,7 @@ export default class Project {
     for (let pkg of queue) {
       let name = pkg.config.getName();
       let dependencies = [];
-      let allDependencies = pkg.getAllDependencies();
+      let allDependencies = pkg.getAllDependencies(excludedDependencyTypes);
 
       for (let [depName, depVersion] of allDependencies) {
         let match = packagesByName[depName];
@@ -135,10 +138,14 @@ export default class Project {
     return { graph, valid };
   }
 
-  async getDependentsGraph(packages: Array<Package>) {
+  async getDependentsGraph(
+    packages: Array<Package>,
+    excludedDepTypes?: Array<configDependencyType>
+  ) {
     let graph = new Map();
     let { valid, graph: dependencyGraph } = await this.getDependencyGraph(
-      packages
+      packages,
+      excludedDepTypes
     );
 
     let dependentsLookup: {

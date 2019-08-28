@@ -8,6 +8,7 @@ import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import sortObject from 'sort-object';
 import { BoltError } from './utils/errors';
+import type { configDependencyType } from './types';
 
 export default class Package {
   filePath: string;
@@ -46,10 +47,13 @@ export default class Package {
     return this.config.getWorkspaces() || [];
   }
 
-  getAllDependencies() {
+  getAllDependencies(excludedTypes?: configDependencyType[] = []) {
     let allDependencies = new Map();
+    let dependencyTypes = DEPENDENCY_TYPES.filter(
+      t => excludedTypes.indexOf(t) === -1
+    );
 
-    for (let type of DEPENDENCY_TYPES) {
+    for (let type of dependencyTypes) {
       let deps = this.config.getDeps(type);
       if (!deps) continue;
 
