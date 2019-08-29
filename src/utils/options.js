@@ -1,5 +1,11 @@
 // @flow
-import type { Dependency, SpawnOpts, FilterOpts } from '../types';
+import { DEPENDENCY_TYPES } from '../constants';
+import type {
+  Dependency,
+  SpawnOpts,
+  FilterOpts,
+  configDependencyType
+} from '../types';
 
 export type Args = Array<string>;
 
@@ -32,6 +38,25 @@ export function number(val: mixed, name: string): number | void {
   }
 }
 
+export function toDependencyTypes(
+  val: mixed,
+  name: string
+): Array<configDependencyType> {
+  if (typeof val !== 'string') {
+    throw new Error(`Flag "${name}" must be a string`);
+  }
+  let types = val.split(',');
+  let invalidTypes = types.filter(t => DEPENDENCY_TYPES.indexOf(t) === -1);
+  if (invalidTypes.length > 0) {
+    throw new Error(
+      `Flag "${name}" must be a comma separated list of valid dependency types. Received invalid types: ${invalidTypes.join(
+        ','
+      )}`
+    );
+  }
+  return ((types: any): Array<configDependencyType>);
+}
+
 export function toSpawnOpts(flags: Flags): SpawnOpts {
   let spawnOpts = {};
 
@@ -44,6 +69,11 @@ export function toSpawnOpts(flags: Flags): SpawnOpts {
   if (flags.serial) spawnOpts.orderMode = 'serial';
   if (typeof flags.bail !== 'undefined')
     spawnOpts.bail = boolean(flags.bail, 'bail');
+  if (flags.excludeFromGraph)
+    spawnOpts.excludeFromGraph = toDependencyTypes(
+      flags.excludeFromGraph,
+      'excludeFromGraph'
+    );
   // TODO:
   // if (flags.concurrency) spawnOpts.maxConcurrent = number(flags.concurrency, 'concurrency');
 

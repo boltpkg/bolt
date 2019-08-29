@@ -88,7 +88,7 @@ export default class Project {
 
   async getDependencyGraph(
     packages: Array<Package>,
-    excludedDependencyTypes?: Array<configDependencyType>
+    excludedDependencyTypes?: Array<configDependencyType> | void
   ) {
     let graph: Map<
       string,
@@ -191,7 +191,11 @@ export default class Project {
     } else if (spawnOpts.orderMode === 'parallel-nodes') {
       results = await this.runPackageTasksParallelNodes(packages, wrappedTask);
     } else {
-      results = await this.runPackageTasksGraphParallel(packages, wrappedTask);
+      results = await this.runPackageTasksGraphParallel(
+        packages,
+        wrappedTask,
+        spawnOpts.excludeFromGraph
+      );
     }
 
     results.forEach(r => {
@@ -243,11 +247,12 @@ export default class Project {
 
   async runPackageTasksGraphParallel<T>(
     packages: Array<Package>,
-    task: GenericTask<T>
+    task: GenericTask<T>,
+    excludeDepTypesFromGraph: Array<configDependencyType> | void
   ): Promise<Array<T>> {
     let { graph: dependentsGraph, valid } = await this.getDependencyGraph(
       packages,
-      ['devDependencies']
+      excludeDepTypesFromGraph
     );
 
     let graph = new Map();

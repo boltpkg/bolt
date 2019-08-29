@@ -18,7 +18,10 @@ export type JSONValue =
 
 export type SpawnOpts = {
   orderMode?: 'serial' | 'parallel' | 'parallel-nodes',
-  bail?: boolean
+  bail?: boolean,
+  // Exclude certain dependency types from being included in the dependency graph used to
+  // execute package tasks in a certain order
+  excludeFromGraph?: Array<configDependencyType>
   // maxConcurrent?: number,
 };
 
