@@ -431,4 +431,42 @@ describe('Project', () => {
     }
     done();
   });
+
+  test('runPackageTasks() excludeFromGraph: devDependencies', async () => {
+    let project = await Project.init(f.find('dev-dependent-workspaces-only'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    await project.runPackageTasks(
+      packages,
+      { excludeFromGraph: 'devDependencies' },
+      async pkg => {
+        ops.push('start:' + pkg.getName());
+        await Promise.resolve();
+        ops.push('end:' + pkg.getName());
+      }
+    );
+
+    expect(ops).toEqual(['start:bar', 'start:foo', 'end:bar', 'end:foo']);
+  });
+
+  test('runPackageTasks() excludeFromGraph: devDependencies cycle', async () => {
+    let project = await Project.init(f.find('dependent-workspaces-with-cycle'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    await project.runPackageTasks(
+      packages,
+      { excludeFromGraph: 'devDependencies' },
+      async pkg => {
+        ops.push('start:' + pkg.getName());
+        await Promise.resolve();
+        ops.push('end:' + pkg.getName());
+      }
+    );
+
+    expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
+    // There is not a cycle anymore now that we have excluded devDependencies
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
 });

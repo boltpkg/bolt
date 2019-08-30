@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "description": "Contains two workspaces that are only dependent as a devDependency.",
+  "name": "dev-dependent-workspaces-only",
+  "version": "1.0.0",
+  "bolt": {
+    "workspaces": [
+      "packages/*"
+    ]
+  }
+}
