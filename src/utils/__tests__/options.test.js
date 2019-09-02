@@ -41,14 +41,17 @@ describe('options', () => {
   });
 
   test('toDependencyTypes', () => {
-    expect(toDependencyTypes('devDependencies')).toEqual(['devDependencies']);
-    expect(toDependencyTypes('peerDependencies')).toEqual(['peerDependencies']);
-    expect(toDependencyTypes('devDependencies,peerDependencies')).toEqual([
-      'devDependencies',
+    expect(toDependencyTypes('devDependencies', 'flag')).toEqual([
+      'devDependencies'
+    ]);
+    expect(toDependencyTypes('peerDependencies', 'flag')).toEqual([
       'peerDependencies'
     ]);
-    expect(() => toDependencyTypes('deps', 'flagName')).toThrow(
-      'Flag "flagName" must be a comma separated list of valid dependency types. Received invalid types: "deps"'
+    expect(
+      toDependencyTypes('devDependencies,peerDependencies', 'flag')
+    ).toEqual(['devDependencies', 'peerDependencies']);
+    expect(() => toDependencyTypes('deps', 'flag')).toThrow(
+      'Flag "flag" must be a comma separated list of valid dependency types. Received invalid types: "deps"'
     );
   });
 
