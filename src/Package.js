@@ -49,6 +49,16 @@ export default class Package {
 
   getAllDependencies(excludedTypes?: configDependencyType[] = []) {
     let allDependencies = new Map();
+    if (excludedTypes.length > 0) {
+      let invalidTypes = excludedTypes.filter(
+        t => DEPENDENCY_TYPES.indexOf(t) === -1
+      );
+      if (invalidTypes.length > 0) {
+        throw new BoltError(
+          `Invalid dependency types to exclude: "${invalidTypes.join(',')}"`
+        );
+      }
+    }
     let dependencyTypes = DEPENDENCY_TYPES.filter(
       t => excludedTypes.indexOf(t) === -1
     );

@@ -2,10 +2,15 @@
   "private": true,
   "name": "simple-project-with-multiple-dep-types",
   "version": "1.0.0",
+  "dependencies": {
+    "depOnly": "^1.0.0"
+  },
   "devDependencies": {
+    "devDepOnly": "^1.0.0",
     "react": "^16.0.0"
   },
   "peerDependencies": {
+    "peerDepOnly": "^1.0.0",
     "react": "^16.0.0"
   },
   "bolt": {

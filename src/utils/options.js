@@ -49,9 +49,9 @@ export function toDependencyTypes(
   let invalidTypes = types.filter(t => DEPENDENCY_TYPES.indexOf(t) === -1);
   if (invalidTypes.length > 0) {
     throw new Error(
-      `Flag "${name}" must be a comma separated list of valid dependency types. Received invalid types: ${invalidTypes.join(
+      `Flag "${name}" must be a comma separated list of valid dependency types. Received invalid types: "${invalidTypes.join(
         ','
-      )}`
+      )}"`
     );
   }
   return ((types: any): Array<configDependencyType>);
