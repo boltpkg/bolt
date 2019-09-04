@@ -68,10 +68,11 @@ describe('function/runWorkspaceTasks', () => {
         let ops = [];
         await runWorkspaceTasks(
           async ({ dir, config }) => {
-            ops.push('start:' + config.name);
+            let name: string = (config: any).name;
+            ops.push('start:' + name);
             // wait until next tick
             await Promise.resolve();
-            ops.push('end:' + config.name);
+            ops.push('end:' + name);
           },
           { cwd: projectRoot, spawnOpts: c.spawnOpts }
         );
