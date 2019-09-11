@@ -5,11 +5,11 @@ var ver = process.versions.node;
 var majorVer = parseInt(ver.split('.')[0], 10);
 var cli;
 
-if (majorVer < 4) {
+if (majorVer < 6) {
   throw new Error(
     'Node version ' +
       ver +
-      ' is not supported in Bolt, please use Node.js 4.0 or higher.'
+      ' is not supported in Bolt, please use Node.js 6.0 or higher.'
   );
 } else if (majorVer < 8) {
   cli = require('./dist/legacy/cli').default;

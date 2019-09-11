@@ -3,12 +3,11 @@ git:
 sudo: false
 language: node_js
 node_js:
-  - '4'
   - '6'
   - '8'
   - '10'
-cache: 
+cache:
   yarn: true
   directories:
-  - node_modules
+    - node_modules
 script: yarn test --maxWorkers=4 && yarn flow
