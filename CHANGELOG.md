@@ -1,5 +1,8 @@
 # Bolt Changelog
 
+## 0.24.1
+
+* fix for #207 windows cmdshim problem (#241)
 
 ## 0.24.0
 
