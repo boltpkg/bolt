@@ -34,7 +34,7 @@ export default async function symlinkPackageDependencies(
 
   /*********************************************************************
    * Calculate all the external dependencies that need to be symlinked *
-  **********************************************************************/
+   *********************************************************************/
 
   directoriesToCreate.push(pkg.nodeModules, pkg.nodeModulesBin);
 
@@ -87,7 +87,7 @@ export default async function symlinkPackageDependencies(
 
   /*********************************************************************
    * Calculate all the internal dependencies that need to be symlinked *
-  **********************************************************************/
+   *********************************************************************/
 
   for (let dependency of internalDeps) {
     let depWorkspace = dependencyGraph.get(dependency) || {};
@@ -101,9 +101,9 @@ export default async function symlinkPackageDependencies(
     throw new BoltError('Cannot symlink invalid set of dependencies.');
   }
 
-  /********************************************************
+  /*********************************************************
    * Calculate all the bin files that need to be symlinked *
-  *********************************************************/
+   *********************************************************/
   let projectBinFiles = await fs.readdirSafe(project.pkg.nodeModulesBin);
 
   // TODO: For now, we'll search through each of the bin files in the Project and find which ones are
@@ -118,14 +118,11 @@ export default async function symlinkPackageDependencies(
     // read the symlink to find the actual bin file (path will be relative to the symlink)
     let actualBinFileRelative = await fs.readlink(binPath);
 
-    if (!actualBinFileRelative) {
-      throw new BoltError(`${binName} is not a symlink`);
-    }
-
-    let actualBinFile = path.join(
-      project.pkg.nodeModulesBin,
-      actualBinFileRelative
-    );
+    // If not a symlink we default to the actual src file
+    // https://github.com/npm/npm/blob/d081cc6c8d73f2aa698aab36605377c95e916224/lib/utils/gently-rm.js#L273
+    let actualBinFile = actualBinFileRelative
+      ? path.join(project.pkg.nodeModulesBin, actualBinFileRelative)
+      : binPath;
 
     // To find the name of the dep that created the bin we'll get its path from node_modules and
     // use the first one or two parts (two if the package is scoped)
@@ -149,9 +146,9 @@ export default async function symlinkPackageDependencies(
     });
   }
 
-  /*****************************************************************
+  /******************************************************************
    * Calculate all the internal bin files that need to be symlinked *
-  ******************************************************************/
+   ******************************************************************/
 
   // TODO: Same as above, we should really be making sure we get all the transitive bins as well
 
@@ -192,9 +189,9 @@ export default async function symlinkPackageDependencies(
     }
   }
 
-  /**********************************
+  /***********************************
    * Create directories and symlinks *
-  ***********************************/
+   ***********************************/
 
   await yarn.runIfExists(pkg, 'preinstall');
 
