@@ -3,9 +3,9 @@
 
 ## 0.24.0
 
-Add filterOpts option to runWorkspaceTasks function (#245)
-Drop node v4 support and require v6 at minimum (#246)
-fix #56 for workspaces --dev flag swallows first dependency (#242)
+* Add filterOpts option to runWorkspaceTasks function (#245)
+* Drop node v4 support and require v6 at minimum BREAKING (#246)
+* fix #56 for workspaces --dev flag swallows first dependency (#242)
 
 ## 0.23.6
 
