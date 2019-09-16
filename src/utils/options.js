@@ -42,7 +42,8 @@ export function toSpawnOpts(flags: Flags): SpawnOpts {
   if (flags.parallelNodes) spawnOpts.orderMode = 'parallel-nodes';
   if (flags.parallel) spawnOpts.orderMode = 'parallel';
   if (flags.serial) spawnOpts.orderMode = 'serial';
-  if (flags.bail) spawnOpts.bail = boolean(flags.bail, 'bail');
+  if (typeof flags.bail !== 'undefined')
+    spawnOpts.bail = boolean(flags.bail, 'bail');
   // TODO:
   // if (flags.concurrency) spawnOpts.maxConcurrent = number(flags.concurrency, 'concurrency');
 
