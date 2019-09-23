@@ -48,6 +48,18 @@ describe('options', () => {
     expect(toDependency(nameWithVersion)).toEqual({ name: nameWithVersion });
     nameWithVersion = `@packageName@${version}`;
     expect(toDependency(nameWithVersion)).toEqual({ name, version });
+    // Version with @ symbol
+    expect(toDependency(`packageName@file:local/@my-packages`)).toEqual({
+      name: 'packageName',
+      version: 'file:local/@my-packages'
+    });
+    // Scoped package with @ symbol version
+    expect(
+      toDependency(`@scope/packageName@file:local/@scope/packageName`)
+    ).toEqual({
+      name: '@scope/packageName',
+      version: 'file:local/@scope/packageName'
+    });
   });
 
   test('toYarnInit', () => {
