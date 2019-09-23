@@ -44,8 +44,7 @@ export async function projectRun(opts: ProjectRunOptions) {
     await yarn.run(project.pkg, opts.script, opts.scriptArgs);
   } else {
     throw new BoltError(
-      `Package at "${project.pkg
-        .dir}" does not have a script named "${opts.script}"`
+      `Package at "${project.pkg.dir}" does not have a script named "${opts.script}"`
     );
   }
 }

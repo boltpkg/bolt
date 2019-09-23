@@ -46,9 +46,9 @@ export async function publish(opts: PublishOptions) {
 
   if (unsuccessful.length > 0) {
     throw new BoltError(
-      `Failed to publish ${unsuccessful.length} ${unsuccessful.length === 1
-        ? 'package'
-        : 'packages'}`
+      `Failed to publish ${unsuccessful.length} ${
+        unsuccessful.length === 1 ? 'package' : 'packages'
+      }`
     );
   }
 }

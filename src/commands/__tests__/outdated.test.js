@@ -11,8 +11,10 @@ describe('bolt outdated', () => {
         cwd: 'dummyPattern/dummyPath'
       })
     );
-    expect(
-      yarn.cliCommand
-    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'outdated', ['jest']);
+    expect(yarn.cliCommand).toHaveBeenCalledWith(
+      'dummyPattern/dummyPath',
+      'outdated',
+      ['jest']
+    );
   });
 });

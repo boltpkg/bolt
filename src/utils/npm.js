@@ -8,10 +8,11 @@ import pLimit from 'p-limit';
 const npmRequestLimit = pLimit(40);
 
 function getCorrectRegistry() {
-  let registry = process.env.npm_config_registry === 'https://registry.yarnpkg.com'
-    ? undefined
-    : process.env.npm_config_registry
-  return registry
+  let registry =
+    process.env.npm_config_registry === 'https://registry.yarnpkg.com'
+      ? undefined
+      : process.env.npm_config_registry;
+  return registry;
 }
 
 export function info(pkgName: string) {

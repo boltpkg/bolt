@@ -9,8 +9,10 @@ describe('bolt licenses list', () => {
     await licensesList(
       toLicensesListOptions([], { cwd: 'dummyPattern/dummyPath' })
     );
-    expect(
-      yarn.cliCommand
-    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'licenses', ['list']);
+    expect(yarn.cliCommand).toHaveBeenCalledWith(
+      'dummyPattern/dummyPath',
+      'licenses',
+      ['list']
+    );
   });
 });
