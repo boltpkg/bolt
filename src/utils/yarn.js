@@ -68,12 +68,9 @@ export async function install(
       break;
   }
 
-  await processes.spawn(localYarn, ['install', ...installFlags], {
+  await spawnWithUserAgent(localYarn, ['install', ...installFlags], {
     cwd,
     tty: true,
-    env: {
-      ...(await getEnvWithUserAgents())
-    },
     useBasename: true
   });
 }
