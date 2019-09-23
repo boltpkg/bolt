@@ -21,20 +21,23 @@ export default async function addDependenciesToPackage(
   let projectDependencies = project.pkg.getAllDependencies();
   let pkgDependencies = pkg.getAllDependencies();
   let { graph: depGraph } = await project.getDependencyGraph(packages);
+  let inProjectRoot = pkg.isSamePackage(project.pkg);
 
   let dependencyNames = dependencies.map(dep => dep.name);
   let externalDeps = dependencies.filter(dep => !depGraph.has(dep.name));
   let internalDeps = dependencies.filter(dep => depGraph.has(dep.name));
 
   let externalDepsToInstallForProject = externalDeps.filter(
-    dep => !projectDependencies.has(dep.name)
+    // If we are in the project, always (re)install external deps to keep same behaviour as yarn
+    // Otherwise, if in a workspace, only project install if it isn't already installed
+    dep => inProjectRoot || !projectDependencies.has(dep.name)
   );
   if (externalDepsToInstallForProject.length !== 0) {
     await yarn.add(project.pkg, externalDepsToInstallForProject, type);
     // we reinitialise the project config because it will be modified externally by yarn
     project = await Project.init(project.pkg.dir);
   }
-  if (pkg.isSamePackage(project.pkg)) {
+  if (inProjectRoot) {
     if (internalDeps.length > 0) {
       throw new BoltError(
         messages.cannotInstallWorkspaceInProject(internalDeps[0].name)
