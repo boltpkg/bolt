@@ -72,13 +72,30 @@ describe('utils/addDependenciesToPackages', () => {
     );
   });
 
-  test('it should not yarn install packages that are already installed', async () => {
+  test('it should not yarn install packages that are already installed when run from a workspace', async () => {
+    let rootDir = f.copy('nested-workspaces');
+    let project = await Project.init(rootDir);
+    let packages = await project.getPackages();
+    let pkg = project.getPackageByName(packages, 'foo');
+    if (!pkg) throw new Error('missing foo');
+
+    await addDependenciesToPackage(project, pkg, [{ name: 'react' }]);
+
+    expect(unsafeYarn.add).toHaveBeenCalledTimes(0);
+  });
+
+  test('it should yarn install packages that are already installed when run from the project root', async () => {
     let cwd = f.copy('nested-workspaces');
     let project = await Project.init(cwd);
 
     await addDependenciesToPackage(project, project.pkg, [{ name: 'react' }]);
 
-    expect(unsafeYarn.add).toHaveBeenCalledTimes(0);
+    expect(unsafeYarn.add).toHaveBeenCalledTimes(1);
+    expect(unsafeYarn.add).toHaveBeenCalledWith(
+      project.pkg,
+      [{ name: 'react' }],
+      'dependencies'
+    );
   });
 
   test('it should throw if version does not match version in project config', async () => {

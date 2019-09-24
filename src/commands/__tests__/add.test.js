@@ -79,7 +79,7 @@ describe('bolt add', () => {
           cwd: projectDir
         })
       );
-      expect(yarn.add).toHaveBeenCalledTimes(0);
+      expect(yarn.add).toHaveBeenCalledTimes(1);
     });
 
     test('adding new dependency with --dev flag', async () => {
