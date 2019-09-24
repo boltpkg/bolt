@@ -66,11 +66,12 @@ export function toFilterOpts(flags: Flags): FilterOpts {
  * and returns an object with the package name and version (if passed)
  */
 export function toDependency(dependencyString: string): Dependency {
-  let [name, version] = dependencyString.split('@').filter(part => part !== '');
+  let [name, ...rest] = dependencyString.split('@').filter(part => part !== '');
+  let version = rest.join('@');
   if (name.includes('/')) {
     name = '@' + name;
   }
-  return version ? { name, version } : { name };
+  return version.length > 0 ? { name, version } : { name };
 }
 
 export function toYarnInit(flags: Flags) {
