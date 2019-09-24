@@ -243,9 +243,7 @@ export default class Config {
     if (typeof workspaces === 'undefined') return;
     return toArrayOfStrings(
       workspaces,
-      `package.json#bolt.workspaces must be an array of globs. See "${
-        this.filePath
-      }"`
+      `package.json#bolt.workspaces must be an array of globs. See "${this.filePath}"`
     );
   }
 
@@ -255,9 +253,7 @@ export default class Config {
     if (typeof deps === 'undefined') return;
     return toObjectOfStrings(
       deps,
-      `package.json#${depType} must be an object of strings. See "${
-        this.filePath
-      }"`
+      `package.json#${depType} must be an object of strings. See "${this.filePath}"`
     );
   }
 
@@ -267,9 +263,7 @@ export default class Config {
     if (typeof scripts === 'undefined') return;
     return toObjectOfStrings(
       scripts,
-      `package.json#scripts must be an object of strings. See "${
-        this.filePath
-      }"`
+      `package.json#scripts must be an object of strings. See "${this.filePath}"`
     );
   }
 
@@ -280,9 +274,7 @@ export default class Config {
     if (typeof bin === 'string') return bin;
     return toObjectOfStrings(
       bin,
-      `package.json#bin must be an object of strings or a string. See "${
-        this.filePath
-      }"`
+      `package.json#bin must be an object of strings or a string. See "${this.filePath}"`
     );
   }
 }

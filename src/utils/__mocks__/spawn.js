@@ -31,8 +31,8 @@ spawn.default = async function mockSpawn(cmd, args, opts) {
 };
 
 // __mock('echo', ['test'], {}, { code: 0, stdout: '', stderr: '' });
-spawn.__mock = ({cmd, args, opts}, {stdout, stderr, code}) => {
-  mocks.push({cmd, args, opts, stdout, stderr, code});
+spawn.__mock = ({ cmd, args, opts }, { stdout, stderr, code }) => {
+  mocks.push({ cmd, args, opts, stdout, stderr, code });
 };
 
 module.exports = spawn;

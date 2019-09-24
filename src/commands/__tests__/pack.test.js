@@ -12,10 +12,10 @@ describe('bolt pack', () => {
         filename: 'my-app'
       })
     );
-    expect(
-      yarn.cliCommand
-    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'pack', [
-      '--filename=my-app'
-    ]);
+    expect(yarn.cliCommand).toHaveBeenCalledWith(
+      'dummyPattern/dummyPath',
+      'pack',
+      ['--filename=my-app']
+    );
   });
 });

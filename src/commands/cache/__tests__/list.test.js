@@ -11,9 +11,11 @@ describe('bolt cache list', () => {
         cwd: 'dummyPattern/dummyPath'
       })
     );
-    expect(
-      yarn.cliCommand
-    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'cache', ['list']);
+    expect(yarn.cliCommand).toHaveBeenCalledWith(
+      'dummyPattern/dummyPath',
+      'cache',
+      ['list']
+    );
   });
 
   it('should handle --pattern flag', async () => {
@@ -23,11 +25,10 @@ describe('bolt cache list', () => {
         pattern: 'jest'
       })
     );
-    expect(
-      yarn.cliCommand
-    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'cache', [
-      'list',
-      '--pattern=jest'
-    ]);
+    expect(yarn.cliCommand).toHaveBeenCalledWith(
+      'dummyPattern/dummyPath',
+      'cache',
+      ['list', '--pattern=jest']
+    );
   });
 });

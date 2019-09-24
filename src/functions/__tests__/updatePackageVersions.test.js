@@ -12,9 +12,9 @@ const f = fixtures(__dirname);
 jest.mock('../../utils/logger');
 
 /*
-* NOTE: The way we are testing, we are testing the update of a single dependency.
-* This means that projects will be left in an invalid state after most test runs.
-*/
+ * NOTE: The way we are testing, we are testing the update of a single dependency.
+ * This means that projects will be left in an invalid state after most test runs.
+ */
 
 async function getDepVersion(
   pathToPkg: string,

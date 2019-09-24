@@ -2,5 +2,5 @@
 module.exports = {
   ...require('./clean'),
   ...require('./dir'),
-  ...require('./list'),
+  ...require('./list')
 };
