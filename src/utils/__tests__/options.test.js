@@ -6,7 +6,8 @@ import {
   string,
   boolean,
   number,
-  toFilterOpts
+  toFilterOpts,
+  toSpawnOpts
 } from '../options';
 
 describe('options', () => {
@@ -28,7 +29,7 @@ describe('options', () => {
     expect(() => number('number', 'flag')).toThrow();
   });
 
-  test('toFilerOptions', () => {
+  test('toFilterOptions', () => {
     expect(toFilterOpts({ only: 'only' })).toEqual({ only: 'only' });
     expect(toFilterOpts({ onlyFs: 'onlyFs' })).toEqual({ onlyFs: 'onlyFs' });
     expect(toFilterOpts({ ignore: 'ignore' })).toEqual({ ignore: 'ignore' });
@@ -36,6 +37,28 @@ describe('options', () => {
       ignoreFs: 'ignoreFs'
     });
     expect(toFilterOpts({})).toEqual({});
+  });
+
+  test('toSpawnOpts', () => {
+    expect(toSpawnOpts({})).toEqual({});
+    expect(toSpawnOpts({ bail: false })).toEqual({ bail: false });
+    expect(toSpawnOpts({ bail: true })).toEqual({ bail: true });
+    expect(toSpawnOpts({ parallelNodes: true })).toEqual({
+      orderMode: 'parallel-nodes'
+    });
+    expect(toSpawnOpts({ parallel: true })).toEqual({
+      orderMode: 'parallel'
+    });
+    expect(toSpawnOpts({ serial: true })).toEqual({
+      orderMode: 'serial'
+    });
+    expect(toSpawnOpts({ bail: false, serial: true })).toEqual({
+      bail: false,
+      orderMode: 'serial'
+    });
+    expect(() => toSpawnOpts({ serial: true, parallel: true })).toThrow(
+      'Commands cannot be run both serially and in parallel'
+    );
   });
 
   test('toDependency', () => {
