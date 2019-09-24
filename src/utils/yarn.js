@@ -22,6 +22,32 @@ function depTypeToFlag(depType) {
   return flag ? `--${flag}` : flag;
 }
 
+async function getEnvWithUserAgents() {
+  let yarnUserAgent = await userAgent();
+  let boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
+
+  return {
+    ...process.env,
+    npm_config_user_agent: boltUserAgent,
+    bolt_config_user_agent: boltUserAgent
+  };
+}
+
+/* Add the relevant *_config_user_agent env vars to all spawned yarn processes */
+async function spawnWithUserAgent(
+  cmd: string,
+  args: string[],
+  opts?: processes.SpawnOptions
+) {
+  return processes.spawn(cmd, args, {
+    ...opts,
+    env: {
+      ...(await getEnvWithUserAgents()),
+      ...(opts && opts.env)
+    }
+  });
+}
+
 export type LockFileMode = 'default' | 'pure' | 'frozen';
 
 export async function install(
@@ -42,17 +68,9 @@ export async function install(
       break;
   }
 
-  let yarnUserAgent = await userAgent();
-  let boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
-
-  await processes.spawn(localYarn, ['install', ...installFlags], {
+  await spawnWithUserAgent(localYarn, ['install', ...installFlags], {
     cwd,
     tty: true,
-    env: {
-      ...process.env,
-      npm_config_user_agent: boltUserAgent,
-      bolt_config_user_agent: boltUserAgent
-    },
     useBasename: true
   });
 }
@@ -79,7 +97,7 @@ export async function add(
     if (flag) spawnArgs.push(flag);
   }
 
-  await processes.spawn(localYarn, spawnArgs, {
+  await spawnWithUserAgent(localYarn, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true
@@ -104,7 +122,7 @@ export async function upgrade(
     });
   }
 
-  await processes.spawn(localYarn, [...spawnArgs, ...flags], {
+  await spawnWithUserAgent(localYarn, [...spawnArgs, ...flags], {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true
@@ -125,7 +143,7 @@ export async function run(
   if (args.length) {
     spawnArgs = spawnArgs.concat(args);
   }
-  await processes.spawn(localYarnRelative, spawnArgs, {
+  await spawnWithUserAgent(localYarnRelative, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true,
@@ -165,7 +183,7 @@ export async function getScript(pkg: Package, script: string) {
 
 export async function remove(dependencies: Array<string>, cwd: string) {
   let localYarn = path.join(await getLocalBinPath(), 'yarn');
-  await processes.spawn(localYarn, ['remove', ...dependencies], {
+  await spawnWithUserAgent(localYarn, ['remove', ...dependencies], {
     cwd,
     tty: true
   });
@@ -178,7 +196,7 @@ export async function cliCommand(
 ) {
   let localYarn = path.join(await getLocalBinPath(), 'yarn');
 
-  return await processes.spawn(localYarn, [command, ...spawnArgs], {
+  return await spawnWithUserAgent(localYarn, [command, ...spawnArgs], {
     cwd,
     tty: true,
     useBasename: true
@@ -187,7 +205,7 @@ export async function cliCommand(
 
 export async function info(cwd: string, spawnArgs: Array<string> = []) {
   let localYarn = path.join(await getLocalBinPath(), 'yarn');
-  await processes.spawn(localYarn, ['info', ...spawnArgs], {
+  await spawnWithUserAgent(localYarn, ['info', ...spawnArgs], {
     cwd,
     tty: true
   });
@@ -222,7 +240,7 @@ export async function globalCli(
     }
   });
 
-  await processes.spawn('yarn', spawnArgs, {
+  await spawnWithUserAgent('yarn', spawnArgs, {
     tty: true
   });
 }
