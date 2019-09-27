@@ -1,5 +1,13 @@
 # Bolt Changelog
 
+# 0.24.2
+
+* Upgrade prettier to latest (#250)
+* Fix --no-bail flag (#247)
+* Add bolt_config_user_agent env var to `yarn add` (#240)
+* Update toDependency util to handle versions containing @ symbols (#248)
+* Fix bolt add not reinstalling packages from the project root (#249)
+
 ## 0.24.1
 
 * fix for #207 windows cmdshim problem (#241)
