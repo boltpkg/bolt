@@ -9,8 +9,6 @@ const mockedCommands: any = commands;
 describe('cli', () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    // Remove listeners that the cli (and meow) attach on each run to prevent memory leaks in watch mode
-    process.removeAllListeners();
   });
   describe('--help flag', () => {
     it('should run help command if --help flag is passed with no command args', async () => {
