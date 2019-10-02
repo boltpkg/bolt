@@ -1,13 +1,9 @@
 // @flow
 import includes from 'array-includes';
-import projectBinPath from 'project-bin-path';
-import * as path from 'path';
 import type { Dependency, configDependencyType } from '../types';
 import type Package from '../Package';
-import Project from '../Project';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
-import * as logger from '../utils/fs';
 import { DEPENDENCY_TYPE_FLAGS_MAP, BOLT_VERSION } from '../constants';
 
 function depTypeToFlag(depType) {
