@@ -103,6 +103,10 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
   let [command, ...commandArgs] = args;
   let [subCommand, ...subCommandArgs] = commandArgs;
 
+  if (typeof command === 'undefined' && flags.help) {
+    return commands.help(commands.toHelpOptions(args, flags));
+  }
+
   if (commandMap.ADD[command]) {
     return commands.add(commands.toAddOptions(commandArgs, flags));
   } else if (commandMap.AUTOCLEAN[command]) {
@@ -410,10 +414,10 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
 
   let { pkg, input, flags } = meow({
     argv,
-    help: messages.helpContent(),
     flags: {
       '--': true
-    }
+    },
+    autoHelp: false
   });
 
   logger.title(
