@@ -142,6 +142,52 @@ describe('utils/addDependenciesToPackages', () => {
     expect(pkg.getDependencyVersionRange('project-only-dep')).toEqual('^1.0.0');
   });
 
+  test('should update all package dependencies when run from project root', async () => {
+    let cwd = f.copy('package-with-external-deps-installed');
+    let project = await Project.init(cwd);
+    let packages = await project.getPackages();
+    let fooPkg = project.getPackageByName(packages, 'foo');
+    let barPkg = project.getPackageByName(packages, 'bar');
+    if (!fooPkg || !barPkg) {
+      // This check is required to satisfy flow
+      throw new Error('missing packages');
+    }
+
+    expect(project.pkg.getDependencyVersionRange('global-dep')).toEqual(
+      '^1.0.0'
+    );
+    expect(fooPkg.getDependencyVersionRange('global-dep')).toEqual('^1.0.0');
+    expect(barPkg.getDependencyVersionRange('global-dep')).toEqual('^1.0.0');
+
+    expect(project.pkg.getDependencyVersionRange('foo-dep')).toEqual('^1.0.0');
+    expect(fooPkg.getDependencyVersionRange('foo-dep')).toEqual('^1.0.0');
+    expect(barPkg.getDependencyVersionRange('foo-dep')).toEqual(null);
+
+    await addDependenciesToPackage(project, project.pkg, [
+      { name: 'global-dep', version: '^1.1.0' },
+      { name: 'foo-dep', version: '^1.2.0' }
+    ]);
+
+    // Refetch packages as their config will be stale
+    packages = await project.getPackages();
+    fooPkg = project.getPackageByName(packages, 'foo');
+    barPkg = project.getPackageByName(packages, 'bar');
+    if (!fooPkg || !barPkg) {
+      // This check is required to satisfy flow
+      throw new Error('missing packages');
+    }
+
+    expect(project.pkg.getDependencyVersionRange('global-dep')).toEqual(
+      '^1.1.0'
+    );
+    expect(fooPkg.getDependencyVersionRange('global-dep')).toEqual('^1.1.0');
+    expect(barPkg.getDependencyVersionRange('global-dep')).toEqual('^1.1.0');
+
+    expect(project.pkg.getDependencyVersionRange('foo-dep')).toEqual('^1.2.0');
+    expect(fooPkg.getDependencyVersionRange('foo-dep')).toEqual('^1.2.0');
+    expect(barPkg.getDependencyVersionRange('foo-dep')).toEqual(null);
+  });
+
   test('should be able to add packages with tagged versions (without specifying)', async () => {
     let cwd = f.copy('package-with-external-deps-installed');
     let project = await Project.init(cwd);

@@ -10,6 +10,7 @@ import { BoltError } from './errors';
 import * as logger from './logger';
 import * as yarn from './yarn';
 import symlinkPackageDependencies from './symlinkPackageDependencies';
+import updateWorkspaceDependencies from '../functions/updateWorkspaceDependencies';
 
 export default async function addDependenciesToPackage(
   project: Project,
@@ -43,6 +44,15 @@ export default async function addDependenciesToPackage(
         messages.cannotInstallWorkspaceInProject(internalDeps[0].name)
       );
     }
+
+    // Update all workspace versions
+    const depsToUpgrade = externalDeps.reduce((prev, dep) => {
+      prev[dep.name] = dep.version;
+      return prev;
+    }, {});
+    await updateWorkspaceDependencies(depsToUpgrade, {
+      cwd: project.pkg.dir
+    });
     return true;
   }
 
