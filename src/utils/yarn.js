@@ -10,10 +10,6 @@ import * as fs from '../utils/fs';
 import * as logger from '../utils/fs';
 import { DEPENDENCY_TYPE_FLAGS_MAP, BOLT_VERSION } from '../constants';
 
-function getLocalBinPath(): Promise<string> {
-  return projectBinPath(__dirname);
-}
-
 function depTypeToFlag(depType) {
   let flag = Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).find(
     key => DEPENDENCY_TYPE_FLAGS_MAP[key] === depType

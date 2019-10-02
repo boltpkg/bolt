@@ -1,14 +1,12 @@
 {
-  "name": "@rxdi/bolt",
-  "version": "0.24.2",
+  "name": "bolt",
+  "version": "0.24.3",
   "main": "index.js",
   "author": "James Kyle <me@thejameskyle.com>",
   "license": "MIT",
   "repository": "https://github.com/boltpkg/bolt",
   "bin": {
-    "mono": "./bin.js",
-    "bolt": "./bin.js",
-    "rxdi-bolt": "./bin.js"
+    "bolt": "./bin.js"
   },
   "files": [
     "dist",
@@ -25,6 +23,7 @@
     "build:modern": "cross-env BABEL_ENV=modern babel src -d dist/modern",
     "build": "yarn run clean && yarn build:legacy && yarn build:modern",
     "prepublish": "yarn build",
+    "patch":"npm version patch && npm publish --update-readme --access public",
     "precommit": "lint-staged"
   },
   "devDependencies": {
