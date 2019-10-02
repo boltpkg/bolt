@@ -1,12 +1,14 @@
 {
-  "name": "bolt",
+  "name": "@rxdi/bolt",
   "version": "0.24.2",
   "main": "index.js",
   "author": "James Kyle <me@thejameskyle.com>",
   "license": "MIT",
   "repository": "https://github.com/boltpkg/bolt",
   "bin": {
-    "bolt": "./bin.js"
+    "mono": "./bin.js",
+    "bolt": "./bin.js",
+    "rxdi-bolt": "./bin.js"
   },
   "files": [
     "dist",
