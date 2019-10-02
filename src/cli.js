@@ -412,7 +412,7 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
 export default async function cli(argv: Array<string>, exit: boolean = false) {
   let start = Date.now();
 
-  let { pkg, input, flags } = meow({
+  let { pkg, input, flags } = meow('', {
     argv,
     flags: {
       '--': true
