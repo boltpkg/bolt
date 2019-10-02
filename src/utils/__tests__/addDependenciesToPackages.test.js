@@ -148,6 +148,10 @@ describe('utils/addDependenciesToPackages', () => {
     let packages = await project.getPackages();
     let fooPkg = project.getPackageByName(packages, 'foo');
     let barPkg = project.getPackageByName(packages, 'bar');
+    if (!fooPkg || !barPkg) {
+      // This check is required to satisfy flow
+      throw new Error('missing packages');
+    }
 
     expect(project.pkg.getDependencyVersionRange('global-dep')).toEqual(
       '^1.0.0'
@@ -168,6 +172,10 @@ describe('utils/addDependenciesToPackages', () => {
     packages = await project.getPackages();
     fooPkg = project.getPackageByName(packages, 'foo');
     barPkg = project.getPackageByName(packages, 'bar');
+    if (!fooPkg || !barPkg) {
+      // This check is required to satisfy flow
+      throw new Error('missing packages');
+    }
 
     expect(project.pkg.getDependencyVersionRange('global-dep')).toEqual(
       '^1.1.0'
