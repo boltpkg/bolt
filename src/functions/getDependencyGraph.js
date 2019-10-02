@@ -1,9 +1,11 @@
 // @flow
 import Project from '../Project';
 import * as yarn from '../utils/yarn';
+import type { configDependencyType } from '../types';
 
 type Options = {
-  cwd?: string
+  cwd?: string,
+  excludedTypes?: Array<configDependencyType>
 };
 
 type DependencyGraph = Map<string, Array<string>>;
@@ -18,7 +20,7 @@ export default async function getDependencyGraph(
   let {
     graph: dependencyGraph,
     valid: graphIsValid
-  } = await project.getDependencyGraph(packages);
+  } = await project.getDependencyGraph(packages, opts.excludedTypes);
 
   if (!graphIsValid) {
     throw new Error('Dependency graph is not valid');

@@ -109,6 +109,46 @@ describe('Project', () => {
     });
   });
 
+  test('getDependencyGraph() without excluded dependency types', async () => {
+    let project = await Project.init(f.find('dev-dependent-workspaces-only'));
+    let packages = await project.getPackages();
+    let { valid, graph } = await project.getDependencyGraph(packages);
+    let expectedDependencies = {
+      'dev-dependent-workspaces-only': [],
+      bar: [],
+      foo: ['bar']
+    };
+
+    expect(valid).toEqual(true);
+    expect(graph).toBeInstanceOf(Map);
+    expect(graph.size).toBe(Object.keys(expectedDependencies).length);
+
+    Object.entries(expectedDependencies).forEach(([pkg, dependencies]) => {
+      assertDependencies(graph, pkg, dependencies);
+    });
+  });
+
+  test('getDependencyGraph() with excluded dependency types', async () => {
+    let project = await Project.init(f.find('dev-dependent-workspaces-only'));
+    let packages = await project.getPackages();
+    let { valid, graph } = await project.getDependencyGraph(packages, [
+      'devDependencies'
+    ]);
+    let expectedDependencies = {
+      'dev-dependent-workspaces-only': [],
+      bar: [],
+      foo: []
+    };
+
+    expect(valid).toEqual(true);
+    expect(graph).toBeInstanceOf(Map);
+    expect(graph.size).toBe(Object.keys(expectedDependencies).length);
+
+    Object.entries(expectedDependencies).forEach(([pkg, dependencies]) => {
+      assertDependencies(graph, pkg, dependencies);
+    });
+  });
+
   test('getDependentsGraph() with nested workspaces', async () => {
     let project = await Project.init(f.find('nested-workspaces'));
     let packages = await project.getPackages();
@@ -139,6 +179,44 @@ describe('Project', () => {
       'workspace-a': [],
       'pkg-b': ['pkg-c'],
       'pkg-c': []
+    };
+
+    expect(valid).toEqual(true);
+    expect(graph).toBeInstanceOf(Map);
+    expect(graph.size).toBe(Object.keys(expectedDependents).length);
+
+    Object.entries(expectedDependents).forEach(([pkg, dependents]) => {
+      assertDependents(graph, pkg, dependents);
+    });
+  });
+
+  test('getDependentsGraph() without excluded dependency types', async () => {
+    let project = await Project.init(f.find('dev-dependent-workspaces-only'));
+    let packages = await project.getPackages();
+    let { valid, graph } = await project.getDependentsGraph(packages);
+    let expectedDependents = {
+      bar: ['foo'],
+      foo: []
+    };
+
+    expect(valid).toEqual(true);
+    expect(graph).toBeInstanceOf(Map);
+    expect(graph.size).toBe(Object.keys(expectedDependents).length);
+
+    Object.entries(expectedDependents).forEach(([pkg, dependents]) => {
+      assertDependents(graph, pkg, dependents);
+    });
+  });
+
+  test('getDependentsGraph() with excluded dependency types', async () => {
+    let project = await Project.init(f.find('dev-dependent-workspaces-only'));
+    let packages = await project.getPackages();
+    let { valid, graph } = await project.getDependentsGraph(packages, [
+      'devDependencies'
+    ]);
+    let expectedDependents = {
+      bar: [],
+      foo: []
     };
 
     expect(valid).toEqual(true);
@@ -430,5 +508,43 @@ describe('Project', () => {
       expect(ops).toEqual(['start:bar', 'start:foo', 'end:foo']);
     }
     done();
+  });
+
+  test('runPackageTasks() excludeFromGraph: devDependencies', async () => {
+    let project = await Project.init(f.find('dev-dependent-workspaces-only'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    await project.runPackageTasks(
+      packages,
+      { excludeFromGraph: ['devDependencies'] },
+      async pkg => {
+        ops.push('start:' + pkg.getName());
+        await Promise.resolve();
+        ops.push('end:' + pkg.getName());
+      }
+    );
+
+    expect(ops).toEqual(['start:bar', 'start:foo', 'end:bar', 'end:foo']);
+  });
+
+  test('runPackageTasks() excludeFromGraph: devDependencies cycle', async () => {
+    let project = await Project.init(f.find('dependent-workspaces-with-cycle'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    await project.runPackageTasks(
+      packages,
+      { excludeFromGraph: ['devDependencies'] },
+      async pkg => {
+        ops.push('start:' + pkg.getName());
+        await Promise.resolve();
+        ops.push('end:' + pkg.getName());
+      }
+    );
+
+    expect(ops).toEqual(['start:bar', 'end:bar', 'start:foo', 'end:foo']);
+    // There is not a cycle anymore now that we have excluded devDependencies
+    expect(logger.warn).not.toHaveBeenCalled();
   });
 });
