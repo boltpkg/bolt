@@ -1,18 +1,10 @@
 // @flow
 import includes from 'array-includes';
-import projectBinPath from 'project-bin-path';
-import * as path from 'path';
 import type { Dependency, configDependencyType } from '../types';
 import type Package from '../Package';
-import Project from '../Project';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
-import * as logger from '../utils/fs';
 import { DEPENDENCY_TYPE_FLAGS_MAP, BOLT_VERSION } from '../constants';
-
-function getLocalBinPath(): Promise<string> {
-  return projectBinPath(__dirname);
-}
 
 function depTypeToFlag(depType) {
   let flag = Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).find(
@@ -54,7 +46,6 @@ export async function install(
   cwd: string,
   lockfileMode: LockFileMode = 'default'
 ) {
-  let localYarn = path.join(await getLocalBinPath(), 'yarn');
   let installFlags = [];
 
   switch (lockfileMode) {
@@ -68,7 +59,7 @@ export async function install(
       break;
   }
 
-  await spawnWithUserAgent(localYarn, ['install', ...installFlags], {
+  await spawnWithUserAgent('npx', ['yarn', 'install', ...installFlags], {
     cwd,
     tty: true,
     useBasename: true
@@ -80,8 +71,7 @@ export async function add(
   dependencies: Array<Dependency>,
   type?: configDependencyType
 ) {
-  let localYarn = path.join(await getLocalBinPath(), 'yarn');
-  let spawnArgs = ['add'];
+  let spawnArgs = ['yarn', 'add'];
   if (!dependencies.length) return;
 
   dependencies.forEach(dep => {
@@ -97,7 +87,7 @@ export async function add(
     if (flag) spawnArgs.push(flag);
   }
 
-  await spawnWithUserAgent(localYarn, spawnArgs, {
+  await spawnWithUserAgent('npx', spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true
@@ -109,8 +99,7 @@ export async function upgrade(
   dependencies: Array<Dependency> = [],
   flags: Array<string> = []
 ) {
-  let localYarn = path.join(await getLocalBinPath(), 'yarn');
-  let spawnArgs = ['upgrade'];
+  let spawnArgs = ['yarn', 'upgrade'];
 
   if (dependencies.length) {
     dependencies.forEach(dep => {
@@ -122,7 +111,7 @@ export async function upgrade(
     });
   }
 
-  await spawnWithUserAgent(localYarn, [...spawnArgs, ...flags], {
+  await spawnWithUserAgent('npx', [...spawnArgs, ...flags], {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true
@@ -134,16 +123,11 @@ export async function run(
   script: string,
   args: Array<string> = []
 ) {
-  let project = await Project.init(pkg.dir);
-  let localYarn = path.join(await getLocalBinPath(), 'yarn');
-  // We use a relative path because the absolute paths are very long and noisy in logs
-  let localYarnRelative = path.relative(pkg.dir, localYarn);
-  let spawnArgs = ['run', '-s', script];
-
+  let spawnArgs = ['yarn', 'run', '-s', script];
   if (args.length) {
     spawnArgs = spawnArgs.concat(args);
   }
-  await spawnWithUserAgent(localYarnRelative, spawnArgs, {
+  await spawnWithUserAgent('npx', spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
     tty: true,
@@ -182,8 +166,7 @@ export async function getScript(pkg: Package, script: string) {
 }
 
 export async function remove(dependencies: Array<string>, cwd: string) {
-  let localYarn = path.join(await getLocalBinPath(), 'yarn');
-  await spawnWithUserAgent(localYarn, ['remove', ...dependencies], {
+  await spawnWithUserAgent('npx', ['yarn', 'remove', ...dependencies], {
     cwd,
     tty: true
   });
@@ -194,9 +177,7 @@ export async function cliCommand(
   command: string = '',
   spawnArgs: Array<string> = []
 ) {
-  let localYarn = path.join(await getLocalBinPath(), 'yarn');
-
-  return await spawnWithUserAgent(localYarn, [command, ...spawnArgs], {
+  return await spawnWithUserAgent('npx', ['yarn', command, ...spawnArgs], {
     cwd,
     tty: true,
     useBasename: true
@@ -204,19 +185,16 @@ export async function cliCommand(
 }
 
 export async function info(cwd: string, spawnArgs: Array<string> = []) {
-  let localYarn = path.join(await getLocalBinPath(), 'yarn');
-  await spawnWithUserAgent(localYarn, ['info', ...spawnArgs], {
+  await spawnWithUserAgent('npx', ['yarn', 'info', ...spawnArgs], {
     cwd,
     tty: true
   });
 }
 
 export async function userAgent() {
-  let localYarn = path.join(await getLocalBinPath(), 'yarn');
-
   let { stdout: yarnUserAgent } = await processes.spawn(
-    localYarn,
-    ['config', 'get', 'user-agent'],
+    'npx',
+    ['yarn', 'config', 'get', 'user-agent'],
     {
       tty: false
     }

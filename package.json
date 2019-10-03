@@ -23,6 +23,7 @@
     "build:modern": "cross-env BABEL_ENV=modern babel src -d dist/modern",
     "build": "yarn run clean && yarn build:legacy && yarn build:modern",
     "prepublish": "yarn build",
+    "patch": "npm version patch && npm publish --update-readme --access public",
     "precommit": "lint-staged"
   },
   "devDependencies": {
@@ -66,7 +67,6 @@
     "parse-json": "^2.2.0",
     "path-is-inside": "^1.0.2",
     "pkg-up": "^2.0.0",
-    "project-bin-path": "^1.1.0",
     "read-cmd-shim": "^1.0.1",
     "read-pkg": "^2.0.0",
     "rimraf": "^2.6.1",

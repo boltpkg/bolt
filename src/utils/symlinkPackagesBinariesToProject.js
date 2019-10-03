@@ -1,20 +1,12 @@
 // @flow
 import path from 'path';
-import pathIsInside from 'path-is-inside';
-import includes from 'array-includes';
-
 import Project from '../Project';
-import Package from '../Package';
-import { BoltError } from './errors';
 import * as fs from './fs';
-import * as logger from './logger';
-import * as messages from './messages';
-import * as yarn from './yarn';
 
 export default async function symlinkPackagesBinaries(project: Project) {
   let projectBinPath = project.pkg.nodeModulesBin;
   let packages = await project.getPackages();
-  let { graph: dependencyGraph } = await project.getDependencyGraph(packages);
+  // let { graph: dependencyGraph } = await project.getDependencyGraph(packages);
 
   let symlinksToCreate = [];
 
