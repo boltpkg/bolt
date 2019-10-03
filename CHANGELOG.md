@@ -1,5 +1,10 @@
 # Bolt Changelog
 
+# 0.24.3
+* Fixes `--help` so that is is correctly passed down to other commands (#252)
+* `bolt add` on an existing dependency now correctly updates all workspaces versions if required (#251)
+* Allow exclusion of certain dependency types from dependency graph (#244)
+
 # 0.24.2
 
 * Upgrade prettier to latest (#250)
