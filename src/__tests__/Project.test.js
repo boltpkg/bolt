@@ -510,6 +510,71 @@ describe('Project', () => {
     done();
   });
 
+  test('runPackageTasks() fails with no bail orderMode: parallel', async done => {
+    let project = await Project.init(f.find('independent-workspaces'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    try {
+      await project.runPackageTasks(
+        packages,
+        { orderMode: 'parallel', bail: false },
+        async pkg => {
+          ops.push('start:' + pkg.getName());
+          if (pkg.getName() === 'bar') {
+            throw new Error('test');
+          }
+          await Promise.resolve();
+          ops.push('end:' + pkg.getName());
+        }
+      );
+      done.fail(new Error('Error should have been thrown'));
+    } catch (error) {
+      expect(ops).toEqual(['start:bar', 'start:foo', 'end:foo']);
+    }
+    done();
+  });
+
+  test('runPackageTasks() fails with no bail with no orderMode', async done => {
+    let project = await Project.init(f.find('independent-workspaces'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    try {
+      await project.runPackageTasks(packages, { bail: false }, async pkg => {
+        ops.push('start:' + pkg.getName());
+        if (pkg.getName() === 'bar') {
+          throw new Error('test');
+        }
+        await Promise.resolve();
+        ops.push('end:' + pkg.getName());
+      });
+      done.fail(new Error('Error should have been thrown'));
+    } catch (error) {
+      expect(ops).toEqual(['start:bar', 'start:foo', 'end:foo']);
+    }
+    done();
+  });
+
+  test('runPackageTasks() reports decent error message when failing with no bail', async () => {
+    let project = await Project.init(f.find('independent-workspaces'));
+    let packages = await project.getPackages();
+    let ops = [];
+
+    await expect(
+      project.runPackageTasks(packages, { bail: false }, async pkg => {
+        ops.push('start:' + pkg.getName());
+        if (pkg.getName() === 'bar') {
+          throw new Error('Bar is bad');
+        }
+        await Promise.resolve();
+        ops.push('end:' + pkg.getName());
+      })
+    ).rejects.toMatchObject({
+      message: expect.stringMatching(/1 tasks failed.\nBar is bad/)
+    });
+  });
+
   test('runPackageTasks() excludeFromGraph: devDependencies', async () => {
     let project = await Project.init(f.find('dev-dependent-workspaces-only'));
     let packages = await project.getPackages();

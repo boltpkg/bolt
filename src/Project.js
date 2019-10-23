@@ -10,7 +10,8 @@ import * as logger from './utils/logger';
 import {
   promiseWrapper,
   promiseWrapperSuccess,
-  type PromiseResult
+  type PromiseResult,
+  type PromiseFailure
 } from './utils/promiseWrapper';
 import * as messages from './utils/messages';
 import { BoltError } from './utils/errors';
@@ -22,7 +23,7 @@ import chunkd from 'chunkd';
 
 type GenericTask<T> = (pkg: Package) => Promise<T>;
 
-type TaskResult = PromiseResult<mixed>;
+type TaskResult = PromiseResult<mixed> | void;
 
 type InternalTask = GenericTask<TaskResult>;
 
@@ -197,12 +198,18 @@ export default class Project {
         spawnOpts.excludeFromGraph
       );
     }
-
-    results.forEach(r => {
-      if (r.status === 'error') {
-        throw r.error;
-      }
-    });
+    const taskFailures: Array<PromiseFailure> = (results.filter(
+      r => r && r.status === 'error'
+    ): any);
+    if (taskFailures.length > 0) {
+      const failuresWithMsg = taskFailures
+        .map(r => r.error && r.error.message)
+        .filter(Boolean)
+        .join('\n');
+      throw new BoltError(
+        `${taskFailures.length} tasks failed.\n${failuresWithMsg}`
+      );
+    }
   }
 
   async runPackageTasksSerial<T>(
@@ -249,7 +256,7 @@ export default class Project {
     packages: Array<Package>,
     task: GenericTask<T>,
     excludeDepTypesFromGraph: Array<configDependencyType> | void
-  ): Promise<Array<T>> {
+  ): Promise<Array<T | void>> {
     let { graph: dependentsGraph, valid } = await this.getDependencyGraph(
       packages,
       excludeDepTypesFromGraph
@@ -275,7 +282,7 @@ export default class Project {
     if (!safe) {
       logger.warn(messages.unsafeCycles());
     }
-    return ((Object.values(values): any): Array<T>);
+    return [...values.values()];
   }
 
   getPackageByName(packages: Array<Package>, pkgName: string) {
