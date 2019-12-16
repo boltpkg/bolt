@@ -204,10 +204,9 @@ export default class Project {
     if (taskFailures.length > 0) {
       const failuresWithMsg = taskFailures
         .map(r => r.error && r.error.message)
-        .filter(Boolean)
-        .join('\n');
+        .filter(Boolean);
       throw new BoltError(
-        `${taskFailures.length} tasks failed.\n${failuresWithMsg}`
+        messages.taskFailed(taskFailures.length, failuresWithMsg)
       );
     }
   }
