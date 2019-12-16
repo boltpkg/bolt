@@ -267,21 +267,25 @@ export default class Project {
       graph.set(pkgName, pkgInfo.dependencies);
     }
 
+    let results = await taskGraphRunner({
+      graph,
+      force: true,
+      task: async pkgName => {
+        let pkg = this.getPackageByName(packages, pkgName);
+        if (pkg) {
+          return task(pkg);
+        }
+      }
+    });
+
     let {
       safe,
       values
-    }: { safe: boolean, values: Map<string, T | void> } = await taskGraphRunner(
-      {
-        graph,
-        force: true,
-        task: async pkgName => {
-          let pkg = this.getPackageByName(packages, pkgName);
-          if (pkg) {
-            return task(pkg);
-          }
-        }
-      }
-    );
+    }: { safe: boolean, values: Map<string, T | void> } = (results: {
+      safe: boolean,
+      // The value type of the Map is wrong so we cast it to any and recast to the correct type
+      values: Map<string, any>
+    });
 
     if (!safe) {
       logger.warn(messages.unsafeCycles());
