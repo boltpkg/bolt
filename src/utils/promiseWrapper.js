@@ -1,12 +1,12 @@
 // @flow
 
-type PromiseSuccess<T> = {
+export type PromiseSuccess<T> = {
   result: T,
   status: 'success'
 };
 
-type PromiseFailure = {
-  error: mixed,
+export type PromiseFailure = {
+  error: any,
   status: 'error'
 };
 

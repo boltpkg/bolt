@@ -408,3 +408,10 @@ export function taskRunningAcrossCINodes(
 ): Message {
   return `Task is being split across ${nodes} nodes. Current node running across ${count} of ${total} workspaces`;
 }
+
+export function taskFailed(
+  numFailures: number,
+  failuresWithMsg: string[]
+): Message {
+  return `${numFailures} tasks failed.\n${failuresWithMsg.join('\n')}`;
+}
