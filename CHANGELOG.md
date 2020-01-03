@@ -1,6 +1,6 @@
 # Bolt Changelog
 
-# 0.24.3
+# 0.24.4
 * Fix --no-bail not throwing when running in default orderMode (#256)
 
 # 0.24.3
