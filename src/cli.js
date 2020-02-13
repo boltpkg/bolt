@@ -8,6 +8,7 @@ import { BoltError } from './utils/errors';
 import cleanStack from 'clean-stack';
 import * as commands from './commands';
 import * as options from './utils/options';
+import { globalOptions } from './GlobalOptions';
 
 const commandMap = {
   ADD: { add: true },
@@ -415,9 +416,15 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
   let { pkg, input, flags } = meow('', {
     argv,
     flags: {
-      '--': true
+      '--': true,
+      /* Global options as defined in GlobalOptions.js.
+       * Added here so bolt --<option> <cmd> doesn't parse <cmd> as the value of the <option> flag */
+      prefix: {
+        type: 'boolean'
+      }
     },
-    autoHelp: false
+    autoHelp: false,
+    booleanDefault: undefined
   });
 
   logger.title(
@@ -429,6 +436,7 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
   processes.handleSignals();
 
   try {
+    globalOptions.setFromFlags(flags);
     await runCommandFromCli(input, flags);
   } catch (err) {
     if (err instanceof BoltError) {
