@@ -16,7 +16,6 @@ describe('cli', () => {
       mockedCommands.toHelpOptions.mockImplementationOnce(() => opts);
       await cli(['--help']);
       expect(mockedCommands.toHelpOptions).toHaveBeenCalledWith([], {
-        '--': [],
         help: true
       });
       expect(commands.help).toHaveBeenCalledTimes(1);
@@ -34,9 +33,7 @@ describe('cli', () => {
       const opts = {};
       mockedCommands.toInstallOptions.mockImplementationOnce(() => opts);
       await cli([]);
-      expect(mockedCommands.toInstallOptions).toHaveBeenCalledWith([], {
-        '--': []
-      });
+      expect(mockedCommands.toInstallOptions).toHaveBeenCalledWith([], {});
       expect(commands.install).toHaveBeenCalledTimes(1);
       expect(commands.install).toHaveBeenCalledWith(opts);
     });
@@ -46,7 +43,6 @@ describe('cli', () => {
       mockedCommands.toAddOptions.mockImplementationOnce(() => opts);
       await cli(['add', 'foo', '--dev']);
       expect(mockedCommands.toAddOptions).toHaveBeenCalledWith(['foo'], {
-        '--': [],
         dev: true
       });
       expect(commands.add).toHaveBeenCalledTimes(1);
