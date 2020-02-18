@@ -28,8 +28,12 @@ function fmt(str: Message | Buffer | string, opts: LoggerOpts = {}) {
   return result;
 }
 
-function prompt(pkg) {
-  return (pkg ? '(' + pkg.config.getName() + ') ' : '') + '$ ';
+function prompt(pkg, cmd) {
+  let prompt = pkg ? '(' + pkg.config.getName() + ')' : '';
+  if (!cmd) {
+    return prompt;
+  }
+  return prompt + ' $ ' + cmd;
 }
 
 function write(
@@ -81,7 +85,7 @@ export function stdout(
   pkg?: Package,
   opts: LoggerOpts = {}
 ) {
-  let prefix = chalk.cyan(prompt(pkg) + cmd);
+  let prefix = chalk.cyan(prompt(pkg, cmd));
   write(data, { prefix, ...opts }, false);
 }
 
@@ -91,12 +95,12 @@ export function stderr(
   pkg?: Package,
   opts: LoggerOpts = {}
 ) {
-  let prefix = chalk.red(prompt(pkg) + cmd);
+  let prefix = chalk.red(prompt(pkg, cmd));
   write(data, { prefix, ...opts }, true);
 }
 
 export function cmd(cmd: string, args: Array<string>, opts: LoggerOpts = {}) {
-  let msg = chalk.dim(prompt() + cmd);
+  let msg = chalk.dim(prompt(null, cmd));
   if (args.length) {
     msg += ' ';
     msg += chalk.magenta(args.join(' '));

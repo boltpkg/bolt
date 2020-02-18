@@ -100,7 +100,8 @@ export async function add(
   await spawnWithUserAgent(localYarn, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
-    tty: true
+    tty: true,
+    useBasename: true
   });
 }
 
@@ -125,7 +126,8 @@ export async function upgrade(
   await spawnWithUserAgent(localYarn, [...spawnArgs, ...flags], {
     cwd: pkg.dir,
     pkg: pkg,
-    tty: true
+    tty: true,
+    useBasename: true
   });
 }
 
@@ -218,7 +220,8 @@ export async function userAgent() {
     localYarn,
     ['config', 'get', 'user-agent'],
     {
-      tty: false
+      tty: false,
+      silent: true
     }
   );
 

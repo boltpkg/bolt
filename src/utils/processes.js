@@ -7,6 +7,7 @@ import type Project from '../Project';
 import pLimit from 'p-limit';
 import os from 'os';
 import path from 'path';
+import { globalOptions, type GlobalOptions } from '../GlobalOptions';
 
 const limit = pLimit(os.cpus().length);
 const processes = new Set();
@@ -37,6 +38,7 @@ export class ChildProcessError extends Error {
 }
 
 export type SpawnOptions = {
+  ...GlobalOptions,
   cwd?: string,
   pkg?: Package,
   silent?: boolean,
@@ -58,7 +60,11 @@ export function spawn(
         let isTTY = process.stdout.isTTY && opts.tty;
         let cmdDisplayName = opts.useBasename ? path.basename(cmd) : cmd;
 
-        let cmdStr = cmdDisplayName + ' ' + args.join(' ');
+        let displayCmd =
+          opts.disableCmdPrefix != null
+            ? opts.disableCmdPrefix
+            : globalOptions.get('disableCmdPrefix');
+        let cmdStr = displayCmd ? '' : cmdDisplayName + ' ' + args.join(' ');
 
         let spawnOpts: child_process$spawnOpts = {
           cwd: opts.cwd,

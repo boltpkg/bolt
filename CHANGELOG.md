@@ -1,9 +1,14 @@
 # Bolt Changelog
 
-# 0.24.3
+# master
+* Add --no-prefix flag to disable prefixing subcommand output with the command string
+
+# 0.24.4
+
 * Fix --no-bail not throwing when running in default orderMode (#256)
 
 # 0.24.3
+
 * Fixes `--help` so that is is correctly passed down to other commands (#252)
 * `bolt add` on an existing dependency now correctly updates all workspaces versions if required (#251)
 * Allow exclusion of certain dependency types from dependency graph (#244)
