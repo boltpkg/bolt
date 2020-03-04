@@ -1,6 +1,7 @@
 # Bolt Changelog
 
-# master
+# 0.24.5
+
 * Add --no-prefix flag to disable prefixing subcommand output with the command string
 
 # 0.24.4
