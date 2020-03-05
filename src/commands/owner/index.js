@@ -2,5 +2,5 @@
 module.exports = {
   ...require('./add'),
   ...require('./list'),
-  ...require('./remove'),
+  ...require('./remove')
 };

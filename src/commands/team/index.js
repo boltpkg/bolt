@@ -4,5 +4,5 @@ module.exports = {
   ...require('./create'),
   ...require('./destroy'),
   ...require('./list'),
-  ...require('./remove'),
+  ...require('./remove')
 };

@@ -3,7 +3,7 @@
 import inquirer from 'inquirer';
 
 export async function isWorkspaceNeeded() {
-  const question = await inquirer.prompt([
+  let question = await inquirer.prompt([
     {
       type: 'confirm',
       name: 'workspaces',

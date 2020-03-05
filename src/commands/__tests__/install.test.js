@@ -5,7 +5,7 @@ import * as yarn from '../../utils/yarn';
 import * as path from 'path';
 import * as fs from '../../utils/fs';
 import Project from '../../Project';
-import Workspace from '../../Workspace';
+import Package from '../../Package';
 import fixtures from 'fixturez';
 
 const f = fixtures(__dirname);
@@ -17,19 +17,20 @@ jest.unmock('../install');
 
 const unsafeProcesses: any & typeof processes = processes;
 const unsafeYarn: any & typeof yarn = yarn;
+const unsafeProcess: any & typeof process = process;
 
-async function assertNodeModulesExists(workspace: Workspace) {
-  let nodeModulesStat = await fs.stat(workspace.pkg.nodeModules);
-  let nodeModulesBinStat = await fs.stat(workspace.pkg.nodeModulesBin);
+async function assertNodeModulesExists(pkg: Package) {
+  let nodeModulesStat = await fs.stat(pkg.nodeModules);
+  let nodeModulesBinStat = await fs.stat(pkg.nodeModulesBin);
   expect(nodeModulesStat.isDirectory()).toEqual(true);
   expect(nodeModulesBinStat.isDirectory()).toEqual(true);
 }
 
-async function assertDependenciesSymlinked(workspace: Workspace) {
-  let deps = workspace.pkg.getAllDependencies();
+async function assertDependenciesSymlinked(pkg: Package) {
+  let deps = pkg.getAllDependencies();
 
   for (let dep of deps.keys()) {
-    let depStat = await fs.lstat(path.join(workspace.pkg.nodeModules, dep));
+    let depStat = await fs.lstat(path.join(pkg.nodeModules, dep));
     expect(depStat.isSymbolicLink()).toBe(true);
   }
 }
@@ -37,79 +38,130 @@ async function assertDependenciesSymlinked(workspace: Workspace) {
 describe('install', () => {
   test('simple-package, should run yarn install at the root', async () => {
     let cwd = f.find('simple-package');
-    await install(toInstallOptions([], { cwd }));
-    expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
-    expect(unsafeProcesses.spawn).toHaveBeenCalledWith('yarn', ['install'], {
-      cwd,
-      tty: true
-    });
+    await install(
+      toInstallOptions([], {
+        cwd
+      })
+    );
+    expect(yarn.install).toHaveBeenCalledTimes(1);
+    expect(yarn.install).toHaveBeenCalledWith(cwd, 'default');
   });
 
   test('should still run yarn install at the root when called from ws', async () => {
     let rootDir = f.find('simple-project');
     let cwd = path.join(path.join(rootDir, 'packages', 'foo'));
-    await install(toInstallOptions([], { cwd }));
-    expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
-    expect(unsafeProcesses.spawn).toHaveBeenCalledWith('yarn', ['install'], {
-      cwd: rootDir,
-      tty: true
-    });
+    await install(
+      toInstallOptions([], {
+        cwd
+      })
+    );
+    expect(yarn.install).toHaveBeenCalledTimes(1);
+    expect(yarn.install).toHaveBeenCalledWith(rootDir, 'default');
   });
 
   test('should pass the --pure-lockfile flag correctly', async () => {
     let rootDir = f.find('simple-project');
     let cwd = path.join(path.join(rootDir, 'packages', 'foo'));
-    await install(toInstallOptions([], { cwd, pureLockfile: true }));
-    expect(unsafeProcesses.spawn).toHaveBeenCalledTimes(1);
-    expect(unsafeProcesses.spawn).toHaveBeenCalledWith(
-      'yarn',
-      ['install', '--pure-lockfile'],
-      {
-        cwd: rootDir,
-        tty: true
-      }
+    await install(
+      toInstallOptions([], {
+        cwd,
+        pureLockfile: true
+      })
     );
+    expect(yarn.install).toHaveBeenCalledTimes(1);
+    expect(yarn.install).toHaveBeenCalledWith(rootDir, 'pure');
+  });
+
+  test('should pass the --frozen-lockfile flag correctly', async () => {
+    const rootDir = f.find('simple-project');
+    const cwd = path.join(path.join(rootDir, 'packages', 'foo'));
+    await install(
+      toInstallOptions([], {
+        cwd,
+        frozenLockfile: true
+      })
+    );
+    expect(yarn.install).toHaveBeenCalledTimes(1);
+    expect(yarn.install).toHaveBeenCalledWith(rootDir, 'frozen');
+  });
+
+  test('should correctly give priority to --frozen-lockfile if --pure-lockfile is also passed', async () => {
+    const rootDir = f.find('simple-project');
+    const cwd = path.join(path.join(rootDir, 'packages', 'foo'));
+    await install(
+      toInstallOptions([], {
+        cwd,
+        frozenLockfile: true,
+        pureLockfile: true
+      })
+    );
+    expect(yarn.install).toHaveBeenCalledTimes(1);
+    expect(yarn.install).toHaveBeenCalledWith(rootDir, 'frozen');
   });
 
   test('should work in project with scoped packages', async () => {
     let cwd = f.find('nested-workspaces-with-scoped-package-names');
     let project = await Project.init(cwd);
-    let workspaces = await project.getWorkspaces();
+    let packages = await project.getPackages();
 
-    await install(toInstallOptions([], { cwd }));
+    await install(
+      toInstallOptions([], {
+        cwd
+      })
+    );
 
-    for (let workspace of workspaces) {
-      assertNodeModulesExists(workspace);
-      assertDependenciesSymlinked(workspace);
+    for (let pkg of packages) {
+      assertNodeModulesExists(pkg);
+      assertDependenciesSymlinked(pkg);
     }
+  });
+
+  test('should install even if a workspace is missing a package.json', async () => {
+    let cwd = f.find('no-package-json-workspace');
+    let project = await Project.init(cwd);
+    let packages = await project.getPackages();
+
+    await install(
+      toInstallOptions([], {
+        cwd
+      })
+    );
   });
 
   test('should run preinstall, postinstall and prepublish in each ws', async () => {
     let cwd = f.find('simple-project');
     let project = await Project.init(cwd);
-    let workspaces = await project.getWorkspaces();
+    let packages = await project.getPackages();
 
-    await install(toInstallOptions([], { cwd }));
+    await install(
+      toInstallOptions([], {
+        cwd
+      })
+    );
 
-    for (let workspace of workspaces) {
+    for (let pkg of packages) {
       let runFn = unsafeYarn.runIfExists;
-      expect(runFn).toHaveBeenCalledWith(workspace.pkg, 'preinstall');
-      expect(runFn).toHaveBeenCalledWith(workspace.pkg, 'postinstall');
-      expect(runFn).toHaveBeenCalledWith(workspace.pkg, 'prepublish');
+      expect(runFn).toHaveBeenCalledWith(pkg, 'preinstall');
+      expect(runFn).toHaveBeenCalledWith(pkg, 'postinstall');
+      expect(runFn).toHaveBeenCalledWith(pkg, 'prepublish');
     }
   });
 
   // This is re-testing symlinkPackageDependencies, but we'd rather be explicit here
   test('should install (symlink) all deps in workspaces', async () => {
     let cwd = f.copy('nested-workspaces-with-root-dependencies-installed');
-    const project = await Project.init(cwd);
-    const workspaces = await project.getWorkspaces();
+    let project = await Project.init(cwd);
+    let packages = await project.getPackages();
 
-    await install(toInstallOptions([], { cwd }));
+    await install(
+      toInstallOptions([], {
+        cwd
+      })
+    );
 
-    for (let workspace of workspaces) {
-      assertNodeModulesExists(workspace);
-      assertDependenciesSymlinked(workspace);
+    for (let pkg of packages) {
+      assertNodeModulesExists(pkg);
+      assertDependenciesSymlinked(pkg);
       // TODO: assertBinfileSymlinked (currently tested partially in symlinkPackageDependencies)
     }
   });
@@ -118,8 +170,31 @@ describe('install', () => {
     let cwd = f.copy('invalid-project-root-dependency-on-ws');
     let project = await Project.init(cwd);
 
-    await expect(install(toInstallOptions([], { cwd }))).rejects.toBeInstanceOf(
-      Error
+    await expect(
+      install(
+        toInstallOptions([], {
+          cwd
+        })
+      )
+    ).rejects.toBeInstanceOf(Error);
+  });
+
+  test('workspaces with bins', async () => {
+    let cwd = f.copy('workspace-with-bin');
+    let project = await Project.init(cwd);
+
+    await install(toInstallOptions([], { cwd }));
+
+    let binPath = path.join(
+      cwd,
+      'packages',
+      'foo',
+      'node_modules',
+      '.bin',
+      'bar'
     );
+    let stat = await fs.stat(binPath);
+
+    expect(stat.isFile()).toBe(true);
   });
 });

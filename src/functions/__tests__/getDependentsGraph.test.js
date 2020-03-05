@@ -6,7 +6,7 @@ import fixtures from 'fixturez';
 const f = fixtures(__dirname);
 
 describe('function/getDependentsGraph', () => {
-  describe('A project with nested workspaces', async () => {
+  describe('A project with nested workspaces', () => {
     it('should return a simplified dependents graph', async () => {
       let cwd = f.find('nested-workspaces');
       let dependentsGraph = await getDependentsGraph({ cwd });

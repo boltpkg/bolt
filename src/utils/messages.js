@@ -1,7 +1,6 @@
 // @flow
 import chalk from 'chalk';
-import type Workspace from '../Workspace';
-import type Package from '../Package';
+import Package from '../Package';
 
 /*::
 export opaque type Message = string;
@@ -30,6 +29,10 @@ function badVer(str) {
 function cmd(str) {
   return chalk.bgBlack.magenta(`\`${str}\``);
 }
+
+const importantSeparator = chalk.red(
+  '===============================IMPORTANT!==============================='
+);
 
 export function packageMustDependOnCurrentVersion(
   name: string,
@@ -135,12 +138,12 @@ export function dependencyNotInstalled(depName: string): Message {
 
 export function cannotRemoveDependencyDependendOnByWorkspaces(
   depName: string,
-  workspaces: Array<Workspace>
+  packages: Array<Package>
 ): Message {
   return `Cannot remove dependency ${normalPkg(
     depName
-  )} that is depended on by some workspaces:\n${workspaces
-    .map(workspace => ` - ${normalPkg(workspace.pkg.config.getName())}`)
+  )} that is depended on by some workspaces:\n${packages
+    .map(pkg => ` - ${normalPkg(pkg.getName())}`)
     .join('\n')}`;
 }
 export function externalDepsPassedToUpdatePackageVersions(
@@ -186,6 +189,9 @@ export function helpContent(): string {
   return `
     usage
       $ bolt [command] <...args> <...opts>
+
+    options:
+      --no-prefix Do not prefix spawned process output with the command string
 
     commands
       init         init a bolt project
@@ -251,14 +257,18 @@ export function lockingAllPackages(): Message {
 }
 
 export function validatingProject(): Message {
-  return '[1/3] Validating project...';
+  return '[1/4] Validating project...';
 }
 export function installingProjectDependencies(): Message {
-  return '[2/3] Installing project dependencies...';
+  return '[2/4] Installing project dependencies...';
 }
 
 export function linkingWorkspaceDependencies(): Message {
-  return '[3/3] Linking workspace dependencies...';
+  return '[3/4] Linking workspace dependencies...';
+}
+
+export function linkingWorkspaceBinaries(): Message {
+  return '[4/4] Linking workspace binaries...';
 }
 
 export function publishingPackage(
@@ -272,12 +282,38 @@ export function noUnpublishedPackagesToPublish(): Message {
   return 'No unpublished packages to publish';
 }
 
-export function notPublishingPackage(
+export function willPublishUnpublishedPackage(
+  pkgName: string,
+  pkgLocalVersion: string
+): Message {
+  return `${pkgName} is being published at version ${pkgLocalVersion} because it is not yet published`;
+}
+
+export function willPublishPackage(
+  pkgLocalVersion: string,
+  pkgPublishedVersion: string,
+  pkgName: string
+): Message {
+  return `${pkgName} is being published because our local version (${pkgLocalVersion}) is ahead of npm's (${pkgPublishedVersion})`;
+}
+
+export function willNotPublishPackage(
   pkgLocalVersion: string,
   pkgPublishedVersion: string,
   pkgName: string
 ): Message {
   return `${pkgName} is not being published because version ${pkgPublishedVersion} is already published on npm and we are trying to publish version ${pkgLocalVersion}`;
+}
+
+export function successfullyPublishedPackage(
+  pkgName: string,
+  pkgVersion: string
+): Message {
+  return `Successfully published ${pkgName}@${pkgVersion}`;
+}
+
+export function failedToPublishPackage(pkgName: string): Message {
+  return `Failed to publish ${pkgName}`;
 }
 
 export function couldNotBeNormalized(): Message {
@@ -295,7 +331,7 @@ export function cannotInstallWorkspaceInProject(pkgName: string): Message {
 export function cannotUpgradeWorkspaceDependencyInProject(
   pkgName: string
 ): Message {
-  return `Cannot upgrade workspace "${pkgName}" as a dependency of a project. 
+  return `Cannot upgrade workspace "${pkgName}" as a dependency of a project.
   All the workspaces are symlinked, upgrading workspce dependency is invalid.`;
 }
 
@@ -303,13 +339,18 @@ export function errorParsingJSON(filePath: string): Message {
   return `Error parsing JSON in file:\n${filePath}`;
 }
 
+// TODO: This message actually only makes sense when using changeset commands, so should probably
+// be rethought out once `bolt version`, etc is ready
 export function invalidBoltWorkspacesFromUpdate(
   name: string,
   depName: string,
   depRange: string,
   newVersion: string
 ): Message {
-  return `${name} has a dependency on ${depName} at ${depRange}, however the new version of ${newVersion} leaves this range. You will need to make a new changeset that includes an update to ${name}`;
+  return `${importantSeparator}
+  ${name} has a dependency on ${depName} at ${depRange}, however the new version of ${newVersion} leaves this range.
+  You will need to make a new changeset that includes an update to ${name}
+${importantSeparator}`;
 }
 
 export function unableToInstall(): Message {
@@ -317,11 +358,11 @@ export function unableToInstall(): Message {
 }
 
 export function cannotInitConfigMissingPkgJSON(filePath: string): Message {
-  const basePath = filePath.replace(/.package\.json$/, '');
+  let basePath = filePath.replace(/.package\.json$/, '');
   return `This folder does not contain a package.json:\n${basePath}
-  
+
   Sometimes this is caused by incomplete packages or switching branches.
-  
+
   Try removing the directory or fixing the package and run bolt again.`;
 }
 
@@ -341,7 +382,7 @@ export function errorWorkspaceUpgrade(): Message {
   return `${chalk.red.bold(
     '[bolt workspace upgrade]'
   )} Unable to upgrade dependencies for a single workspace.
-	
+
 	In order to upgrade a dependency [across all the workspaces] please run ${cmd(
     '"bolt upgrade [...args]"'
   )} or ${cmd('"bolt workspaces upgrade [...args]"')}`;
@@ -361,4 +402,19 @@ export function errorWorkspacesUpgrade(filterOpts: Array<string>): Message {
 
 export function noNeedToSymlinkInternalDependency(): Message {
   return `Internal packages are symlinked, there is no need update them`;
+}
+
+export function taskRunningAcrossCINodes(
+  nodes: number,
+  count: number,
+  total: number
+): Message {
+  return `Task is being split across ${nodes} nodes. Current node running across ${count} of ${total} workspaces`;
+}
+
+export function taskFailed(
+  numFailures: number,
+  failuresWithMsg: string[]
+): Message {
+  return `${numFailures} tasks failed.\n${failuresWithMsg.join('\n')}`;
 }

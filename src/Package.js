@@ -8,6 +8,7 @@ import * as logger from './utils/logger';
 import * as messages from './utils/messages';
 import sortObject from 'sort-object';
 import { BoltError } from './utils/errors';
+import type { configDependencyType } from './types';
 
 export default class Package {
   filePath: string;
@@ -46,10 +47,23 @@ export default class Package {
     return this.config.getWorkspaces() || [];
   }
 
-  getAllDependencies() {
+  getAllDependencies(excludedTypes?: configDependencyType[] = []) {
     let allDependencies = new Map();
+    if (excludedTypes.length > 0) {
+      let invalidTypes = excludedTypes.filter(
+        t => DEPENDENCY_TYPES.indexOf(t) === -1
+      );
+      if (invalidTypes.length > 0) {
+        throw new BoltError(
+          `Invalid dependency types to exclude: "${invalidTypes.join(',')}"`
+        );
+      }
+    }
+    let dependencyTypes = DEPENDENCY_TYPES.filter(
+      t => excludedTypes.indexOf(t) === -1
+    );
 
-    for (let type of DEPENDENCY_TYPES) {
+    for (let type of dependencyTypes) {
       let deps = this.config.getDeps(type);
       if (!deps) continue;
 
@@ -114,7 +128,7 @@ export default class Package {
     });
   }
 
-  getDependencyTypes(depName: string) {
+  getDependencyTypes(depName: string): Array<string> {
     let matchedTypes = [];
     for (let depType of DEPENDENCY_TYPES) {
       let deps = this.config.getDeps(depType);
@@ -127,7 +141,7 @@ export default class Package {
 
   getDependencyVersionRange(depName: string) {
     for (let depType of DEPENDENCY_TYPES) {
-      const deps = this.config.getDeps(depType);
+      let deps = this.config.getDeps(depType);
       if (deps && deps[depName]) {
         return deps[depName];
       }
@@ -149,5 +163,34 @@ export default class Package {
 
   isSamePackage(pkg: Package) {
     return pkg.dir === this.dir;
+  }
+
+  getName() {
+    return this.config.getName();
+  }
+
+  getVersion() {
+    return this.config.getVersion();
+  }
+
+  getBins(): Array<{ name: string, filePath: string }> {
+    let bin = this.config.getBin();
+    if (typeof bin === 'undefined') {
+      return [];
+    } else if (typeof bin === 'string') {
+      return [
+        {
+          name: this.config.getName(),
+          filePath: path.join(this.dir, bin)
+        }
+      ];
+    } else {
+      return Object.keys(bin).map(key => {
+        return {
+          name: key,
+          filePath: path.join(this.dir, bin[key])
+        };
+      });
+    }
   }
 }

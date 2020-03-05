@@ -30,8 +30,8 @@ async function fakeYarnUpgrade(pkg: Package, dependencies: Array<Dependency>) {
 
 async function depsAtVersion(pkgPath: string, expectedDeps: DependencySet) {
   let allDepsCorrect = true;
-  const pkg = await Package.init(path.join(pkgPath, 'package.json'));
-  const deps = pkg.getAllDependencies();
+  let pkg = await Package.init(path.join(pkgPath, 'package.json'));
+  let deps = pkg.getAllDependencies();
   Object.entries(expectedDeps).forEach(([name, version]) => {
     allDepsCorrect = allDepsCorrect && deps.get(name) === version;
   });
@@ -50,27 +50,27 @@ describe('utils/upgradeDependenciesInPackage', () => {
   });
 
   test('upgrading existing dep in project', async () => {
-    const project = await Project.init(cwd);
+    let project = await Project.init(cwd);
 
     await upgradeDependenciesInPackage(project, project.pkg, [
       { name: 'left-pad' }
     ]);
 
-    const deps = (await Project.init(cwd)).pkg.getAllDependencies;
+    let deps = (await Project.init(cwd)).pkg.getAllDependencies;
     expect(await depsAtVersion(project.pkg.dir, { 'left-pad': '^2.0.0' })).toBe(
       true
     );
   });
 
   test('upgrading shared existing dep in project', async () => {
-    const project = await Project.init(cwd);
+    let project = await Project.init(cwd);
 
     await upgradeDependenciesInPackage(project, project.pkg, [
       { name: 'react', version: '^26.0.0' }
     ]);
 
-    const deps = (await Project.init(cwd)).pkg.getAllDependencies;
-    const fooDir = getFooDir(project);
+    let deps = (await Project.init(cwd)).pkg.getAllDependencies;
+    let fooDir = getFooDir(project);
     expect(await depsAtVersion(project.pkg.dir, { react: '^26.0.0' })).toBe(
       true
     );

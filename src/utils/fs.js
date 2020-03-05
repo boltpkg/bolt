@@ -49,8 +49,21 @@ function _symlink(src: string, dest: string, type: string) {
   return promisify(cb => fs.symlink(src, dest, type, cb));
 }
 
-function cmdShim(src: string, dest: string) {
-  return promisify(cb => _cmdShim(src, dest, cb));
+function stripExtension(filePath: string) {
+  return path.join(
+    path.dirname(filePath),
+    path.basename(filePath, path.extname(filePath))
+  );
+}
+
+async function cmdShim(src: string, dest: string) {
+  // If not a symlink we default to the actual src file
+  // https://github.com/npm/npm/blob/d081cc6c8d73f2aa698aab36605377c95e916224/lib/utils/gently-rm.js#L273
+  let relativeShimTarget = await readlink(src);
+  let currentShimTarget = relativeShimTarget
+    ? path.resolve(path.dirname(src), relativeShimTarget)
+    : src;
+  await promisify(cb => _cmdShim(currentShimTarget, stripExtension(dest), cb));
 }
 
 async function createSymbolicLink(src, dest, type) {
@@ -68,7 +81,7 @@ async function createPosixSymlink(origin, dest, type) {
     type = 'file';
   }
 
-  const src = path.relative(path.dirname(dest), origin);
+  let src = path.relative(path.dirname(dest), origin);
 
   return await createSymbolicLink(src, dest, type);
 }
@@ -140,4 +153,22 @@ export async function readlink(filePath: string) {
   }
 
   return result;
+}
+
+export async function dirExists(dir: string) {
+  try {
+    let _stat = await stat(dir);
+    return _stat.isDirectory();
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function symlinkExists(filePath: string) {
+  try {
+    let stat = await lstat(filePath);
+    return stat.isSymbolicLink();
+  } catch (err) {
+    return false;
+  }
 }

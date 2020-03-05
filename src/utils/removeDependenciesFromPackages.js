@@ -1,13 +1,13 @@
 // @flow
 import Project from '../Project';
-import type Workspace from '../Workspace';
-import type Package from '../Package';
+import Package from '../Package';
 import * as logger from './logger';
 import * as messages from './messages';
 import * as yarn from './yarn';
 import * as fs from './fs';
 import * as path from 'path';
 import { BoltError } from './errors';
+import type { SpawnOpts } from '../types';
 
 const UNINSTALL_SCRIPTS = ['preuninstall', 'uninstall', 'postuninstall'];
 
@@ -57,22 +57,23 @@ async function removeDependenciesFromPackage(
 
 export default async function removeDependenciesFromPackages(
   project: Project,
-  workspaces: Array<Workspace>,
   packages: Array<Package>,
-  dependencies: Array<string>
+  targetPackages: Array<Package>,
+  dependencies: Array<string>,
+  spawnOpts: SpawnOpts
 ) {
   // Is the set of packages that we're modifying include the project package? ...
   let includesProjectPackage = false;
 
-  // Which workspaces are we working with? ...
-  let includedWorkspacesDirs = {};
+  // Which packages are we working with? ...
+  let includedPackagesDirs = {};
 
   // ...let's find out...
-  for (let pkg of packages) {
+  for (let pkg of targetPackages) {
     if (pkg.isSamePackage(project.pkg)) {
       includesProjectPackage = true;
     } else {
-      includedWorkspacesDirs[pkg.dir] = true;
+      includedPackagesDirs[pkg.dir] = true;
     }
   }
 
@@ -82,7 +83,7 @@ export default async function removeDependenciesFromPackages(
 
   for (let depName of dependencies) {
     // Get all of the dependents for this dependency
-    let dependents = packages.filter(pkg => {
+    let dependents = targetPackages.filter(pkg => {
       return pkg.getAllDependencies().has(depName);
     });
 
@@ -108,21 +109,20 @@ export default async function removeDependenciesFromPackages(
 
     // Check to see if any workspaces (other than our dependents) depend on
     // this dependency.
-    let excludedDependentWorkspaces = workspaces.filter(workspace => {
+    let excludedDependentPackages = packages.filter(pkg => {
       return (
-        !dependentsByDir.has(workspace.pkg.dir) &&
-        workspace.pkg.getAllDependencies().has(depName)
+        !dependentsByDir.has(pkg.dir) && pkg.getAllDependencies().has(depName)
       );
     });
 
     // We can't remove dependencies from our project package that aren't also
     // being removed from all of the dependent workspaces.
-    if (excludedDependentWorkspaces.length) {
+    if (excludedDependentPackages.length) {
       invalid.push(depName);
       logger.error(
         messages.cannotRemoveDependencyDependendOnByWorkspaces(
           depName,
-          excludedDependentWorkspaces
+          excludedDependentPackages
         )
       );
       logger.info(messages.runWorkspacesRemoveDependency(depName));
@@ -136,16 +136,18 @@ export default async function removeDependenciesFromPackages(
   }
 
   // Get an array of workspaces that we're removing from.
-  let includedWorkspaces = workspaces.filter(workspace => {
-    return includedWorkspacesDirs[workspace.pkg.dir];
+  let includedPackages = packages.filter(pkg => {
+    return includedPackagesDirs[pkg.dir];
   });
 
   // Run the uninstall scripts for each workspace
   await Promise.all(
     UNINSTALL_SCRIPTS.map(async script => {
-      await project.runWorkspaceTasks(includedWorkspaces, async workspace => {
-        await yarn.runIfExists(workspace.pkg, script);
-      });
+      await project.runPackageTasks(
+        includedPackages,
+        spawnOpts,
+        async pkg => await yarn.runIfExists(pkg, script)
+      );
     })
   );
 
@@ -155,8 +157,8 @@ export default async function removeDependenciesFromPackages(
   }
 
   // Remove from every included workspace
-  for (let workspace of includedWorkspaces) {
-    await removeDependenciesFromPackage(project, workspace.pkg, dependencies);
+  for (let pkg of includedPackages) {
+    await removeDependenciesFromPackage(project, pkg, dependencies);
   }
 
   logger.success(messages.removedDependencies());

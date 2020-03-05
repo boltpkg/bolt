@@ -1,5 +1,5 @@
 // @flow
-import type { FilterOpts } from '../../types';
+import type { SpawnOpts, FilterOpts } from '../../types';
 import * as options from '../../utils/options';
 import Project from '../../Project';
 import * as yarn from '../../utils/yarn';
@@ -8,6 +8,7 @@ export type WorkspacesRunOptions = {
   cwd?: string,
   script: string,
   scriptArgs: options.Args,
+  spawnOpts: SpawnOpts,
   filterOpts: FilterOpts
 };
 
@@ -16,10 +17,14 @@ export function toWorkspacesRunOptions(
   flags: options.Flags
 ): WorkspacesRunOptions {
   let [script, ...scriptArgs] = args;
+  const flagArgs = flags['--'] || [];
+
   return {
     cwd: options.string(flags.cwd, 'cwd'),
     script,
-    scriptArgs,
+    // for ws run commands we pass in all flags that are added after the `--`
+    scriptArgs: [...scriptArgs, ...flagArgs],
+    spawnOpts: options.toSpawnOpts(flags),
     filterOpts: options.toFilterOpts(flags)
   };
 }
@@ -27,14 +32,13 @@ export function toWorkspacesRunOptions(
 export async function workspacesRun(opts: WorkspacesRunOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let filteredWorkspaces = project.filterWorkspaces(
-    workspaces,
-    opts.filterOpts
-  );
+  let packages = await project.getPackages();
+  let filteredPackages = project.filterPackages(packages, opts.filterOpts);
 
-  await project.runWorkspaceTasks(filteredWorkspaces, async workspace => {
+  await project.runPackageTasks(
+    filteredPackages,
+    opts.spawnOpts,
     // no need to error if script doesn't exist
-    await yarn.runIfExists(workspace.pkg, opts.script, opts.scriptArgs);
-  });
+    async pkg => await yarn.runIfExists(pkg, opts.script, opts.scriptArgs)
+  );
 }

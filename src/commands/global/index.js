@@ -4,5 +4,5 @@ module.exports = {
   ...require('./bin'),
   ...require('./list'),
   ...require('./remove'),
-  ...require('./upgrade'),
+  ...require('./upgrade')
 };

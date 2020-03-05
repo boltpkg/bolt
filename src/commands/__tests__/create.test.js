@@ -11,11 +11,10 @@ describe('bolt create', () => {
         cwd: 'dummyPattern/dummyPath'
       })
     );
-    expect(
-      yarn.cliCommand
-    ).toHaveBeenCalledWith('dummyPattern/dummyPath', 'create', [
-      'react-app',
-      'my-app'
-    ]);
+    expect(yarn.cliCommand).toHaveBeenCalledWith(
+      'dummyPattern/dummyPath',
+      'create',
+      ['react-app', 'my-app']
+    );
   });
 });

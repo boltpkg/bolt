@@ -1,10 +1,11 @@
+// @flow
 /**
  * This ensures that all promises have finished before throwing any errors. Useful when you need to
  * be able to clean up after yourself, but have many async operations happening at once
  *
  * try {
- *  const promises = [];
- *  const locksHeld = [];
+ *  let promises = [];
+ *  let locksHeld = [];
  *
  *  files.forEach(file => {
  *    promises.push(getLockForFile(f)
@@ -19,9 +20,11 @@
  *  releaseLocksForFiles(locksHeld);
  * }
  * */
-export async function settleAll(promises) {
-  let error;
-  let results = [];
+export async function settleAll<T>(
+  promises: Array<Promise<T>>
+): Promise<Array<T>> {
+  let error: any;
+  let results: Array<T> = [];
 
   for (let promise of promises) {
     try {

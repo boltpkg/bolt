@@ -22,7 +22,7 @@ export function toInfoOptions(
 
 export async function info(opts: InfoOptions) {
   let cwd = opts.cwd || process.cwd();
-  const spawnArgs = Array.prototype.concat([], opts.args);
+  let spawnArgs = Array.prototype.concat([], opts.args);
   if (opts.flags && opts.flags.json) {
     spawnArgs.push('--json');
   }

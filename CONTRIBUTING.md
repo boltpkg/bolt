@@ -15,7 +15,6 @@ Join the boltpkg community slack room at https://boltpkg.slack.com
     - Package.js                 # exports function to initialise a package
     - Project.js                 # exports function to initialise a project
     - types.js                   # flow types
-    - Workspace.js               # exports function to initialise a workspace
     - commands                   # all the commands are here
       - workspace                # workspace related commands
       - workspaces               # workspaces related commands

@@ -8,6 +8,7 @@ import { BoltError } from './utils/errors';
 import cleanStack from 'clean-stack';
 import * as commands from './commands';
 import * as options from './utils/options';
+import { globalOptions } from './GlobalOptions';
 
 const commandMap = {
   ADD: { add: true },
@@ -102,6 +103,10 @@ const commandMap = {
 function runCommandFromCli(args: options.Args, flags: options.Flags) {
   let [command, ...commandArgs] = args;
   let [subCommand, ...subCommandArgs] = commandArgs;
+
+  if (typeof command === 'undefined' && flags.help) {
+    return commands.help(commands.toHelpOptions(args, flags));
+  }
 
   if (commandMap.ADD[command]) {
     return commands.add(commands.toAddOptions(commandArgs, flags));
@@ -406,14 +411,20 @@ function runCommandFromCli(args: options.Args, flags: options.Flags) {
 }
 
 export default async function cli(argv: Array<string>, exit: boolean = false) {
-  const start = Date.now();
+  let start = Date.now();
 
-  const { pkg, input, flags } = meow({
+  let { pkg, input, flags } = meow('', {
     argv,
-    help: messages.helpContent(),
     flags: {
-      '--': true
-    }
+      '--': true,
+      /* Global options as defined in GlobalOptions.js.
+       * Added here so bolt --<option> <cmd> doesn't parse <cmd> as the value of the <option> flag */
+      prefix: {
+        type: 'boolean'
+      }
+    },
+    autoHelp: false,
+    booleanDefault: undefined
   });
 
   logger.title(
@@ -425,6 +436,7 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
   processes.handleSignals();
 
   try {
+    globalOptions.setFromFlags(flags);
     await runCommandFromCli(input, flags);
   } catch (err) {
     if (err instanceof BoltError) {
@@ -440,8 +452,8 @@ export default async function cli(argv: Array<string>, exit: boolean = false) {
     }
   }
 
-  const timing = (Date.now() - start) / 1000;
-  const rounded = Math.round(timing * 100) / 100;
+  let timing = (Date.now() - start) / 1000;
+  let rounded = Math.round(timing * 100) / 100;
 
   logger.info(messages.doneInSeconds(rounded), {
     emoji: '🏁',

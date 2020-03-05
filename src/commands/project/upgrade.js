@@ -49,7 +49,12 @@ export async function projectUpgrade(opts: ProjectUpgradeOptions) {
   let project = await Project.init(cwd);
 
   try {
-    await upgradeDependenciesInPackage(project, project.pkg, opts.deps, opts.flags);
+    await upgradeDependenciesInPackage(
+      project,
+      project.pkg,
+      opts.deps,
+      opts.flags
+    );
   } catch (err) {
     throw new BoltError(`upgrading dependencies failed due to ${err}`);
   }

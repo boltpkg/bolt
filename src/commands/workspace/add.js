@@ -10,7 +10,7 @@ import { DEPENDENCY_TYPE_FLAGS_MAP } from '../../constants';
 
 export type WorkspaceAddOptions = {
   cwd?: string,
-  workspaceName: string,
+  pkgName: string,
   deps: Array<Dependency>,
   type: configDependencyType
 };
@@ -19,8 +19,8 @@ export function toWorkspaceAddOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceAddOptions {
-  let [workspaceName, ...deps] = args;
-  const depsArgs = [];
+  let [pkgName, ...deps] = args;
+  let depsArgs = [];
   let type = 'dependencies';
 
   deps.forEach(dep => {
@@ -30,12 +30,16 @@ export function toWorkspaceAddOptions(
   Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).forEach(depTypeFlag => {
     if (flags[depTypeFlag]) {
       type = DEPENDENCY_TYPE_FLAGS_MAP[depTypeFlag];
+      // check if value of dependency flag is a package name and then push to dependency arguments
+      if (typeof flags[depTypeFlag] === 'string') {
+        depsArgs.push(options.toDependency(flags[depTypeFlag]));
+      }
     }
   });
 
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    workspaceName,
+    pkgName,
     deps: depsArgs,
     type
   };
@@ -44,17 +48,14 @@ export function toWorkspaceAddOptions(
 export async function workspaceAdd(opts: WorkspaceAddOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let workspace = await project.getWorkspaceByName(
-    workspaces,
-    opts.workspaceName
-  );
+  let packages = await project.getPackages();
+  let pkg = await project.getPackageByName(packages, opts.pkgName);
 
-  if (!workspace) {
+  if (!pkg) {
     throw new BoltError(
-      `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
+      `Could not find a workspace named "${opts.pkgName}" from "${cwd}"`
     );
   }
 
-  await addDependenciesToPackage(project, workspace.pkg, opts.deps, opts.type);
+  await addDependenciesToPackage(project, pkg, opts.deps, opts.type);
 }

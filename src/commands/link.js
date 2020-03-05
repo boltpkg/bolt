@@ -6,14 +6,14 @@ import * as options from '../utils/options';
 import { BoltError } from '../utils/errors';
 import * as messages from '../utils/messages';
 
-function getWorkspaceMap(workspaces) {
-  let workspaceMap = new Map();
+function getPackageMap(packages) {
+  let packageMap = new Map();
 
-  for (let workspace of workspaces) {
-    workspaceMap.set(workspace.pkg.config.getName(), workspace);
+  for (let pkg of packages) {
+    packageMap.set(pkg.getName(), pkg);
   }
 
-  return workspaceMap;
+  return packageMap;
 }
 
 export type LinkOptions = {|
@@ -35,13 +35,13 @@ export async function link(opts: LinkOptions) {
   let cwd = opts.cwd || process.cwd();
   let packagesToLink = opts.packagesToLink;
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let workspaceMap = getWorkspaceMap(workspaces);
+  let packages = await project.getPackages();
+  let packageMap = getPackageMap(packages);
 
   if (packagesToLink && packagesToLink.length) {
     await Promise.all(
       packagesToLink.map(async packageToLink => {
-        if (workspaceMap.has(packageToLink)) {
+        if (packageMap.has(packageToLink)) {
           logger.warn(messages.linkInternalPackage(packageToLink));
         } else {
           await yarn.cliCommand(cwd, 'link', [packageToLink]);

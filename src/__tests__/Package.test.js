@@ -34,7 +34,7 @@ describe('Package', () => {
     it('should return dependency type of a dependency', async () => {
       let filePath = path.join(f.find('nested-workspaces'), 'package.json');
       let pkg = await Package.init(filePath);
-      const depTypes = pkg.getDependencyTypes('react');
+      let depTypes = pkg.getDependencyTypes('react');
       expect(depTypes).toEqual(['dependencies']);
     });
 
@@ -44,7 +44,7 @@ describe('Package', () => {
         'package.json'
       );
       let pkg = await Package.init(filePath);
-      const depTypes = pkg.getDependencyTypes('react');
+      let depTypes = pkg.getDependencyTypes('react');
       expect(depTypes).toEqual(['devDependencies', 'peerDependencies']);
     });
 
@@ -53,6 +53,39 @@ describe('Package', () => {
       let pkg = await Package.init(filePath);
       let depTypes = pkg.getDependencyTypes('non-existent-dep');
       expect(depTypes).toEqual([]);
+    });
+  });
+
+  describe('getAllDependencies', () => {
+    it('should return all dependencies of the package', async () => {
+      let filePath = path.join(
+        f.find('simple-project-with-multiple-depTypes'),
+        'package.json'
+      );
+      let pkg = await Package.init(filePath);
+      let dependencies = pkg.getAllDependencies();
+      let expected = new Map([
+        ['depOnly', '^1.0.0'],
+        ['devDepOnly', '^1.0.0'],
+        ['react', '^16.0.0'],
+        ['peerDepOnly', '^1.0.0']
+      ]);
+      expect(dependencies).toEqual(expected);
+    });
+
+    it('should filter out dependencies of a certain type when passed the excludedTypes arg', async () => {
+      let filePath = path.join(
+        f.find('simple-project-with-multiple-depTypes'),
+        'package.json'
+      );
+      let pkg = await Package.init(filePath);
+      let dependencies = pkg.getAllDependencies(['devDependencies']);
+      let expected = new Map([
+        ['depOnly', '^1.0.0'],
+        ['peerDepOnly', '^1.0.0'],
+        ['react', '^16.0.0']
+      ]);
+      expect(dependencies).toEqual(expected);
     });
   });
 });

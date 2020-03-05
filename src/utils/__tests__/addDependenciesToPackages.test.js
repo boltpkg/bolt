@@ -26,7 +26,7 @@ function fakeYarnAdd(pkg, dependencies, type = 'dependencies') {
 }
 
 function assertSingleYarnAddCall(expectedPkg, expectedDeps) {
-  const yarnAddCalls = unsafeYarn.add.mock.calls;
+  let yarnAddCalls = unsafeYarn.add.mock.calls;
 
   expect(yarnAddCalls.length).toEqual(1);
   expect(yarnAddCalls[0][0]).toEqual(expectedPkg);
@@ -58,10 +58,11 @@ describe('utils/addDependenciesToPackages', () => {
   test('it should still run yarn add at the root when run from another package', async () => {
     let rootDir = f.copy('nested-workspaces');
     let project = await Project.init(rootDir);
-    let workspaces = await project.getWorkspaces();
-    let wsToRunIn = project.getWorkspaceByName(workspaces, 'foo') || {};
+    let packages = await project.getPackages();
+    let pkg = project.getPackageByName(packages, 'foo');
+    if (!pkg) throw new Error('missing foo');
 
-    await addDependenciesToPackage(project, wsToRunIn.pkg, [{ name: 'chalk' }]);
+    await addDependenciesToPackage(project, pkg, [{ name: 'chalk' }]);
 
     expect(unsafeYarn.add).toHaveBeenCalledTimes(1);
     expect(unsafeYarn.add).toHaveBeenCalledWith(
@@ -71,23 +72,41 @@ describe('utils/addDependenciesToPackages', () => {
     );
   });
 
-  test('it should not yarn install packages that are already installed', async () => {
+  test('it should not yarn install packages that are already installed when run from a workspace', async () => {
+    let rootDir = f.copy('nested-workspaces');
+    let project = await Project.init(rootDir);
+    let packages = await project.getPackages();
+    let pkg = project.getPackageByName(packages, 'foo');
+    if (!pkg) throw new Error('missing foo');
+
+    await addDependenciesToPackage(project, pkg, [{ name: 'react' }]);
+
+    expect(unsafeYarn.add).toHaveBeenCalledTimes(0);
+  });
+
+  test('it should yarn install packages that are already installed when run from the project root', async () => {
     let cwd = f.copy('nested-workspaces');
     let project = await Project.init(cwd);
 
     await addDependenciesToPackage(project, project.pkg, [{ name: 'react' }]);
 
-    expect(unsafeYarn.add).toHaveBeenCalledTimes(0);
+    expect(unsafeYarn.add).toHaveBeenCalledTimes(1);
+    expect(unsafeYarn.add).toHaveBeenCalledWith(
+      project.pkg,
+      [{ name: 'react' }],
+      'dependencies'
+    );
   });
 
   test('it should throw if version does not match version in project config', async () => {
     let cwd = f.copy('nested-workspaces');
     let project = await Project.init(cwd);
-    let workspaces = await project.getWorkspaces();
-    let wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
+    let packages = await project.getPackages();
+    let pkg = project.getPackageByName(packages, 'foo');
+    if (!pkg) throw new Error('missing foo');
 
     await expect(
-      addDependenciesToPackage(project, wsToAddTo.pkg, [
+      addDependenciesToPackage(project, pkg, [
         { name: 'left-pad', version: '2.0.0' }
       ])
     ).rejects.toBeInstanceOf(Error);
@@ -96,51 +115,92 @@ describe('utils/addDependenciesToPackages', () => {
   test('should call symlinkPackageDependencies to symlink dependencies in workspace', async () => {
     let cwd = f.copy('package-with-external-deps-installed');
     let project = await Project.init(cwd);
-    let workspaces = await project.getWorkspaces();
-    let wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
+    let packages = await project.getPackages();
+    let pkg = project.getPackageByName(packages, 'foo');
+    if (!pkg) throw new Error('missing foo');
 
-    await addDependenciesToPackage(project, wsToAddTo.pkg, [
+    await addDependenciesToPackage(project, pkg, [
       { name: 'project-only-dep' }
     ]);
 
-    expect(symlinkSpy).toHaveBeenCalledWith(project, wsToAddTo.pkg, [
-      'project-only-dep'
-    ]);
+    expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['project-only-dep']);
   });
 
   test('should update packages dependencies in package config', async () => {
     let cwd = f.copy('package-with-external-deps-installed');
     let project = await Project.init(cwd);
-    let workspaces = await project.getWorkspaces();
-    let wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
+    let packages = await project.getPackages();
+    let pkg = project.getPackageByName(packages, 'foo');
+    if (!pkg) throw new Error('missing foo');
 
-    expect(wsToAddTo.pkg.getDependencyVersionRange('project-only-dep')).toEqual(
-      null
-    );
-    await addDependenciesToPackage(project, wsToAddTo.pkg, [
+    expect(pkg.getDependencyVersionRange('project-only-dep')).toEqual(null);
+    await addDependenciesToPackage(project, pkg, [
       { name: 'project-only-dep' }
     ]);
 
-    expect(symlinkSpy).toHaveBeenCalledWith(project, wsToAddTo.pkg, [
-      'project-only-dep'
-    ]);
-    expect(wsToAddTo.pkg.getDependencyVersionRange('project-only-dep')).toEqual(
+    expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['project-only-dep']);
+    expect(pkg.getDependencyVersionRange('project-only-dep')).toEqual('^1.0.0');
+  });
+
+  test('should update all package dependencies when run from project root', async () => {
+    let cwd = f.copy('package-with-external-deps-installed');
+    let project = await Project.init(cwd);
+    let packages = await project.getPackages();
+    let fooPkg = project.getPackageByName(packages, 'foo');
+    let barPkg = project.getPackageByName(packages, 'bar');
+    if (!fooPkg || !barPkg) {
+      // This check is required to satisfy flow
+      throw new Error('missing packages');
+    }
+
+    expect(project.pkg.getDependencyVersionRange('global-dep')).toEqual(
       '^1.0.0'
     );
+    expect(fooPkg.getDependencyVersionRange('global-dep')).toEqual('^1.0.0');
+    expect(barPkg.getDependencyVersionRange('global-dep')).toEqual('^1.0.0');
+
+    expect(project.pkg.getDependencyVersionRange('foo-dep')).toEqual('^1.0.0');
+    expect(fooPkg.getDependencyVersionRange('foo-dep')).toEqual('^1.0.0');
+    expect(barPkg.getDependencyVersionRange('foo-dep')).toEqual(null);
+
+    await addDependenciesToPackage(project, project.pkg, [
+      { name: 'global-dep', version: '^1.1.0' },
+      { name: 'foo-dep', version: '^1.2.0' }
+    ]);
+
+    // Refetch packages as their config will be stale
+    packages = await project.getPackages();
+    fooPkg = project.getPackageByName(packages, 'foo');
+    barPkg = project.getPackageByName(packages, 'bar');
+    if (!fooPkg || !barPkg) {
+      // This check is required to satisfy flow
+      throw new Error('missing packages');
+    }
+
+    expect(project.pkg.getDependencyVersionRange('global-dep')).toEqual(
+      '^1.1.0'
+    );
+    expect(fooPkg.getDependencyVersionRange('global-dep')).toEqual('^1.1.0');
+    expect(barPkg.getDependencyVersionRange('global-dep')).toEqual('^1.1.0');
+
+    expect(project.pkg.getDependencyVersionRange('foo-dep')).toEqual('^1.2.0');
+    expect(fooPkg.getDependencyVersionRange('foo-dep')).toEqual('^1.2.0');
+    expect(barPkg.getDependencyVersionRange('foo-dep')).toEqual(null);
   });
 
   test('should be able to add packages with tagged versions (without specifying)', async () => {
     let cwd = f.copy('package-with-external-deps-installed');
     let project = await Project.init(cwd);
-    let workspaces = await project.getWorkspaces();
-    let wsToAddTo = project.getWorkspaceByName(workspaces, 'foo') || {};
+    let packages = await project.getPackages();
+    let pkg = project.getPackageByName(packages, 'foo');
+    if (!pkg) throw new Error('missing foo');
 
-    await addDependenciesToPackage(project, wsToAddTo.pkg, [
+    await addDependenciesToPackage(project, pkg, [
       { name: 'project-only-dep-with-beta-tag' }
     ]);
 
     expect(
-      wsToAddTo.pkg.getDependencyVersionRange('project-only-dep-with-beta-tag')
+      pkg.getDependencyVersionRange('project-only-dep-with-beta-tag')
     ).toEqual('1.0.0-beta');
   });
 
@@ -149,41 +209,44 @@ describe('utils/addDependenciesToPackages', () => {
       // i.e if we have bar 1.0.1 installed locally addDependenciesToPackages should add ^1.0.1
       let cwd = f.copy('nested-workspaces');
       let project = await Project.init(cwd);
-      let workspaces = await project.getWorkspaces();
-      let wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
+      let packages = await project.getPackages();
+      let pkg = project.getPackageByName(packages, 'bar');
+      if (!pkg) throw new Error('missing bar');
 
-      expect(wsToAddTo.pkg.getDependencyVersionRange('baz')).toEqual(null);
-      await addDependenciesToPackage(project, wsToAddTo.pkg, [{ name: 'baz' }]);
+      expect(pkg.getDependencyVersionRange('baz')).toEqual(null);
+      await addDependenciesToPackage(project, pkg, [{ name: 'baz' }]);
 
-      expect(symlinkSpy).toHaveBeenCalledWith(project, wsToAddTo.pkg, ['baz']);
-      expect(wsToAddTo.pkg.getDependencyVersionRange('baz')).toEqual('^1.0.1');
+      expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['baz']);
+      expect(pkg.getDependencyVersionRange('baz')).toEqual('^1.0.1');
     });
 
     test('should allow any version range that satisfies local dep', async () => {
       // i.e if we have bar 1.0.1 installed locally ^1.0.0 should still install
       let cwd = f.copy('nested-workspaces');
       let project = await Project.init(cwd);
-      let workspaces = await project.getWorkspaces();
-      let wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
+      let packages = await project.getPackages();
+      let pkg = project.getPackageByName(packages, 'bar');
+      if (!pkg) throw new Error('missing bar');
 
-      expect(wsToAddTo.pkg.getDependencyVersionRange('baz')).toEqual(null);
-      await addDependenciesToPackage(project, wsToAddTo.pkg, [
+      expect(pkg.getDependencyVersionRange('baz')).toEqual(null);
+      await addDependenciesToPackage(project, pkg, [
         { name: 'baz', version: '^1.0.0' }
       ]);
 
-      expect(symlinkSpy).toHaveBeenCalledWith(project, wsToAddTo.pkg, ['baz']);
-      expect(wsToAddTo.pkg.getDependencyVersionRange('baz')).toEqual('^1.0.0');
+      expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['baz']);
+      expect(pkg.getDependencyVersionRange('baz')).toEqual('^1.0.0');
     });
 
     test('should throw if attempting to set to version that doesnt satisfy local', async () => {
       let cwd = f.copy('nested-workspaces');
       let project = await Project.init(cwd);
-      let workspaces = await project.getWorkspaces();
-      let wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
+      let packages = await project.getPackages();
+      let pkg = project.getPackageByName(packages, 'bar');
+      if (!pkg) throw new Error('missing bar');
 
       // local baz version is 1.0.0, so we'll install ^2.0.0
       await expect(
-        addDependenciesToPackage(project, wsToAddTo.pkg, [
+        addDependenciesToPackage(project, pkg, [
           { name: 'baz', version: '^2.0.0' }
         ])
       ).rejects.toBeInstanceOf(Error);
@@ -192,11 +255,12 @@ describe('utils/addDependenciesToPackages', () => {
     test('should not add internal to root package', async () => {
       let cwd = f.copy('nested-workspaces');
       let project = await Project.init(cwd);
-      let workspaces = await project.getWorkspaces();
-      let wsToAddTo = project.getWorkspaceByName(workspaces, 'bar') || {};
+      let packages = await project.getPackages();
+      let pkg = project.getPackageByName(packages, 'bar');
+      if (!pkg) throw new Error('missing bar');
 
       expect(project.pkg.getDependencyVersionRange('baz')).toEqual(null);
-      await addDependenciesToPackage(project, wsToAddTo.pkg, [{ name: 'baz' }]);
+      await addDependenciesToPackage(project, pkg, [{ name: 'baz' }]);
       expect(project.pkg.getDependencyVersionRange('baz')).toEqual(null);
       expect(unsafeYarn.add).toHaveBeenCalledTimes(0);
     });

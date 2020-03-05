@@ -2,12 +2,14 @@
 import Project from '../../Project';
 import Package from '../../Package';
 import * as options from '../../utils/options';
+import { type SpawnOpts } from '../../types';
 import * as logger from '../../utils/logger';
 import removeDependenciesFromPackages from '../../utils/removeDependenciesFromPackages';
 
 export type ProjectRemoveOptions = {|
   cwd?: string,
-  deps: Array<string>
+  deps: Array<string>,
+  spawnOpts: SpawnOpts
 |};
 
 export function toProjectRemoveOptions(
@@ -16,19 +18,21 @@ export function toProjectRemoveOptions(
 ): ProjectRemoveOptions {
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    deps: args
+    deps: args,
+    spawnOpts: options.toSpawnOpts(flags)
   };
 }
 
 export async function projectRemove(opts: ProjectRemoveOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
 
   await removeDependenciesFromPackages(
     project,
-    workspaces,
+    packages,
     [project.pkg],
-    opts.deps
+    opts.deps,
+    opts.spawnOpts
   );
 }

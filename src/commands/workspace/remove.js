@@ -5,44 +5,45 @@ import * as options from '../../utils/options';
 import * as logger from '../../utils/logger';
 import removeDependenciesFromPackages from '../../utils/removeDependenciesFromPackages';
 import { BoltError } from '../../utils/errors';
+import type { SpawnOpts } from '../../types';
 
 export type WorkspaceRemoveOptions = {
   cwd?: string,
-  workspaceName: string,
-  deps: Array<string>
+  pkgName: string,
+  deps: Array<string>,
+  spawnOpts: SpawnOpts
 };
 
 export function toWorkspaceRemoveOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceRemoveOptions {
-  let [workspaceName, ...deps] = args;
+  let [pkgName, ...deps] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    workspaceName,
-    deps
+    pkgName,
+    deps,
+    spawnOpts: options.toSpawnOpts(flags)
   };
 }
 
 export async function workspaceRemove(opts: WorkspaceRemoveOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let workspace = await project.getWorkspaceByName(
-    workspaces,
-    opts.workspaceName
-  );
+  let packages = await project.getPackages();
+  let pkg = await project.getPackageByName(packages, opts.pkgName);
 
-  if (!workspace) {
+  if (!pkg) {
     throw new BoltError(
-      `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
+      `Could not find a workspace named "${opts.pkgName}" from "${cwd}"`
     );
   }
 
   await removeDependenciesFromPackages(
     project,
-    workspaces,
-    [workspace.pkg],
-    opts.deps
+    packages,
+    [pkg],
+    opts.deps,
+    opts.spawnOpts
   );
 }

@@ -6,7 +6,9 @@ import {
   string,
   boolean,
   number,
-  toFilterOpts
+  toFilterOpts,
+  toSpawnOpts,
+  toDependencyTypes
 } from '../options';
 
 describe('options', () => {
@@ -28,7 +30,7 @@ describe('options', () => {
     expect(() => number('number', 'flag')).toThrow();
   });
 
-  test('toFilerOptions', () => {
+  test('toFilterOptions', () => {
     expect(toFilterOpts({ only: 'only' })).toEqual({ only: 'only' });
     expect(toFilterOpts({ onlyFs: 'onlyFs' })).toEqual({ onlyFs: 'onlyFs' });
     expect(toFilterOpts({ ignore: 'ignore' })).toEqual({ ignore: 'ignore' });
@@ -38,9 +40,51 @@ describe('options', () => {
     expect(toFilterOpts({})).toEqual({});
   });
 
+  test('toDependencyTypes', () => {
+    expect(toDependencyTypes('devDependencies', 'flag')).toEqual([
+      'devDependencies'
+    ]);
+    expect(toDependencyTypes('peerDependencies', 'flag')).toEqual([
+      'peerDependencies'
+    ]);
+    expect(
+      toDependencyTypes('devDependencies,peerDependencies', 'flag')
+    ).toEqual(['devDependencies', 'peerDependencies']);
+    expect(() => toDependencyTypes('deps', 'flag')).toThrow(
+      'Flag "flag" must be a comma separated list of valid dependency types. Received invalid types: "deps"'
+    );
+  });
+
+  test('toSpawnOpts', () => {
+    expect(toSpawnOpts({})).toEqual({});
+    expect(toSpawnOpts({ bail: false })).toEqual({ bail: false });
+    expect(toSpawnOpts({ parallel: true })).toEqual({ orderMode: 'parallel' });
+    expect(toSpawnOpts({ serial: true })).toEqual({ orderMode: 'serial' });
+    expect(toSpawnOpts({ bail: true })).toEqual({ bail: true });
+    expect(toSpawnOpts({ parallelNodes: true })).toEqual({
+      orderMode: 'parallel-nodes'
+    });
+    expect(toSpawnOpts({ parallel: true })).toEqual({
+      orderMode: 'parallel'
+    });
+    expect(toSpawnOpts({ serial: true })).toEqual({
+      orderMode: 'serial'
+    });
+    expect(toSpawnOpts({ bail: false, serial: true })).toEqual({
+      bail: false,
+      orderMode: 'serial'
+    });
+    expect(() => toSpawnOpts({ parallel: true, serial: true })).toThrow(
+      'Commands cannot be run both serially and in parallel'
+    );
+    expect(
+      toSpawnOpts({ excludeFromGraph: 'devDependencies,peerDependencies' })
+    ).toEqual({ excludeFromGraph: ['devDependencies', 'peerDependencies'] });
+  });
+
   test('toDependency', () => {
-    const name = 'packageName';
-    const version = '1.0.0';
+    let name = 'packageName';
+    let version = '1.0.0';
     expect(toDependency(name)).toEqual({ name });
     let nameWithVersion = `packageName@${version}`;
     expect(toDependency(nameWithVersion)).toEqual({ name, version });
@@ -48,6 +92,18 @@ describe('options', () => {
     expect(toDependency(nameWithVersion)).toEqual({ name: nameWithVersion });
     nameWithVersion = `@packageName@${version}`;
     expect(toDependency(nameWithVersion)).toEqual({ name, version });
+    // Version with @ symbol
+    expect(toDependency(`packageName@file:local/@my-packages`)).toEqual({
+      name: 'packageName',
+      version: 'file:local/@my-packages'
+    });
+    // Scoped package with @ symbol version
+    expect(
+      toDependency(`@scope/packageName@file:local/@scope/packageName`)
+    ).toEqual({
+      name: '@scope/packageName',
+      version: 'file:local/@scope/packageName'
+    });
   });
 
   test('toYarnInit', () => {

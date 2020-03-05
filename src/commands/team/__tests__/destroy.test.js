@@ -7,7 +7,7 @@ jest.mock('../../../utils/npm');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt team destroy', async () => {
-  const team = await teamDestroy(
+  let team = await teamDestroy(
     toTeamDestroyOptions(['test-tag'], { cwd: dummyPath })
   );
   expect(npm.cliCommand).toHaveBeenCalledWith(dummyPath, 'team', [

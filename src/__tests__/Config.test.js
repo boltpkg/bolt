@@ -1,8 +1,10 @@
 // @flow
+import os from 'os';
 import Config from '../Config';
 import * as fs from '../utils/fs';
 import { mkdtempSync } from 'fs';
 import * as path from 'path';
+import detectNewline from 'detect-newline';
 import fixtures from 'fixturez';
 
 const f = fixtures(__dirname);
@@ -39,7 +41,7 @@ describe('writeConfigFile', () => {
   it('should write a json file', async () => {
     let filePath = path.join(f.find('simple-package'), 'package.json');
     let json = { name: 'wat', version: '0.0.0' };
-    let fileContents = JSON.stringify(json, null, 2);
+    let fileContents = JSON.stringify(json, null, 2) + os.EOL;
     let config = await Config.init(filePath);
     await config.write(json);
     expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);
@@ -51,7 +53,7 @@ describe('writeConfigFile', () => {
       'package.json'
     );
     let json = { name: 'wat', version: '0.0.0' };
-    let fileContents = JSON.stringify(json, null, 4);
+    let fileContents = JSON.stringify(json, null, 4) + os.EOL;
     let config = await Config.init(filePath);
     await config.write(json);
     expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);
@@ -63,10 +65,26 @@ describe('writeConfigFile', () => {
       'package.json'
     );
     let json = { name: 'wat', version: '0.0.0' };
-    let fileContents = JSON.stringify(json, null, 2);
+    let fileContents = JSON.stringify(json, null, 2) + os.EOL;
     let config = await Config.init(filePath);
     await config.write(json);
     expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);
+  });
+
+  it('should preserve the line endings style of the source json', async () => {
+    let filePath = path.join(f.find('simple-package'), 'package.json');
+    const packageFileContent = await fs.readFile(filePath);
+    const readMock = jest.spyOn(fs, 'readFile').mockImplementation(async () => {
+      return packageFileContent.toString().replace(/\n/g, '\r\n');
+    });
+
+    let json = { name: 'wat', version: '0.0.0' };
+    let fileContents =
+      JSON.stringify(json, null, 2).replace(/\n/g, '\r\n') + '\r\n';
+    let config = await Config.init(filePath);
+    await config.write(json);
+    expect(fs.writeFile).toHaveBeenCalledWith(filePath, fileContents);
+    readMock.mockRestore();
   });
 });
 

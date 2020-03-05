@@ -2,7 +2,6 @@
 import semver from 'semver';
 
 import Project from '../Project';
-import Workspace from '../Workspace';
 import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
 import includes from 'array-includes';
@@ -42,14 +41,12 @@ export default async function updatePackageVersions(
 ): Promise<Array<string>> {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let { graph } = await project.getDependencyGraph(workspaces);
+  let packages = await project.getPackages();
+  let { graph } = await project.getDependencyGraph(packages);
   let editedPackages = new Set();
 
-  const internalDeps = Object.keys(updatedPackages).filter(dep =>
-    graph.has(dep)
-  );
-  const externalDeps = Object.keys(updatedPackages).filter(
+  let internalDeps = Object.keys(updatedPackages).filter(dep => graph.has(dep));
+  let externalDeps = Object.keys(updatedPackages).filter(
     dep => !graph.has(dep)
   );
 
@@ -59,20 +56,19 @@ export default async function updatePackageVersions(
     );
   }
 
-  for (let workspace of workspaces) {
-    let pkg = workspace.pkg;
+  for (let pkg of packages) {
     let promises = [];
-    let name = workspace.pkg.config.getName();
+    let name = pkg.getName();
 
     for (let depName of internalDeps) {
-      const depRange = String(pkg.getDependencyVersionRange(depName));
-      const depTypes = pkg.getDependencyTypes(depName);
-      const rangeType = versionRangeToRangeType(depRange);
-      const newDepRange = rangeType + updatedPackages[depName];
+      let depRange = String(pkg.getDependencyVersionRange(depName));
+      let depTypes = pkg.getDependencyTypes(depName);
+      let rangeType = versionRangeToRangeType(depRange);
+      let newDepRange = rangeType + updatedPackages[depName];
       if (depTypes.length === 0) continue;
 
-      const inUpdatedPackages = includes(internalDeps, name);
-      const willLeaveSemverRange = !semver.satisfies(
+      let inUpdatedPackages = includes(internalDeps, name);
+      let willLeaveSemverRange = !semver.satisfies(
         updatedPackages[depName],
         depRange
       );

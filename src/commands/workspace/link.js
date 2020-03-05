@@ -7,7 +7,7 @@ import { BoltError } from '../../utils/errors';
 
 export type WorkspaceLinkOptions = {|
   cwd?: string,
-  workspaceName: string,
+  pkgName: string,
   packagesToLink?: Array<string>
 |};
 
@@ -15,10 +15,10 @@ export function toWorkspacelinkOptions(
   args: options.Args,
   flags: options.Flags
 ): WorkspaceLinkOptions {
-  const [workspaceName, ...packagesToLink] = args;
+  let [pkgName, ...packagesToLink] = args;
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    workspaceName,
+    pkgName,
     packagesToLink
   };
 }
@@ -26,17 +26,14 @@ export function toWorkspacelinkOptions(
 export async function workspacelink(opts: WorkspaceLinkOptions) {
   let cwd = opts.cwd || process.cwd();
   let packagesToLink = opts.packagesToLink;
-  let workspaceName = opts.workspaceName;
+  let pkgName = opts.pkgName;
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let workspace = await project.getWorkspaceByName(
-    workspaces,
-    opts.workspaceName
-  );
+  let packages = await project.getPackages();
+  let pkg = await project.getPackageByName(packages, opts.pkgName);
 
-  if (!workspace) {
+  if (!pkg) {
     throw new BoltError(
-      `Could not find a workspace named "${opts.workspaceName}" from "${cwd}"`
+      `Could not find a workspace named "${opts.pkgName}" from "${cwd}"`
     );
   }
 
@@ -45,6 +42,6 @@ export async function workspacelink(opts: WorkspaceLinkOptions) {
   if (packagesToLink && packagesToLink.length) {
     await link.link(await link.toLinkOptions(packagesToLink, { '--': [] }));
   } else {
-    await yarn.cliCommand(workspace.pkg.dir, 'link');
+    await yarn.cliCommand(pkg.dir, 'link');
   }
 }

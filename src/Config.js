@@ -1,6 +1,8 @@
 // @flow
+import os from 'os';
 import pkgUp from 'pkg-up';
 import detectIndent from 'detect-indent';
+import detectNewline from 'detect-newline';
 import parseJson from 'parse-json';
 import type { JSONValue, DependencySet } from './types';
 import * as fs from './utils/fs';
@@ -71,6 +73,7 @@ export default class Config {
   fileContents: string;
   json: JSONValue;
   indent: string;
+  newline: string;
   invalid: boolean;
 
   constructor(filePath: string, fileContents: string) {
@@ -78,6 +81,7 @@ export default class Config {
     this.fileContents = fileContents;
     try {
       this.indent = detectIndent(fileContents).indent || '  ';
+      this.newline = detectNewline(fileContents) || os.EOL;
       this.json = parseJson(fileContents);
     } catch (e) {
       if (e.name === 'JSONError') {
@@ -100,7 +104,7 @@ export default class Config {
       fileContents = await fs.readFile(filePath);
     } catch (e) {
       if (e.code === 'ENOENT') {
-        logger.error(messages.cannotInitConfigMissingPkgJSON(filePath));
+        throw new BoltError(messages.cannotInitConfigMissingPkgJSON(filePath));
       }
       throw e;
     }
@@ -108,7 +112,9 @@ export default class Config {
   }
 
   async write(json: JSONValue) {
-    let fileContents = JSON.stringify(json, null, this.indent);
+    let fileContents =
+      JSON.stringify(json, null, this.indent).replace(/\n/g, this.newline) +
+      this.newline;
     await fs.writeFile(this.filePath, fileContents);
     this.fileContents = fileContents;
     this.json = json;
@@ -237,8 +243,7 @@ export default class Config {
     if (typeof workspaces === 'undefined') return;
     return toArrayOfStrings(
       workspaces,
-      `package.json#bolt.workspaces must be an array of globs. See "${this
-        .filePath}"`
+      `package.json#bolt.workspaces must be an array of globs. See "${this.filePath}"`
     );
   }
 
@@ -248,8 +253,7 @@ export default class Config {
     if (typeof deps === 'undefined') return;
     return toObjectOfStrings(
       deps,
-      `package.json#${depType} must be an object of strings. See "${this
-        .filePath}"`
+      `package.json#${depType} must be an object of strings. See "${this.filePath}"`
     );
   }
 
@@ -259,8 +263,7 @@ export default class Config {
     if (typeof scripts === 'undefined') return;
     return toObjectOfStrings(
       scripts,
-      `package.json#scripts must be an object of strings. See "${this
-        .filePath}"`
+      `package.json#scripts must be an object of strings. See "${this.filePath}"`
     );
   }
 
@@ -271,8 +274,7 @@ export default class Config {
     if (typeof bin === 'string') return bin;
     return toObjectOfStrings(
       bin,
-      `package.json#bin must be an object of strings or a string. See "${this
-        .filePath}"`
+      `package.json#bin must be an object of strings or a string. See "${this.filePath}"`
     );
   }
 }

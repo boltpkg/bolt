@@ -6,16 +6,16 @@ jest.mock('../../utils/npm');
 
 describe('bolt logout', () => {
   test('should return the expected cwd', () => {
-    const commandArgs = [];
-    const expectedCwd = 'dummy/path/to/dir';
-    const flags = { cwd: expectedCwd };
-    const result = toLogoutOptions(commandArgs, flags);
+    let commandArgs = [];
+    let expectedCwd = 'dummy/path/to/dir';
+    let flags = { cwd: expectedCwd };
+    let result = toLogoutOptions(commandArgs, flags);
     expect(result.cwd).toBe(expectedCwd);
   });
 
   test('should call npm logout once', async () => {
-    const cwd = 'dummy/path/to/dir';
-    const opt = { cwd };
+    let cwd = 'dummy/path/to/dir';
+    let opt = { cwd };
     await logout(opt);
     expect(npm.logout).toHaveBeenCalledTimes(1);
   });

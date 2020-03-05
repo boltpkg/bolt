@@ -1,8 +1,7 @@
 // @flow
 
 import Project from '../Project';
-import type Workspace from '../Workspace';
-import type Package from '../Package';
+import Package from '../Package';
 import type { Dependency } from '../types';
 import * as messages from './messages';
 import { BoltError } from './errors';
@@ -17,17 +16,17 @@ export default async function upgradeDependenciesInPackage(
   dependencies: Array<Dependency>,
   flags?: Array<string>
 ) {
-  const workspaces = await project.getWorkspaces();
-  const pkgDependencies = pkg.getAllDependencies();
-  const { graph: depGraph } = await project.getDependencyGraph(workspaces);
+  let packages = await project.getPackages();
+  let pkgDependencies = pkg.getAllDependencies();
+  let { graph: depGraph } = await project.getDependencyGraph(packages);
 
-  const externalDeps = dependencies.filter(dep => !depGraph.has(dep.name));
-  const internalDeps = dependencies.filter(dep => depGraph.has(dep.name));
-  const projectDependencies = project.pkg.getAllDependencies();
+  let externalDeps = dependencies.filter(dep => !depGraph.has(dep.name));
+  let internalDeps = dependencies.filter(dep => depGraph.has(dep.name));
+  let projectDependencies = project.pkg.getAllDependencies();
 
   if (project.pkg.isSamePackage(pkg)) {
     if (internalDeps.length > 0) {
-      const internalDepNames = internalDeps.map(dep => dep.name);
+      let internalDepNames = internalDeps.map(dep => dep.name);
       internalDeps.forEach(dep => {
         logger.error(
           messages.cannotUpgradeWorkspaceDependencyInProject(dep.name)
@@ -40,10 +39,10 @@ export default async function upgradeDependenciesInPackage(
   await yarn.upgrade(project.pkg, externalDeps, flags);
 
   // we reinitialise the project config because it may be modified externally by yarn
-  const newProject = await Project.init(project.pkg.dir);
+  let newProject = await Project.init(project.pkg.dir);
   // get the new versions of everything from the project config
-  const newProjectDependencies = newProject.pkg.getAllDependencies();
-  const depsToUpgrade = {};
+  let newProjectDependencies = newProject.pkg.getAllDependencies();
+  let depsToUpgrade = {};
 
   newProjectDependencies.forEach((value, key) => {
     depsToUpgrade[key] = value;

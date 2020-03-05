@@ -8,32 +8,39 @@ import * as logger from '../utils/logger';
 import * as messages from '../utils/messages';
 import validateProject from '../utils/validateProject';
 import symlinkPackageDependencies from '../utils/symlinkPackageDependencies';
+import symlinkPackagesBinaries from '../utils/symlinkPackagesBinariesToProject';
 import * as yarn from '../utils/yarn';
 import pathIsInside from 'path-is-inside';
 import { BoltError } from '../utils/errors';
+import { BOLT_VERSION } from '../constants';
+import type { LockFileMode } from '../utils/yarn';
 
 export type InstallOptions = {|
   cwd?: string,
-  pureLockfile: boolean
+  lockfileMode: LockFileMode
 |};
 
 export function toInstallOptions(
   args: options.Args,
   flags: options.Flags
 ): InstallOptions {
+  let lockfileMode: LockFileMode = 'default';
+  // in order of strictness:
+  if (options.boolean(flags.frozenLockfile, 'frozen-lockfile')) {
+    lockfileMode = 'frozen';
+  } else if (options.boolean(flags.pureLockfile, 'pure-lockfile')) {
+    lockfileMode = 'pure';
+  }
   return {
     cwd: options.string(flags.cwd, 'cwd'),
-    pureLockfile: options.boolean(flags.pureLockfile, 'pure-lockfile') || false
+    lockfileMode
   };
 }
 
 export async function install(opts: InstallOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let installFlags = [];
-
-  if (opts.pureLockfile) installFlags.push('--pure-lockfile');
+  let packages = await project.getPackages();
 
   logger.info(messages.validatingProject(), { emoji: '🔎', prefix: false });
 
@@ -47,20 +54,24 @@ export async function install(opts: InstallOptions) {
     prefix: false
   });
 
-  await processes.spawn('yarn', ['install', ...installFlags], {
-    cwd: project.pkg.dir,
-    tty: true
-  });
+  await yarn.install(project.pkg.dir, opts.lockfileMode);
 
   logger.info(messages.linkingWorkspaceDependencies(), {
     emoji: '🔗',
     prefix: false
   });
 
-  for (let workspace of workspaces) {
-    const dependencies = workspace.pkg.getAllDependencies().keys();
-    await symlinkPackageDependencies(project, workspace.pkg, dependencies);
+  for (let pkg of packages) {
+    let dependencies = Array.from(pkg.getAllDependencies().keys());
+    await symlinkPackageDependencies(project, pkg, dependencies);
   }
+
+  logger.info(messages.linkingWorkspaceBinaries(), {
+    emoji: '🚀',
+    prefix: false
+  });
+
+  await symlinkPackagesBinaries(project);
 
   logger.success(messages.installedAndLinkedWorkspaces(), { emoji: '💥' });
 }

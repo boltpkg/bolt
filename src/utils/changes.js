@@ -1,14 +1,11 @@
 // @flow
 import Repository from '../Repository';
-import Workspace from '../Workspace';
+import Package from '../Package';
 import * as git from '../utils/git';
 
-async function getLastVersionCommitForWorkspace(
-  repo: Repository,
-  workspace: Workspace
-) {
+async function getLastVersionCommitForPackage(repo: Repository, pkg: Package) {
   let cwd = repo.dir;
-  let filePath = workspace.pkg.config.filePath;
+  let filePath = pkg.config.filePath;
   let commits = await git.getCommitsToFile(filePath, { cwd });
   let matchedCommit = null;
 
@@ -33,15 +30,15 @@ async function getLastVersionCommitForWorkspace(
   return matchedCommit;
 }
 
-export async function getWorkspaceVersionCommits(
+export async function getPackageVersionCommits(
   repo: Repository,
-  workspaces: Array<Workspace>
+  packages: Array<Package>
 ) {
   let versionCommits = new Map();
 
-  for (let workspace of workspaces) {
-    let commit = await getLastVersionCommitForWorkspace(repo, workspace);
-    versionCommits.set(workspace, commit);
+  for (let pkg of packages) {
+    let commit = await getLastVersionCommitForPackage(repo, pkg);
+    versionCommits.set(pkg, commit);
   }
 
   return versionCommits;

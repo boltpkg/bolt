@@ -12,24 +12,24 @@ const f = fixtures(__dirname);
 jest.mock('../../utils/logger');
 
 /*
-* NOTE: The way we are testing, we are testing the update of a single dependency.
-* This means that projects will be left in an invalid state after most test runs.
-*/
+ * NOTE: The way we are testing, we are testing the update of a single dependency.
+ * This means that projects will be left in an invalid state after most test runs.
+ */
 
 async function getDepVersion(
   pathToPkg: string,
   depName: string,
   depType: string = 'dependencies'
 ) {
-  const config = await Config.init(path.join(pathToPkg, 'package.json'));
-  const deps = config.getDeps(depType);
+  let config = await Config.init(path.join(pathToPkg, 'package.json'));
+  let deps = config.getDeps(depType);
   return deps ? deps[depName] : undefined;
 }
 
 describe('function/updatePackageVersions', () => {
   let cwd, pkgWithDepsPath, pkgPeerDepsPath, loggerSpy;
 
-  describe('A simple project with lots of internally linked deps', async () => {
+  describe('A simple project with lots of internally linked deps', () => {
     beforeEach(async () => {
       cwd = f.copy('lots-of-internally-linked-deps');
       pkgWithDepsPath = path.join(cwd, 'packages', 'has-all-deps');

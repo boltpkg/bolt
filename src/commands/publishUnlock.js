@@ -19,10 +19,7 @@ export function toPublishUnlockOptions(
 export async function publishUnlock(opts: PublishUnlockOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-
-  let packages = workspaces
-    .map(workspace => workspace.pkg)
-    .filter(pkg => !pkg.config.getPrivate());
-  await locks.unlock(packages);
+  let packages = await project.getPackages();
+  let publicPackages = packages.filter(pkg => !pkg.config.getPrivate());
+  await locks.unlock(publicPackages);
 }

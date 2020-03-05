@@ -12,17 +12,17 @@ const opt = { flags, args };
 
 describe('bolt info', () => {
   test('should return the expected cwd', () => {
-    const result = toInfoOptions(args, flags);
+    let result = toInfoOptions(args, flags);
     expect(result.cwd).toBe(cwd);
   });
 
   test('should return the expected argument', () => {
-    const result = toInfoOptions(args, flags);
+    let result = toInfoOptions(args, flags);
     expect(result.args).toBe(args);
   });
 
   test('should return the expected flags', () => {
-    const result = toInfoOptions(args, flags);
+    let result = toInfoOptions(args, flags);
     expect(result.flags).toBe(flags);
   });
 

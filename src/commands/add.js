@@ -18,7 +18,7 @@ export function toAddOptions(
   args: options.Args,
   flags: options.Flags
 ): AddOptions {
-  const depsArgs = [];
+  let depsArgs = [];
   let type = 'dependencies';
 
   // args is each of our dependencies we are adding which may have "@version" parts to them

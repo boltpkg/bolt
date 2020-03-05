@@ -21,25 +21,27 @@ export default async function updateWorkspaceDependencies(
 ) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let { graph } = await project.getDependencyGraph(workspaces);
+  let packages = await project.getPackages();
+  let { graph } = await project.getDependencyGraph(packages);
   let editedPackages = new Set();
 
   // Note: all dependencyToUpgrade are external dependencies
 
-  for (let workspace of workspaces) {
-    let pkg = workspace.pkg;
+  for (let pkg of packages) {
     let pkgDependencies = pkg.getAllDependencies();
-    let name = workspace.pkg.config.getName();
+    let name = pkg.getName();
+
     for (let depName in dependencyToUpgrade) {
       if (pkgDependencies.has(depName)) {
-        const depType = pkg.getDependencyTypes(depName);
+        let depTypes = pkg.getDependencyTypes(depName);
         editedPackages.add(name);
-        await pkg.setDependencyVersionRange(
-          depName,
-          depType,
-          dependencyToUpgrade[depName]
-        );
+        for (let depType of depTypes) {
+          await pkg.setDependencyVersionRange(
+            depName,
+            depType,
+            dependencyToUpgrade[depName]
+          );
+        }
       }
     }
   }

@@ -1,6 +1,6 @@
 // @flow
 import Project from '../Project';
-import type { JSONValue } from '../types';
+import type { FilterOpts, JSONValue, SpawnOpts } from '../types';
 
 type WorkspaceInfo = {
   dir: string,
@@ -10,7 +10,9 @@ type WorkspaceInfo = {
 type Task = (workspace: WorkspaceInfo) => Promise<mixed>;
 
 type Options = {
-  cwd?: string
+  cwd?: string,
+  spawnOpts?: SpawnOpts,
+  filterOpts?: FilterOpts
 };
 
 export default async function runWorkspaceTasks(
@@ -18,13 +20,16 @@ export default async function runWorkspaceTasks(
   opts: Options = {}
 ): Promise<void> {
   let cwd = opts.cwd || process.cwd();
+  let spawnOpts = opts.spawnOpts || {};
+  let filterOpts = opts.filterOpts || {};
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
+  let packages = await project.getPackages();
+  let filteredPackages = project.filterPackages(packages, filterOpts);
 
-  await project.runWorkspaceTasks(workspaces, workspace => {
+  await project.runPackageTasks(filteredPackages, spawnOpts, pkg => {
     return task({
-      dir: workspace.pkg.dir,
-      config: workspace.pkg.config.json
+      dir: pkg.dir,
+      config: pkg.config.json
     });
   });
 }

@@ -7,12 +7,31 @@ import pLimit from 'p-limit';
 
 const npmRequestLimit = pLimit(40);
 
+function getCorrectRegistry() {
+  let registry =
+    process.env.npm_config_registry === 'https://registry.yarnpkg.com'
+      ? undefined
+      : process.env.npm_config_registry;
+  return registry;
+}
+
 export function info(pkgName: string) {
   return npmRequestLimit(async () => {
     logger.info(messages.npmInfo(pkgName));
 
-    const result = await processes.spawn('npm', ['info', pkgName, '--json'], {
-      silent: true
+    // Due to a couple of issues with yarnpkg, we also want to override the npm registry when doing
+    // npm info.
+    // Issues: We sometimes get back cached responses, i.e old data about packages which causes
+    // `publish` to behave incorrectly. It can also cause issues when publishing private packages
+    // as they will always give a 404, which will tell `publish` to always try to publish.
+    // See: https://github.com/yarnpkg/yarn/issues/2935#issuecomment-355292633
+    const envOverride = {
+      npm_config_registry: getCorrectRegistry()
+    };
+
+    let result = await processes.spawn('npm', ['info', pkgName, '--json'], {
+      silent: true,
+      env: Object.assign({}, process.env, envOverride)
     });
 
     return JSON.parse(result.stdout);
@@ -21,10 +40,10 @@ export function info(pkgName: string) {
 
 export async function infoAllow404(pkgName: string) {
   try {
-    const pkgInfo = await info(pkgName);
+    let pkgInfo = await info(pkgName);
     return { published: true, pkgInfo };
   } catch (error) {
-    const output = JSON.parse(error.stdout);
+    let output = JSON.parse(error.stdout);
     if (output.error && output.error.code === 'E404') {
       logger.warn(messages.npmInfo404(pkgName));
       return { published: false, pkgInfo: {} };
@@ -39,11 +58,16 @@ export function publish(
 ) {
   return npmRequestLimit(async () => {
     logger.info(messages.npmPublish(pkgName));
-    const publishFlags = opts.access ? ['--access', opts.access] : [];
-
+    let publishFlags = opts.access ? ['--access', opts.access] : [];
     try {
+      // Due to a super annoying issue in yarn, we have to manually override this env variable
+      // See: https://github.com/yarnpkg/yarn/issues/2935#issuecomment-355292633
+      const envOverride = {
+        npm_config_registry: getCorrectRegistry()
+      };
       await processes.spawn('npm', ['publish', ...publishFlags], {
-        cwd: opts.cwd
+        cwd: opts.cwd,
+        env: Object.assign({}, process.env, envOverride)
       });
       return { published: true };
     } catch (error) {

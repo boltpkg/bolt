@@ -1,5 +1,5 @@
 // @flow
-import type { FilterOpts } from '../../types';
+import type { FilterOpts, SpawnOpts } from '../../types';
 import Project from '../../Project';
 import * as options from '../../utils/options';
 import execCommand from '../../utils/execCommand';
@@ -8,6 +8,7 @@ export type WorkspacesExecOptions = {|
   cwd?: string,
   command: string,
   commandArgs: options.Args,
+  spawnOpts: SpawnOpts,
   filterOpts: FilterOpts
 |};
 
@@ -20,6 +21,7 @@ export function toWorkspacesExecOptions(
     cwd: options.string(flags.cwd, 'cwd'),
     command,
     commandArgs,
+    spawnOpts: options.toSpawnOpts(flags),
     filterOpts: options.toFilterOpts(flags)
   };
 }
@@ -27,13 +29,12 @@ export function toWorkspacesExecOptions(
 export async function workspacesExec(opts: WorkspacesExecOptions) {
   let cwd = opts.cwd || process.cwd();
   let project = await Project.init(cwd);
-  let workspaces = await project.getWorkspaces();
-  let filteredWorkspaces = project.filterWorkspaces(
-    workspaces,
-    opts.filterOpts
-  );
+  let packages = await project.getPackages();
+  let filteredPackages = project.filterPackages(packages, opts.filterOpts);
 
-  await project.runWorkspaceTasks(filteredWorkspaces, async workspace => {
-    await execCommand(project, workspace.pkg, opts.command, opts.commandArgs);
-  });
+  await project.runPackageTasks(
+    filteredPackages,
+    opts.spawnOpts,
+    async pkg => await execCommand(project, pkg, opts.command, opts.commandArgs)
+  );
 }

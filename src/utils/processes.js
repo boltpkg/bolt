@@ -1,20 +1,23 @@
 // @flow
 import crossSpawn from 'cross-spawn';
 import * as logger from './logger';
+import * as cleanUp from './cleanUp';
 import type Package from '../Package';
 import type Project from '../Project';
 import pLimit from 'p-limit';
 import os from 'os';
+import path from 'path';
+import { globalOptions, type GlobalOptions } from '../GlobalOptions';
 
 const limit = pLimit(os.cpus().length);
 const processes = new Set();
 
 export function handleSignals() {
-  process.on('SIGTERM', () => {
+  cleanUp.handleAllSignals(() => {
     for (let child of processes) {
       child.kill('SIGTERM');
     }
-    process.exit(1);
+    processes.clear();
   });
 }
 
@@ -35,10 +38,12 @@ export class ChildProcessError extends Error {
 }
 
 export type SpawnOptions = {
+  ...GlobalOptions,
   cwd?: string,
   pkg?: Package,
   silent?: boolean,
   tty?: boolean,
+  useBasename?: boolean,
   env?: { [key: string]: ?string }
 };
 
@@ -53,8 +58,13 @@ export function spawn(
         let stdoutBuf = Buffer.from('');
         let stderrBuf = Buffer.from('');
         let isTTY = process.stdout.isTTY && opts.tty;
+        let cmdDisplayName = opts.useBasename ? path.basename(cmd) : cmd;
 
-        let cmdStr = cmd + ' ' + args.join(' ');
+        let displayCmd =
+          opts.disableCmdPrefix != null
+            ? opts.disableCmdPrefix
+            : globalOptions.get('disableCmdPrefix');
+        let cmdStr = displayCmd ? '' : cmdDisplayName + ' ' + args.join(' ');
 
         let spawnOpts: child_process$spawnOpts = {
           cwd: opts.cwd,

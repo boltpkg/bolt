@@ -7,7 +7,7 @@ jest.mock('../../../utils/yarn');
 
 const dummyPath = '/dummyPattern/dummyPath';
 test('bolt config delete', async () => {
-  const config = await configDelete(
+  let config = await configDelete(
     toConfigDeleteOptions(['user-agent'], { cwd: dummyPath })
   );
   expect(yarn.cliCommand).toHaveBeenCalledWith(dummyPath, 'config', [

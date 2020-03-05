@@ -8,18 +8,71 @@ import Project from '../Project';
 import * as processes from './processes';
 import * as fs from '../utils/fs';
 import * as logger from '../utils/fs';
-import { DEPENDENCY_TYPE_FLAGS_MAP } from '../constants';
+import { DEPENDENCY_TYPE_FLAGS_MAP, BOLT_VERSION } from '../constants';
 
-async function getLocalBinPath(): Promise<string> {
-  return await projectBinPath(__dirname);
+function getLocalBinPath(): Promise<string> {
+  return projectBinPath(__dirname);
 }
 
 function depTypeToFlag(depType) {
-  const flag = Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).find(
+  let flag = Object.keys(DEPENDENCY_TYPE_FLAGS_MAP).find(
     key => DEPENDENCY_TYPE_FLAGS_MAP[key] === depType
   );
 
   return flag ? `--${flag}` : flag;
+}
+
+async function getEnvWithUserAgents() {
+  let yarnUserAgent = await userAgent();
+  let boltUserAgent = `bolt/${BOLT_VERSION} ${yarnUserAgent}`;
+
+  return {
+    ...process.env,
+    npm_config_user_agent: boltUserAgent,
+    bolt_config_user_agent: boltUserAgent
+  };
+}
+
+/* Add the relevant *_config_user_agent env vars to all spawned yarn processes */
+async function spawnWithUserAgent(
+  cmd: string,
+  args: string[],
+  opts?: processes.SpawnOptions
+) {
+  return processes.spawn(cmd, args, {
+    ...opts,
+    env: {
+      ...(await getEnvWithUserAgents()),
+      ...(opts && opts.env)
+    }
+  });
+}
+
+export type LockFileMode = 'default' | 'pure' | 'frozen';
+
+export async function install(
+  cwd: string,
+  lockfileMode: LockFileMode = 'default'
+) {
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let installFlags = [];
+
+  switch (lockfileMode) {
+    case 'frozen':
+      installFlags.push('--frozen-lockfile');
+      break;
+    case 'pure':
+      installFlags.push('--pure-lockfile');
+      break;
+    default:
+      break;
+  }
+
+  await spawnWithUserAgent(localYarn, ['install', ...installFlags], {
+    cwd,
+    tty: true,
+    useBasename: true
+  });
 }
 
 export async function add(
@@ -27,8 +80,8 @@ export async function add(
   dependencies: Array<Dependency>,
   type?: configDependencyType
 ) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  const spawnArgs = ['add'];
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let spawnArgs = ['add'];
   if (!dependencies.length) return;
 
   dependencies.forEach(dep => {
@@ -40,14 +93,15 @@ export async function add(
   });
 
   if (type) {
-    const flag = depTypeToFlag(type);
+    let flag = depTypeToFlag(type);
     if (flag) spawnArgs.push(flag);
   }
 
-  await processes.spawn(localYarn, spawnArgs, {
+  await spawnWithUserAgent(localYarn, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
-    tty: true
+    tty: true,
+    useBasename: true
   });
 }
 
@@ -56,23 +110,24 @@ export async function upgrade(
   dependencies: Array<Dependency> = [],
   flags: Array<string> = []
 ) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  const spawnArgs = ['upgrade'];
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let spawnArgs = ['upgrade'];
 
   if (dependencies.length) {
     dependencies.forEach(dep => {
       if (dep.version) {
-        spawnArgs.push(`"${dep.name}@${dep.version}"`);
+        spawnArgs.push(`${dep.name}@${dep.version}`);
       } else {
         spawnArgs.push(dep.name);
       }
     });
   }
 
-  await processes.spawn(localYarn, [...spawnArgs, ...flags], {
+  await spawnWithUserAgent(localYarn, [...spawnArgs, ...flags], {
     cwd: pkg.dir,
     pkg: pkg,
-    tty: true
+    tty: true,
+    useBasename: true
   });
 }
 
@@ -81,19 +136,20 @@ export async function run(
   script: string,
   args: Array<string> = []
 ) {
-  const project = await Project.init(pkg.dir);
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let project = await Project.init(pkg.dir);
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
   // We use a relative path because the absolute paths are very long and noisy in logs
-  const localYarnRelative = path.relative(pkg.dir, localYarn);
+  let localYarnRelative = path.relative(pkg.dir, localYarn);
   let spawnArgs = ['run', '-s', script];
 
   if (args.length) {
-    spawnArgs = spawnArgs.concat('--', args);
+    spawnArgs = spawnArgs.concat(args);
   }
-  await processes.spawn(localYarnRelative, spawnArgs, {
+  await spawnWithUserAgent(localYarnRelative, spawnArgs, {
     cwd: pkg.dir,
     pkg: pkg,
-    tty: true
+    tty: true,
+    useBasename: true
   });
 }
 
@@ -102,7 +158,7 @@ export async function runIfExists(
   script: string,
   args: Array<string> = []
 ) {
-  const scriptExists = await getScript(pkg, script);
+  let scriptExists = await getScript(pkg, script);
   if (scriptExists) {
     await run(pkg, script, args);
   }
@@ -128,8 +184,8 @@ export async function getScript(pkg: Package, script: string) {
 }
 
 export async function remove(dependencies: Array<string>, cwd: string) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  await processes.spawn(localYarn, ['remove', ...dependencies], {
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
+  await spawnWithUserAgent(localYarn, ['remove', ...dependencies], {
     cwd,
     tty: true
   });
@@ -140,18 +196,54 @@ export async function cliCommand(
   command: string = '',
   spawnArgs: Array<string> = []
 ) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
 
-  return await processes.spawn(localYarn, [command, ...spawnArgs], {
+  return await spawnWithUserAgent(localYarn, [command, ...spawnArgs], {
+    cwd,
+    tty: true,
+    useBasename: true
+  });
+}
+
+export async function info(cwd: string, spawnArgs: Array<string> = []) {
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
+  await spawnWithUserAgent(localYarn, ['info', ...spawnArgs], {
     cwd,
     tty: true
   });
 }
 
-export async function info(cwd: string, spawnArgs: Array<string> = []) {
-  const localYarn = path.join(await getLocalBinPath(), 'yarn');
-  await processes.spawn(localYarn, ['info', ...spawnArgs], {
-    cwd,
+export async function userAgent() {
+  let localYarn = path.join(await getLocalBinPath(), 'yarn');
+
+  let { stdout: yarnUserAgent } = await processes.spawn(
+    localYarn,
+    ['config', 'get', 'user-agent'],
+    {
+      tty: false,
+      silent: true
+    }
+  );
+
+  return yarnUserAgent.replace(/\n/g, '');
+}
+
+export async function globalCli(
+  command: string = '',
+  dependencies: Array<Dependency>
+) {
+  let spawnArgs = ['global', command];
+  if (!dependencies.length) return;
+
+  dependencies.forEach(dep => {
+    if (dep.version) {
+      spawnArgs.push(`${dep.name}@${dep.version}`);
+    } else {
+      spawnArgs.push(dep.name);
+    }
+  });
+
+  await spawnWithUserAgent('yarn', spawnArgs, {
     tty: true
   });
 }
