@@ -197,4 +197,28 @@ describe('install', () => {
 
     expect(stat.isFile()).toBe(true);
   });
+
+  test('workspaces with bins installing twice still works', async () => {
+    let cwd = f.copy('workspace-with-bin');
+    let project = await Project.init(cwd);
+
+    await install(toInstallOptions([], { cwd }));
+
+    let binPath = path.join(
+      cwd,
+      'packages',
+      'foo',
+      'node_modules',
+      '.bin',
+      'bar'
+    );
+    let stat = await fs.stat(binPath);
+
+    expect(stat.isFile()).toBe(true);
+    
+    // Test to make sure existing symlink problem doesn't break. It used to die if you ran bolt twice
+    await install(toInstallOptions([], { cwd }));
+
+    expect(stat.isFile()).toBe(true);
+  });
 });
