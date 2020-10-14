@@ -173,8 +173,8 @@ export default async function symlinkPackageDependencies(
       let binName = dependency.split('/').pop();
       let src = path.join(depWorkspace.pkg.dir, depBinFiles);
       let dest = path.join(pkg.nodeModulesBin, binName);
-
-      symlinksToCreate.push({ src, dest, type: 'exec' });
+      let exists = await fs.symlinkExists(dest);
+      !exists && symlinksToCreate.push({ src, dest, type: 'exec' });
       continue;
     }
 
@@ -184,7 +184,8 @@ export default async function symlinkPackageDependencies(
 
       // Just in case the symlink is already added (it might have already existed in the projects bin/)
       if (!symlinksToCreate.find(symlink => symlink.dest === dest)) {
-        symlinksToCreate.push({ src, dest, type: 'exec' });
+        let exists = await fs.symlinkExists(dest);
+        !exists && symlinksToCreate.push({ src, dest, type: 'exec' });
       }
     }
   }
