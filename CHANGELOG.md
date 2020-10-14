@@ -1,5 +1,10 @@
 # Bolt Changelog
 
+# 0.24.6
+
+* Bumps dependencies on `meow` and `inquirer` (#278 thanks @patrickcylai)
+* Fix issue where `bolt` twice would break during bin symlink step (#273 thanks @jcreamer898)
+
 # 0.24.5
 
 * Add --no-prefix flag to disable prefixing subcommand output with the command string
