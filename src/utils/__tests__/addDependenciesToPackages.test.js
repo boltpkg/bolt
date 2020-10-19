@@ -16,13 +16,23 @@ jest.mock('../logger');
 
 const unsafeYarn: any & typeof yarn = yarn;
 
-// Mock yarn.add to make it update the packages config when called
-function fakeYarnAdd(pkg, dependencies, type = 'dependencies') {
-  pkg.config.json[type] = pkg.config.json[type] || {};
+function getVersion(version) {
+  if (version === 'latest') {
+    return '^2.0.0';
+  }
+  return version || '^1.0.0';
+}
 
-  dependencies.forEach(dep => {
-    pkg.config.json[type][dep.name] = dep.version || '^1.0.0';
-  });
+// Mock yarn.add to make it update the packages config when called
+async function fakeYarnAdd(pkg, dependencies, type = 'dependencies') {
+  for (let dep of dependencies) {
+    const dependencyTypes = pkg.getDependencyTypes(dep.name);
+    await pkg.setDependencyVersionRange(
+      dep.name,
+      dependencyTypes.length > 0 ? dependencyTypes[0] : 'dependencies',
+      getVersion(dep.version)
+    );
+  }
 }
 
 function assertSingleYarnAddCall(expectedPkg, expectedDeps) {
@@ -165,7 +175,7 @@ describe('utils/addDependenciesToPackages', () => {
 
     await addDependenciesToPackage(project, project.pkg, [
       { name: 'global-dep', version: '^1.1.0' },
-      { name: 'foo-dep', version: '^1.2.0' }
+      { name: 'foo-dep', version: 'latest' }
     ]);
 
     // Refetch packages as their config will be stale
@@ -183,8 +193,9 @@ describe('utils/addDependenciesToPackages', () => {
     expect(fooPkg.getDependencyVersionRange('global-dep')).toEqual('^1.1.0');
     expect(barPkg.getDependencyVersionRange('global-dep')).toEqual('^1.1.0');
 
-    expect(project.pkg.getDependencyVersionRange('foo-dep')).toEqual('^1.2.0');
-    expect(fooPkg.getDependencyVersionRange('foo-dep')).toEqual('^1.2.0');
+    // The 'latest' dist tag of foo-dep should resolve to its actual version in root & workspaces
+    expect(project.pkg.getDependencyVersionRange('foo-dep')).toEqual('^2.0.0');
+    expect(fooPkg.getDependencyVersionRange('foo-dep')).toEqual('^2.0.0');
     expect(barPkg.getDependencyVersionRange('foo-dep')).toEqual(null);
   });
 

@@ -47,7 +47,7 @@ export default async function addDependenciesToPackage(
 
     // Update all workspace versions
     const depsToUpgrade = externalDeps.reduce((prev, dep) => {
-      prev[dep.name] = dep.version;
+      prev[dep.name] = project.pkg.getDependencyVersionRange(dep.name);
       return prev;
     }, {});
     await updateWorkspaceDependencies(depsToUpgrade, {
