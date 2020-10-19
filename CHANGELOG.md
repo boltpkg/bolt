@@ -1,5 +1,9 @@
 # Bolt Changelog
 
+# 0.24.7
+
+* Fix workspace versions not resolving when installed via dist tag (#283 thanks @Blasz)
+
 # 0.24.6
 
 * Bumps dependencies on `meow` and `inquirer` (#278 thanks @patrickcylai)
