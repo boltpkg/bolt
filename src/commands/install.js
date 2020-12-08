@@ -61,10 +61,15 @@ export async function install(opts: InstallOptions) {
     prefix: false
   });
 
-  for (let pkg of packages) {
-    let dependencies = Array.from(pkg.getAllDependencies().keys());
-    await symlinkPackageDependencies(project, pkg, dependencies);
+  let { graph, valid } = await project.getDependencyGraph(packages);
+  if (!valid) {
+    throw new BoltError('Cannot symlink invalid set of dependencies.');
   }
+
+  await Promise.all(packages.map(async (pkg) => {
+    let dependencies = Array.from(pkg.getAllDependencies().keys());
+    await symlinkPackageDependencies(project, pkg, dependencies, packages, graph);
+  }));
 
   logger.info(messages.linkingWorkspaceBinaries(), {
     emoji: '🚀',
