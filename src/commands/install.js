@@ -68,7 +68,7 @@ export async function install(opts: InstallOptions) {
 
   await Promise.all(packages.map(async (pkg) => {
     let dependencies = Array.from(pkg.getAllDependencies().keys());
-    await symlinkPackageDependencies(project, pkg, dependencies, packages, graph);
+    await symlinkPackageDependencies(project, pkg, dependencies, graph);
   }));
 
   logger.info(messages.linkingWorkspaceBinaries(), {

@@ -15,23 +15,8 @@ export default async function symlinkPackageDependencies(
   project: Project,
   pkg: Package,
   dependencies: Array<string>,
-  pkgs: Array<Packages>,
   dependencyGraph,
 ) {
-
-  let packages = pkgs || await project.getPackages();
-  
-  let valid;
-  let dependencyGraphValid = true;
-
-  if (!dependencyGraph) {
-    let {
-      graph,
-      valid,
-    } = await project.getDependencyGraph(packages);
-    dependencyGraph = graph;
-    dependencyGraphValid = valid;
-  }
   
   let pkgName = pkg.config.getName();
   // get all the dependencies that are internal workspaces in this project
@@ -40,7 +25,7 @@ export default async function symlinkPackageDependencies(
   let directoriesToCreate = [];
   let symlinksToCreate = [];
 
-  valid = true;
+  let valid = true;
 
   /*********************************************************************
    * Calculate all the external dependencies that need to be symlinked *
@@ -109,7 +94,7 @@ export default async function symlinkPackageDependencies(
     symlinksToCreate.push({ src, dest, type: 'junction' });
   }
 
-  if (!dependencyGraphValid || !valid) {
+  if (!valid) {
     throw new BoltError('Cannot symlink invalid set of dependencies.');
   }
 
@@ -217,7 +202,7 @@ export default async function symlinkPackageDependencies(
   await Promise.all(
     symlinksToCreate.map(async ({ src, dest, type }) => {
       const symlinkExists = await fs.symlinkExists(dest);
-      
+
       if (!symlinkExists) {
         await fs.symlink(src, dest, type);
       }

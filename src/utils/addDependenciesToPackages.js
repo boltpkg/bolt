@@ -97,5 +97,9 @@ export default async function addDependenciesToPackage(
     await pkg.setDependencyVersionRange(depName, type, String(depVersion));
   }
 
-  await symlinkPackageDependencies(project, pkg, dependencyNames);
+  // Now that all the new stuff is there, do this one more time to get the updates
+  let packagesFinal = await project.getPackages();
+  let { graph: depGraphFinal } = await project.getDependencyGraph(packagesFinal);
+
+  await symlinkPackageDependencies(project, pkg, dependencyNames, depGraphFinal);
 }
