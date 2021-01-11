@@ -14,15 +14,10 @@ import * as yarn from './yarn';
 export default async function symlinkPackageDependencies(
   project: Project,
   pkg: Package,
-  dependencies: Array<string>
+  dependencies: Array<string>,
+  dependencyGraph,
 ) {
-  let projectDeps = project.pkg.getAllDependencies();
-  let pkgDependencies = project.pkg.getAllDependencies();
-  let packages = await project.getPackages();
-  let {
-    graph: dependencyGraph,
-    valid: dependencyGraphValid
-  } = await project.getDependencyGraph(packages);
+  
   let pkgName = pkg.config.getName();
   // get all the dependencies that are internal workspaces in this project
   let internalDeps = (dependencyGraph.get(pkgName) || {}).dependencies || [];
@@ -38,6 +33,7 @@ export default async function symlinkPackageDependencies(
 
   directoriesToCreate.push(pkg.nodeModules, pkg.nodeModulesBin);
 
+  
   for (let depName of dependencies) {
     let versionInProject = project.pkg.getDependencyVersionRange(depName);
     let versionInPkg = pkg.getDependencyVersionRange(depName);
@@ -84,6 +80,7 @@ export default async function symlinkPackageDependencies(
 
     symlinksToCreate.push({ src, dest, type: 'junction' });
   }
+  
 
   /*********************************************************************
    * Calculate all the internal dependencies that need to be symlinked *
@@ -97,7 +94,7 @@ export default async function symlinkPackageDependencies(
     symlinksToCreate.push({ src, dest, type: 'junction' });
   }
 
-  if (!dependencyGraphValid || !valid) {
+  if (!valid) {
     throw new BoltError('Cannot symlink invalid set of dependencies.');
   }
 
@@ -204,7 +201,11 @@ export default async function symlinkPackageDependencies(
 
   await Promise.all(
     symlinksToCreate.map(async ({ src, dest, type }) => {
-      await fs.symlink(src, dest, type);
+      const symlinkExists = await fs.symlinkExists(dest);
+
+      if (!symlinkExists) {
+        await fs.symlink(src, dest, type);
+      }
     })
   );
 

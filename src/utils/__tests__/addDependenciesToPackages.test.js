@@ -132,8 +132,10 @@ describe('utils/addDependenciesToPackages', () => {
     await addDependenciesToPackage(project, pkg, [
       { name: 'project-only-dep' }
     ]);
+    let packagesFinal = await project.getPackages();
+    let { graph } = await project.getDependencyGraph(packagesFinal);
 
-    expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['project-only-dep']);
+    expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['project-only-dep'], graph);
   });
 
   test('should update packages dependencies in package config', async () => {
@@ -147,8 +149,10 @@ describe('utils/addDependenciesToPackages', () => {
     await addDependenciesToPackage(project, pkg, [
       { name: 'project-only-dep' }
     ]);
+    let packagesFinal = await project.getPackages();
+    let { graph } = await project.getDependencyGraph(packagesFinal);
 
-    expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['project-only-dep']);
+    expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['project-only-dep'], graph);
     expect(pkg.getDependencyVersionRange('project-only-dep')).toEqual('^1.0.0');
   });
 
@@ -226,8 +230,10 @@ describe('utils/addDependenciesToPackages', () => {
 
       expect(pkg.getDependencyVersionRange('baz')).toEqual(null);
       await addDependenciesToPackage(project, pkg, [{ name: 'baz' }]);
+      let packagesFinal = await project.getPackages();
+      let { graph } = await project.getDependencyGraph(packagesFinal);
 
-      expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['baz']);
+      expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['baz'], graph);
       expect(pkg.getDependencyVersionRange('baz')).toEqual('^1.0.1');
     });
 
@@ -237,14 +243,17 @@ describe('utils/addDependenciesToPackages', () => {
       let project = await Project.init(cwd);
       let packages = await project.getPackages();
       let pkg = project.getPackageByName(packages, 'bar');
+
       if (!pkg) throw new Error('missing bar');
 
       expect(pkg.getDependencyVersionRange('baz')).toEqual(null);
       await addDependenciesToPackage(project, pkg, [
         { name: 'baz', version: '^1.0.0' }
       ]);
+      let packagesFinal = await project.getPackages();
+      let { graph } = await project.getDependencyGraph(packagesFinal);
 
-      expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['baz']);
+      expect(symlinkSpy).toHaveBeenCalledWith(project, pkg, ['baz'], graph);
       expect(pkg.getDependencyVersionRange('baz')).toEqual('^1.0.0');
     });
 
