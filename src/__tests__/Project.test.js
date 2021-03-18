@@ -556,7 +556,7 @@ describe('Project', () => {
     done();
   });
 
-  test('runPackageTasks() reports decent error message when failing with no bail', async () => {
+  test('runPackageTasks() reports informative error message when failing with no bail', async () => {
     let project = await Project.init(f.find('independent-workspaces'));
     let packages = await project.getPackages();
     let ops = [];
@@ -571,7 +571,7 @@ describe('Project', () => {
         ops.push('end:' + pkg.getName());
       })
     ).rejects.toMatchObject({
-      message: expect.stringMatching(/1 tasks failed.\nBar is bad/)
+      message: expect.stringMatching(/1 tasks failed for bar.\nBar is bad/)
     });
   });
 
