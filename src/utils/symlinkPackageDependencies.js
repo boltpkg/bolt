@@ -15,9 +15,8 @@ export default async function symlinkPackageDependencies(
   project: Project,
   pkg: Package,
   dependencies: Array<string>,
-  dependencyGraph,
+  dependencyGraph: Map<string, { pkg: Package, dependencies: Array<string> }>
 ) {
-  
   let pkgName = pkg.config.getName();
   // get all the dependencies that are internal workspaces in this project
   let internalDeps = (dependencyGraph.get(pkgName) || {}).dependencies || [];
@@ -33,7 +32,6 @@ export default async function symlinkPackageDependencies(
 
   directoriesToCreate.push(pkg.nodeModules, pkg.nodeModulesBin);
 
-  
   for (let depName of dependencies) {
     let versionInProject = project.pkg.getDependencyVersionRange(depName);
     let versionInPkg = pkg.getDependencyVersionRange(depName);
@@ -80,7 +78,6 @@ export default async function symlinkPackageDependencies(
 
     symlinksToCreate.push({ src, dest, type: 'junction' });
   }
-  
 
   /*********************************************************************
    * Calculate all the internal dependencies that need to be symlinked *

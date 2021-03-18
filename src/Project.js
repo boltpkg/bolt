@@ -23,7 +23,7 @@ import chunkd from 'chunkd';
 
 type GenericTask<T> = (pkg: Package) => Promise<T>;
 
-type TaskResult = PromiseResult<mixed> | void;
+type TaskResult = PromiseResult<Package, mixed> | void;
 
 type InternalTask = GenericTask<TaskResult>;
 
@@ -198,15 +198,22 @@ export default class Project {
         spawnOpts.excludeFromGraph
       );
     }
-    const taskFailures: Array<PromiseFailure> = (results.filter(
+    const taskFailures: Array<PromiseFailure<Package>> = (results.filter(
       r => r && r.status === 'error'
     ): any);
     if (taskFailures.length > 0) {
       const failuresWithMsg = taskFailures
         .map(r => r.error && r.error.message)
         .filter(Boolean);
+      const failedPackages: string[] = taskFailures.map(
+        r => (r: any).args[0].config.json.name
+      );
       throw new BoltError(
-        messages.taskFailed(taskFailures.length, failuresWithMsg)
+        messages.taskFailed(
+          taskFailures.length,
+          failuresWithMsg,
+          failedPackages
+        )
       );
     }
   }

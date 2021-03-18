@@ -414,7 +414,10 @@ export function taskRunningAcrossCINodes(
 
 export function taskFailed(
   numFailures: number,
-  failuresWithMsg: string[]
+  failuresWithMsg: string[],
+  packageNames: string[]
 ): Message {
-  return `${numFailures} tasks failed.\n${failuresWithMsg.join('\n')}`;
+  return `${numFailures} tasks failed for ${String(
+    packageNames
+  )}.\n${failuresWithMsg.join('\n')}`;
 }
