@@ -1,5 +1,11 @@
 # Bolt Changelog
 
+# 0.24.9
+
+* Include package names in error output on no bail task failures (#291 thanks @Blasz)
+# 0.24.8
+
+* updates for faster symlinking (#286 thanks @jonathancreamer-eb)
 # 0.24.7
 
 * Fix workspace versions not resolving when installed via dist tag (#283 thanks @Blasz)
