@@ -417,7 +417,7 @@ export function taskFailed(
   failuresWithMsg: string[],
   packageNames: string[]
 ): Message {
-  return `${numFailures} tasks failed for ${packageNames}.\n${failuresWithMsg.join(
-    '\n'
-  )}`;
+  return `${numFailures} tasks failed for ${String(
+    packageNames
+  )}.\n${failuresWithMsg.join('\n')}`;
 }

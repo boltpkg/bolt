@@ -3,13 +3,13 @@
 export type PromiseSuccess<A, T> = {
   result: T,
   status: 'success',
-  args: A
+  args: Array<A>
 };
 
 export type PromiseFailure<A> = {
   error: any,
   status: 'error',
-  args: A
+  args: Array<A>
 };
 
 export type PromiseResult<A, T> = PromiseSuccess<A, T> | PromiseFailure<A>;
