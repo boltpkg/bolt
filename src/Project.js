@@ -106,6 +106,7 @@ export default class Project {
 
     for (let pkg of queue) {
       let name = pkg.config.getName();
+      let legacyName = `${name}-legacy`;
       let dependencies = [];
       let allDependencies = pkg.getAllDependencies(excludedDependencyTypes);
 
@@ -116,6 +117,13 @@ export default class Project {
         let actual = depVersion;
         let expected = match.config.getVersion();
 
+        if (
+          match.config.getName() === '@atlaskit/editor-core' &&
+          name === 'react-intl'
+        ) {
+          debugger;
+          console.log(expected);
+        }
         // Workspace dependencies only need to semver satisfy, not '==='
         if (!semver.satisfies(expected, depVersion)) {
           valid = false;
