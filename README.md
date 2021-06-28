@@ -135,6 +135,7 @@ yarn global add bolt
 | └ `bolt w [name] run [script]`          | Run a script in a single workspace                                        |✅|
 | └ `bolt w [name] add [dependency]`      | Add a dependency to a single workspace                                    |✅|
 | └ `bolt w [name] upgrade [dependency]`  | Upgrade a dependency in a single workspace                                |✅|
+| └ `bolt w [name] remove [dependency]`   | Remove a dependency from a single workspace                               |✅|
 | `bolt project/p`                        | **Run the following commands on your project package:**                   ||
 | └ `bolt p run [script]`                 | Run a script on the project package                                       |✅|
 | └ `bolt p add [dependency]`             | Add a dependency to the project package                                   |✅|
