@@ -88,7 +88,7 @@ export default async function symlinkPackageDependencies(
     let src = depWorkspace.pkg.dir;
     let dest = path.join(pkg.nodeModules, dependency);
 
-    symlinksToCreate.push({ src, dest, type: 'junction' });
+    symlinksToCreate.push({ src, dest, type: 'junction', recreate: true });
   }
 
   if (!valid) {
@@ -197,10 +197,10 @@ export default async function symlinkPackageDependencies(
   );
 
   await Promise.all(
-    symlinksToCreate.map(async ({ src, dest, type }) => {
+    symlinksToCreate.map(async ({ src, dest, type, recreate }) => {
       const symlinkExists = await fs.symlinkExists(dest);
 
-      if (!symlinkExists) {
+      if (!symlinkExists || recreate) {
         await fs.symlink(src, dest, type);
       }
     })
