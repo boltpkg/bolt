@@ -59,7 +59,7 @@ But here's where it gets really cool: When you specify a dependency from one
 workspace to another. It will get linked to the actual source. This way, when
 you go to test your code. All your changes get tested together.
 
-> **Note:** This idea is not new, other tools like [Lerna](https://lernajs.io)
+> **Note:** This idea is not new, other tools like [Lerna](https://lerna.js.org)
 > have existed for awhile and are used by many projects. Bolt is a fresh take
 > on the idea.
 
