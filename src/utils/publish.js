@@ -105,7 +105,8 @@ export async function publish(
       publishedPackages.push({
         name,
         newVersion: version,
-        published: publishConfirmation && publishConfirmation.published
+        published: publishConfirmation && publishConfirmation.published,
+        requiresOTP: publishConfirmation && publishConfirmation.requiresOTP
       });
     });
 

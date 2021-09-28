@@ -72,7 +72,11 @@ export function publish(
       return { published: true };
     } catch (error) {
       // Publish failed
-      return { published: false };
+      const requiresOTP =
+        error.stderr.includes('one-time pass') ||
+        error.message.includes('user TTY');
+
+      return { published: false, requiresOTP };
     }
   });
 }
