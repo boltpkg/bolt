@@ -1,5 +1,8 @@
 # Bolt Changelog
 
+# 0.24.10
+
+* Always symlink internal dependencies even if they already exist (#307 thanks @Blasz)
 # 0.24.9
 
 * Include package names in error output on no bail task failures (#291 thanks @Blasz)
