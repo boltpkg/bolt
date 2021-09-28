@@ -62,6 +62,7 @@ export function depMustMatchProject(
   expected: string,
   actual: string
 ): Message {
+  debugger;
   return `Package ${normalPkg(pkgName)} dependency ${normalPkg(
     depName
   )} must match version in project dependencies. ${goodVer(

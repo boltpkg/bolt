@@ -33,7 +33,11 @@ export default async function symlinkPackageDependencies(
   directoriesToCreate.push(pkg.nodeModules, pkg.nodeModulesBin);
 
   for (let depName of dependencies) {
+    const legacyDepname = `${depName}-legacy`;
     let versionInProject = project.pkg.getDependencyVersionRange(depName);
+    let legacyDepInProject = (
+      project.pkg.getDependencyVersionRange(legacyDepname) || ''
+    ).split('@')[1];
     let versionInPkg = pkg.getDependencyVersionRange(depName);
 
     // If dependency is internal we can ignore it (we symlink below)
@@ -60,7 +64,10 @@ export default async function symlinkPackageDependencies(
       continue;
     }
 
-    if (versionInProject !== versionInPkg) {
+    if (
+      versionInProject !== versionInPkg &&
+      legacyDepInProject !== versionInPkg
+    ) {
       valid = false;
       logger.error(
         messages.depMustMatchProject(
@@ -72,8 +79,12 @@ export default async function symlinkPackageDependencies(
       );
       continue;
     }
-
     let src = path.join(project.pkg.nodeModules, depName);
+
+    if (legacyDepInProject === versionInPkg) {
+      src = path.join(project.pkg.nodeModules, legacyDepname);
+    }
+
     let dest = path.join(pkg.nodeModules, depName);
 
     symlinksToCreate.push({ src, dest, type: 'junction' });
