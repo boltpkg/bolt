@@ -1,6 +1,6 @@
 {
   "name": "bolt",
-  "version": "0.24.9",
+  "version": "0.24.10",
   "main": "index.js",
   "author": "James Kyle <me@thejameskyle.com>",
   "license": "MIT",
